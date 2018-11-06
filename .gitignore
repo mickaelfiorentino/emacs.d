@@ -1,0 +1,5 @@
+*.desktop
+*.lock
+/elpa 
+recentf
+config.el

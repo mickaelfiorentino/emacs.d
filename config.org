@@ -1,0 +1,187 @@
+#+TITLE: Emacs Configuration
+#+AUTHOR: Mickael Fiorentino
+
+* How to use
+
+
+* Defaults
+#+BEGIN_SRC emacs-lisp
+  (setq-default
+   delete-by-moving-to-trash t                      ; Delete files to trash
+   display-time-format "%H:%M"                      ; Format the time string
+   fill-column 100                                  ; Set width for automatic line breaks
+   help-window-select t                             ; Focus new help windows when opened
+   indent-tabs-mode nil                             ; Stop using tabs to indent
+   tab-width 4                                      ; Set width for tabs
+   tab-always-indent 'complete                      ; Tabs perform completion
+   inhibit-startup-screen t                         ; Disable start-up screen
+   initial-scratch-message ""                       ; Empty the initial *scratch* buffer
+   make-backup-files nil                            ; No backup files
+   auto-save-default nil                            ; No auto-save
+   mouse-yank-at-point t                            ; Yank at point rather than pointer
+   scroll-conservatively most-positive-fixnum       ; Always scroll by one line
+   scroll-margin 10                                 ; Add a margin when scrolling vertically
+   select-enable-clipboard t                        ; Merge system's and Emacs' clipboard
+   show-trailing-whitespace nil                     ; Display trailing whitespaces
+   uniquify-buffer-name-style 'forward              ; Uniquify buffer names
+   window-combination-resize t                      ; Resize windows proportionally
+   x-stretch-cursor t)                              ; Stretch cursor to the glyph width
+  (mouse-avoidance-mode 'banish)                    ; Avoid collision of mouse with point
+  (set-default-coding-systems 'utf-8)               ; Default to utf-8 encoding
+  (fset 'yes-or-no-p 'y-or-n-p)                     ; Replace yes/no prompts with y/n
+  (global-subword-mode 1)                           ; Iterate through CamelCase words
+  (delete-selection-mode 1)                         ; Replace region when inserting text
+  (display-time-mode 1)                             ; Enable time in the mode-line
+  (show-paren-mode 1)                               ; Show matching parenthesis
+  (desktop-save-mode 1)                             ; Save desktop
+  (fringe-mode 0)                                   ; Disable fringes
+  (menu-bar-mode -1)                                ; Disable the menu bar
+  (tool-bar-mode -1)                                ; Disable tool-bar
+  (scroll-bar-mode -1)                              ; Disable Scroll bar
+  (toggle-frame-maximized)                          ; Frame maximized by default
+  (global-set-key (kbd "RET") 'newline-and-indent)  ; Newlines Indented by default
+#+END_SRC
+
+
+* Packages
+** Sources
+
+- Add Melpa and org repos
+#+BEGIN_SRC emacs-lisp
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
+(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+(package-initialize)
+#+END_SRC
+
+- Add a local directory for custom elisp code
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path "~/Projects/emacs.d/lisp")
+#+END_SRC
+
+** use-package
+- Bootstrap use-package: Install use-package if it's not already installed.
+- use-package is used to configure the rest of the packages.
+- Taken from use-package README
+#+BEGIN_SRC emacs-lisp
+(unless (or (package-installed-p 'use-package)
+            (package-installed-p 'diminish))
+  (package-refresh-contents)
+  (package-install 'use-package)
+  (package-install 'diminish))
+(eval-when-compile (require 'use-package))
+(require 'diminish)
+(require 'bind-key)
+#+END_SRC
+
+
+* Emacs Daemon 
+- Allow access from emacsclient
+#+BEGIN_SRC emacs-lisp
+(use-package server
+  :config
+  (unless (server-running-p) (server-start)))
+#+END_SRC
+
+
+* Ivy
+#+BEGIN_SRC emacs-lisp
+(use-package ivy
+  :ensure t
+  :diminish (ivy-mode . "")
+  :bind 
+  (:map ivy-mode-map ("C-'" . ivy-avy))
+  :config
+  (ivy-mode 1)
+  ;; add recentf-mode and bookmarks to ivy-switch-buffer.
+  (setq ivy-use-virtual-buffers t)
+  ;; number of result lines to display
+  (setq ivy-height 10)
+  ;; does not count candidates
+  (setq ivy-count-format "")
+  ;; no regexp by default
+  (setq ivy-initial-inputs-alist nil)
+  ;; configure regexp engine.
+  (setq ivy-re-builders-alist
+		;; allow input not in order
+		'((t   . ivy--regex-ignore-order))))
+
+(global-set-key (kbd "C-s") 'swiper)
+(global-set-key (kbd "M-x") 'counsel-M-x)
+(global-set-key (kbd "C-x C-f") 'counsel-find-file)
+(global-set-key (kbd "C-x C-b") 'counsel-ibuffer)
+(global-set-key (kbd "C-c h") 'counsel-command-history)
+#+END_SRC
+
+
+* Shell 
+ - New Shell
+ #+BEGIN_SRC emacs-lisp
+ (defun new-shell ()
+     "creates a shell with a given name"
+     (interactive);; "Prompt\n shell name:")
+     (let ((shell-name (read-string "shell name: " nil)))
+       (shell (concat "*" shell-name "*"))))
+
+ (global-set-key (kbd "C-c t") 'new-shell)
+ #+END_SRC
+ 
+ - Clear shell
+ #+BEGIN_SRC emacs-lisp
+ (add-hook 'shell-mode-hook
+           (lambda ()
+             (local-set-key (kbd "C-l") 'comint-clear-buffer)))
+ #+END_SRC
+ 
+ - Color support
+ #+BEGIN_SRC emacs-lisp
+ (add-hook 'shell-mode-hook
+           (lambda ()
+             (face-remap-set-base 'comint-highlight-prompt :inherit nil)))
+ #+END_SRC
+
+
+* Version Control
+** Magit
+#+BEGIN_SRC emacs-lisp
+(use-package magit
+  :bind ("C-x g" . magit-status))
+#+END_SRC
+
+
+* Customization
+** Theme
+#+BEGIN_SRC emacs-lisp
+(use-package doom-themes
+  :demand t
+  :config
+  (load-theme 'doom-one t)
+  (set-face-attribute 'default nil :font "Hack"))
+#+END_SRC
+** Multiple Cursors
+#+BEGIN_SRC emacs-lisp
+(require 'multiple-cursors)
+(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+(global-set-key (kbd "C->")         'mc/mark-next-like-this)
+(global-set-key (kbd "C-<")         'mc/mark-previous-like-this)
+(global-set-key (kbd "C-c C-<")     'mc/mark-all-like-this)
+#+END_SRC
+
+
+* Documentation
+** Woman
+#+BEGIN_SRC emacs-lisp
+(require 'woman)
+(setq woman-manpath
+      (append
+       (let ((manpath (getenv "MANPATH")))
+	     (if manpath (woman-parse-colon-path (replace-regexp-in-string ".*;" "" manpath))
+	       (progn (message "While configuring woman, MANPATH was not set.") nil)))
+       (list (concat
+              "/CMC/tools/cadence/CONFRML17.10.140_lnx86/share/cfm/man"
+              "/CMC/tools/cadence/SSV-ISR6.16.16.000_lnx86/share/voltus/man"
+              "/CMC/tools/cadence/INNOVUS17.11.000_lnx86/share/innovus/man"
+              "CMC/tools/cadence/GENUS17.10.000_lnx86/share/synth/man_legacy"
+              "/CMC/tools/cadence/GENUS17.10.000_lnx86/share/synth/man_common"
+              "/export/tmp/fiorentino/tools/riscv/rv32ima/share/man"))))
+#+END_SRC
