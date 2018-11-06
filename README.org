@@ -3,7 +3,7 @@
 
 * How to use
 
-- Relies on org-babel to load config.org
+- Relies on org-babel to load [[file:config.org][config.org]]
 - [[file:init.el][init.el]] is the bootstrap (.emacs or ~/.emacs.d/init.el)
 - Packages sould be downloded from Melpa prior to using this config
 - Requires the [[https://sourcefoundry.org/hack/][Hack]] font
@@ -15,6 +15,8 @@
 - [[http://oremacs.com/swiper/][ivy]]
   + counsel
   + swiper
+- company
+- auctex
 - Magit
 - doom-themes
 - multiple-cursors
@@ -42,5 +44,9 @@
 | C-x g   | magit-status                |
 | C->     | mc/mark-next-like-this      |
 | C-<     | mc/mark-previous-like-this  |
+| C-c n   | doi-insert-bibtex           |
+| C-c b   | ivy-bibtex                  |
+| M-o     | [ivy-bibtex] show options   |
 |---------+-----------------------------|
+
 

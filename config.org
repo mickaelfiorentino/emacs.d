@@ -1,4 +1,4 @@
-#+TITLE: Emacs Configuration
+#+STARTUP: content
 #+AUTHOR: Mickael Fiorentino
 
 * Defaults
@@ -50,7 +50,7 @@
   (global-set-key (kbd "M-k")         'backward-paragraph)
   (global-set-key (kbd "M-r")         'replace-string)
   (global-set-key (kbd "C-r")         'query-replace)
-  (global-set-key (kbd "<M-return>")  "\C-a\C- \C-e\M-w\C-j\C-y") ; Duplicate line
+  (global-set-key (kbd "<C-return>")  "\C-a\C- \C-e\M-w\C-j\C-y") ; Duplicate line
 #+END_SRC
 
 
@@ -94,30 +94,41 @@
   (unless (server-running-p) (server-start)))
 #+END_SRC
 
+- Alias in .bashrc:
+#+BEGIN_SRC shell
+alias e="emacsclient -n"
+#+END_SRC
 
-* Ivy
+
+* Completion
+** Ivy
+ #+BEGIN_SRC emacs-lisp
+ (use-package ivy
+   :ensure t
+   :diminish (ivy-mode . "")
+   :bind 
+   (:map ivy-mode-map ("C-'" . ivy-avy))
+   :config
+   (ivy-mode 1)
+   (setq ivy-use-virtual-buffers t)
+   (setq ivy-height 10)
+   (setq ivy-count-format "(%d/%d)")
+   (setq ivy-display-style 'fancy)
+   (setq ivy-initial-inputs-alist nil)
+   (setq ivy-re-builders-alist
+		 ;; allow input not in order
+		 '((t   . ivy--regex-ignore-order))))
+
+ (global-set-key (kbd "C-s") 'swiper)
+ (global-set-key (kbd "M-x") 'counsel-M-x)
+ (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+ (global-set-key (kbd "C-x C-b") 'counsel-ibuffer)
+ (global-set-key (kbd "C-c h") 'counsel-command-history)
+ #+END_SRC
+** Company
 #+BEGIN_SRC emacs-lisp
-(use-package ivy
-  :ensure t
-  :diminish (ivy-mode . "")
-  :bind 
-  (:map ivy-mode-map ("C-'" . ivy-avy))
-  :config
-  (ivy-mode 1)
-  (setq ivy-use-virtual-buffers t)
-  (setq ivy-height 10)
-  (setq ivy-count-format "(%d/%d)")
-  (setq ivy-display-style 'fancy)
-  (setq ivy-initial-inputs-alist nil)
-  (setq ivy-re-builders-alist
-		;; allow input not in order
-		'((t   . ivy--regex-ignore-order))))
-
-(global-set-key (kbd "C-s") 'swiper)
-(global-set-key (kbd "M-x") 'counsel-M-x)
-(global-set-key (kbd "C-x C-f") 'counsel-find-file)
-(global-set-key (kbd "C-x C-b") 'counsel-ibuffer)
-(global-set-key (kbd "C-c h") 'counsel-command-history)
+(require 'company)
+(add-hook 'after-init-hook 'global-company-mode)
 #+END_SRC
 
 
@@ -153,6 +164,88 @@
 #+BEGIN_SRC emacs-lisp
 (use-package magit
   :bind ("C-x g" . magit-status))
+#+END_SRC
+
+
+* Org 
+- TODOs
+#+BEGIN_SRC emacs-lisp
+(setq org-todo-keywords '((sequence "TODO" "PROCESS" "|" "DONE" )))
+#+END_SRC
+
+- Export
+#+BEGIN_SRC emacs-lisp
+(require 'ox)
+(setq org-latex-listings 'minted)
+(setq org-latex-pdf-process
+      '("pdflatex --shell-escape --interaction nonstopmode %f"
+        "bibtex %b"
+        "pdflatex --shell-escape --interaction nonstopmode %f"
+        "pdflatex --shell-escape --interaction nonstopmode %f"))
+(add-to-list 'org-latex-packages-alist '("" "listings"))
+(add-to-list 'org-latex-packages-alist '("" "color"))
+(add-to-list 'org-latex-packages-alist '("" "minted"))
+#+END_SRC
+
+
+* Latex
+- Ensure auctex
+#+BEGIN_SRC emacs-lisp
+(use-package tex
+  :ensure auctex)
+#+END_SRC
+
+- Configure the integration with external PDF reader
+#+BEGIN_SRC emacs-lisp
+(setq LaTeX-command-style '(("" "%(PDF)%(latex) --shell-escape %S%(PDFout)")))
+#+END_SRC
+
+
+* Bibtex
+- Use [[https://github.com/tmalsburg/helm-bibtex][ivy-bibtex]]
+#+BEGIN_SRC emacs-lisp
+(use-package ivy-bibtex
+  :ensure t
+  :config
+  (autoload 'ivy-bibtex "ivy-bibtex" "" t)
+  (setq ivy-re-builders-alist
+      '((ivy-bibtex . ivy--regex-ignore-order)
+        (t . ivy--regex-plus))))
+#+END_SRC
+
+- Configuration
+#+BEGIN_SRC emacs-lisp
+(setq bibtex-completion-bibliography "~/Documents/Phd/Biblio/bibliography.bib")
+(setq bibtex-completion-library-path "~/Documents/Phd/Biblio/files/")
+(setq bibtex-completion-notes-path   "~/Documents/Phd/Biblio/bibliography.org")
+(setq bibtex-completion-pdf-field    "file")
+(setq bibtex-completion-pdf-symbol   "⌘")
+(setq bibtex-completion-notes-symbol "✎")
+(global-set-key (kbd "C-c n")        'doi-insert-bibtex)
+(global-set-key (kbd "C-c b")        'ivy-bibtex)
+#+END_SRC
+
+- Open PDFs
+#+BEGIN_SRC emacs-lisp
+(setq bibtex-completion-pdf-open-function
+  (lambda (fpath)
+    (call-process "evince" nil 0 nil fpath)))
+#+END_SRC
+
+
+* C
+#+BEGIN_SRC emacs-lisp
+(add-hook 'c-mode-common-hook 'hs-minor-mode)
+(setq c-default-style "linux")
+#+END_SRC
+
+
+* Python
+#+BEGIN_SRC emacs-lisp
+(add-hook 'python-mode-hook
+    (lambda ()
+    (setq indent-tabs-mode nil)
+    (setq python-indent 4)))
 #+END_SRC
 
 
