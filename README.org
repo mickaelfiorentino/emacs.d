@@ -3,31 +3,44 @@
 
 * How to use
 
+- Relies on org-babel to load config.org
 - [[file:init.el][init.el]] is the bootstrap (.emacs or ~/.emacs.d/init.el)
 - Packages sould be downloded from Melpa prior to using this config
 - Requires the [[https://sourcefoundry.org/hack/][Hack]] font
 
 * Packages
-- Use-package
+- [[https://github.com/jwiegley/use-package][use-package]]
   + diminish
   + bind-key
-- Counsel
-  + Ivy
-  + Swiper
+- [[http://oremacs.com/swiper/][ivy]]
+  + counsel
+  + swiper
 - Magit
 - doom-themes
 - multiple-cursors
 
 * Keybindings 
-|---------+----------------------------------|
-| C-s     | swiper                           |
-| M-x     | counsel-M-x                      |
-| C-x C-f | counsel-find-file                |
-| C-c h   | counsel-command-history          |
-| C-c t   | new-shell                        |
-| C-l     | [shell-mode] comint-clear-buffer |
-| C-x g   | magit-status                     |
-| C->     | mc/mark-next-like-this           |
-| C-<     | mc/mark-previous-like-this       |
-|---------+----------------------------------|
+|---------+-----------------------------|
+| Key     | Command                     |
+|---------+-----------------------------|
+| M-x     | counsel-M-x                 |
+| C-x C-f | counsel-find-file           |
+| C-c h   | counsel-command-history     |
+| M-2     | split-window-vertically     |
+| M-3     | split-window-horizontally   |
+| M-0     | delete-window               |
+| M-u     | undo                        |
+| M-j     | forward-paragraph           |
+| M-k     | backward-paragraph          |
+| M-r     | replace-string              |
+| C-r     | query-replace               |
+| C-s     | swiper                      |
+| M-q     | [swiper] query-replace      |
+| M-RET   | duplicate line              |
+| C-c t   | new-shell                   |
+| C-l     | [shell] comint-clear-buffer |
+| C-x g   | magit-status                |
+| C->     | mc/mark-next-like-this      |
+| C-<     | mc/mark-previous-like-this  |
+|---------+-----------------------------|
 
