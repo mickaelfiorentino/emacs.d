@@ -1,0 +1,33 @@
+#+TITLE: Emacs Configuration
+#+AUTHOR: Mickael Fiorentino
+
+* How to use
+
+- [[file:init.el][init.el]] is the bootstrap (.emacs or ~/.emacs.d/init.el)
+- Packages sould be downloded from Melpa prior to using this config
+- Requires the [[https://sourcefoundry.org/hack/][Hack]] font
+
+* Packages
+- Use-package
+  + diminish
+  + bind-key
+- Counsel
+  + Ivy
+  + Swiper
+- Magit
+- doom-themes
+- multiple-cursors
+
+* Keybindings 
+|---------+----------------------------------|
+| C-s     | swiper                           |
+| M-x     | counsel-M-x                      |
+| C-x C-f | counsel-find-file                |
+| C-c h   | counsel-command-history          |
+| C-c t   | new-shell                        |
+| C-l     | [shell-mode] comint-clear-buffer |
+| C-x g   | magit-status                     |
+| C->     | mc/mark-next-like-this           |
+| C-<     | mc/mark-previous-like-this       |
+|---------+----------------------------------|
+

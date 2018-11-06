@@ -1,9 +1,6 @@
 #+TITLE: Emacs Configuration
 #+AUTHOR: Mickael Fiorentino
 
-* How to use
-
-
 * Defaults
 #+BEGIN_SRC emacs-lisp
   (setq-default
