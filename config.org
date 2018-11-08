@@ -50,6 +50,7 @@
   (global-set-key (kbd "M-k")         'backward-paragraph)
   (global-set-key (kbd "M-r")         'replace-string)
   (global-set-key (kbd "C-r")         'query-replace)
+  (global-set-key (kbd "C-x C-l")     'goto-line)
   (global-set-key (kbd "<C-return>")  "\C-a\C- \C-e\M-w\C-j\C-y") ; Duplicate line
 #+END_SRC
 
@@ -101,30 +102,31 @@ alias e="emacsclient -n"
 
 
 * Completion
-** Ivy
- #+BEGIN_SRC emacs-lisp
- (use-package ivy
-   :ensure t
-   :diminish (ivy-mode . "")
-   :bind 
-   (:map ivy-mode-map ("C-'" . ivy-avy))
-   :config
-   (ivy-mode 1)
-   (setq ivy-use-virtual-buffers t)
-   (setq ivy-height 10)
-   (setq ivy-count-format "(%d/%d)")
-   (setq ivy-display-style 'fancy)
-   (setq ivy-initial-inputs-alist nil)
-   (setq ivy-re-builders-alist
-		 ;; allow input not in order
-		 '((t   . ivy--regex-ignore-order))))
+** Ivy   
+     #+BEGIN_SRC emacs-lisp
+     (use-package ivy
+         :ensure t
+         :diminish (ivy-mode . "")
+         :bind 
+         (:map ivy-mode-map ("C-'" . ivy-avy))
+         :config
+         (ivy-mode 1)
+         (setq ivy-use-virtual-buffers t)
+         (setq ivy-height 10)
+         (setq ivy-count-format "(%d/%d)")
+         (setq ivy-display-style 'fancy)
+         (setq ivy-initial-inputs-alist nil)
+         (setq ivy-re-builders-alist
+	  	 ;; allow input not in order
+	  	 '((t   . ivy--regex-ignore-order))))
+  
+     (global-set-key (kbd "C-s")     'swiper)
+     (global-set-key (kbd "M-x")     'counsel-M-x)
+     (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+     (global-set-key (kbd "C-x C-b") 'counsel-ibuffer)
+     (global-set-key (kbd "C-c h")   'counsel-command-history)
+     #+END_SRC
 
- (global-set-key (kbd "C-s") 'swiper)
- (global-set-key (kbd "M-x") 'counsel-M-x)
- (global-set-key (kbd "C-x C-f") 'counsel-find-file)
- (global-set-key (kbd "C-x C-b") 'counsel-ibuffer)
- (global-set-key (kbd "C-c h") 'counsel-command-history)
- #+END_SRC
 ** Company
 #+BEGIN_SRC emacs-lisp
 (require 'company)
@@ -234,11 +236,21 @@ alias e="emacsclient -n"
 
 
 * C
-#+BEGIN_SRC emacs-lisp
-(add-hook 'c-mode-common-hook 'hs-minor-mode)
-(setq c-default-style "linux")
-#+END_SRC
+ #+BEGIN_SRC emacs-lisp
+ (add-hook 'c-mode-common-hook 'hs-minor-mode)
+ (setq c-default-style "linux")
+ #+END_SRC
 
+* ASM
+ #+BEGIN_SRC emacs-lisp
+ (add-to-list 'auto-mode-alist '("\\.S\\'" . asm-mode))
+
+ (add-hook 'asm-mode-hook
+     (lambda () (progn (setq asm-comment-char "//") 
+                       (setq comment-start "//")
+                       (setq comment-add 0))))
+
+ #+END_SRC
 
 * Python
 #+BEGIN_SRC emacs-lisp
@@ -252,11 +264,12 @@ alias e="emacsclient -n"
 * Customization
 ** Theme
 #+BEGIN_SRC emacs-lisp
-(use-package doom-themes
-  :demand t
-  :config
-  (load-theme 'doom-one t)
-  (set-face-attribute 'default nil :font "Hack"))
+  (use-package doom-themes
+      :demand t)
+#+END_SRC
+#+BEGIN_SRC emacs-lisp
+(load-theme 'tango t)
+(set-face-attribute 'default nil :font "Hack")
 #+END_SRC
 ** Multiple Cursors
 #+BEGIN_SRC emacs-lisp
