@@ -302,10 +302,8 @@ alias e="emacsclient -n"
 * Customization
 ** Theme
 #+BEGIN_SRC emacs-lisp
-  (use-package doom-themes
-      :demand t)
-  (load-theme 'tango t)
-  (set-face-attribute 'default nil :font "Hack")
+(load-theme 'tango t)
+(set-face-attribute 'default nil :font "Hack")
 #+END_SRC
 
 ** Multiple Cursors
