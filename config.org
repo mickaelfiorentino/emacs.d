@@ -17,7 +17,7 @@
    auto-save-default nil                            ; No auto-save
    mouse-yank-at-point t                            ; Yank at point rather than pointer
    scroll-conservatively most-positive-fixnum       ; Always scroll by one line
-   scroll-margin 10                                 ; Add a margin when scrolling vertically
+   scroll-margin 2                                  ; Add a margin when scrolling vertically
    select-enable-clipboard t                        ; Merge system's and Emacs' clipboard
    show-trailing-whitespace nil                     ; Display trailing whitespaces
    uniquify-buffer-name-style 'forward              ; uniquify buffer names
@@ -119,8 +119,8 @@ alias e="emacsclient -n"
 #+END_SRC
 
 
-* Completion
-** Counsel    
+* Navigation
+** Counsel
 #+BEGIN_SRC emacs-lisp
 (use-package counsel
   :config
@@ -136,7 +136,7 @@ alias e="emacsclient -n"
     (global-set-key (kbd "C-s") 'swiper))
 #+END_SRC
 
-** Ivy   
+** Ivy
 #+BEGIN_SRC emacs-lisp
 (use-package ivy
   :ensure t
@@ -160,6 +160,16 @@ alias e="emacsclient -n"
   :diminish company-mode
   :config
   (add-hook 'after-init-hook 'global-company-mode))
+#+END_SRC
+
+** Multiple Cursors
+#+BEGIN_SRC emacs-lisp
+(use-package multiple-cursors
+  :config
+  (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+  (global-set-key (kbd "C->")         'mc/mark-next-like-this)
+  (global-set-key (kbd "C-<")         'mc/mark-previous-like-this)
+  (global-set-key (kbd "C-c C-<")     'mc/mark-all-like-this))
 #+END_SRC
 
 
@@ -302,18 +312,17 @@ alias e="emacsclient -n"
 * Customization
 ** Theme
 #+BEGIN_SRC emacs-lisp
-(load-theme 'tango t)
+(load-theme 'tsdh-light t)
 (set-face-attribute 'default nil :font "Hack")
 #+END_SRC
-
-** Multiple Cursors
+** Mode-line
 #+BEGIN_SRC emacs-lisp
-(use-package multiple-cursors
-  :config
-  (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
-  (global-set-key (kbd "C->")         'mc/mark-next-like-this)
-  (global-set-key (kbd "C-<")         'mc/mark-previous-like-this)
-  (global-set-key (kbd "C-c C-<")     'mc/mark-all-like-this))
+  (use-package smart-mode-line
+    :init
+    (setq sml/no-confirm-load-theme t)
+    (setq sml/theme 'respectful) ;; automatic light dark respectful
+    :config
+    (sml/setup))
 #+END_SRC
 
 
