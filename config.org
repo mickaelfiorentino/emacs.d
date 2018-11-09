@@ -47,12 +47,8 @@
   (global-set-key (kbd "M-3")         'split-window-horizontally)
   (global-set-key (kbd "M-o")         'other-window)
   (global-set-key (kbd "M-u")         'undo)
-  (global-set-key (kbd "M-k")         'kill-buffer)
+  (global-set-key (kbd "M-k")         'kill-buffer-and-window)
   (global-set-key (kbd "M-r")         'replace-string)
-  (global-set-key (kbd "C-s")         'swiper)
-  (global-set-key (kbd "M-x")         'counsel-M-x)
-  (global-set-key (kbd "C-x C-f")     'counsel-find-file)
-  (global-set-key (kbd "C-=")         'counsel-ibuffer)
   (global-set-key (kbd "C-x C-b")     'ibuffer)
   (global-set-key (kbd "C-r")         'query-replace)
   (global-set-key (kbd "C-S-r")       'query-replace-regexp)
@@ -68,10 +64,11 @@
 
 - Add Melpa and org repos
 #+BEGIN_SRC emacs-lisp
-(require 'package)
-(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
-(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
-(package-initialize)
+  (require 'package)
+  ;; (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
+  (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+  (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+  (package-initialize)
 #+END_SRC
 
 - Add a local directory for custom elisp code
@@ -89,9 +86,22 @@
   (package-refresh-contents)
   (package-install 'use-package)
   (package-install 'diminish))
+#+END_SRC
+
+- Install packages if they are not installed
+#+BEGIN_SRC emacs-lisp
+(mapc
+ (lambda (package)
+   (if (not (package-installed-p package))
+       (progn
+         (package-refresh-contents)
+         (package-install package))))
+   '(use-package diminish bind-key))
+
 (eval-when-compile (require 'use-package))
 (require 'diminish)
 (require 'bind-key)
+(setq use-package-always-ensure t)
 #+END_SRC
 
 
@@ -110,6 +120,22 @@ alias e="emacsclient -n"
 
 
 * Completion
+** Counsel    
+#+BEGIN_SRC emacs-lisp
+(use-package counsel
+  :config
+  (global-set-key (kbd "M-x")     'counsel-M-x)
+  (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+  (global-set-key (kbd "C-=")     'counsel-ibuffer))
+#+END_SRC
+
+** Swiper
+#+BEGIN_SRC emacs-lisp
+(use-package swiper
+  :config
+    (global-set-key (kbd "C-s") 'swiper))
+#+END_SRC
+
 ** Ivy   
 #+BEGIN_SRC emacs-lisp
 (use-package ivy
@@ -128,11 +154,12 @@ alias e="emacsclient -n"
   ;; allow input not in order
   '((t   . ivy--regex-ignore-order))))
 #+END_SRC
-    
 ** Company
 #+BEGIN_SRC emacs-lisp
-(require 'company)
-(add-hook 'after-init-hook 'global-company-mode)
+(use-package company
+  :diminish company-mode
+  :config
+  (add-hook 'after-init-hook 'global-company-mode))
 #+END_SRC
 
 
@@ -269,19 +296,20 @@ alias e="emacsclient -n"
 ** Theme
 #+BEGIN_SRC emacs-lisp
   (use-package doom-themes
-      :demand t)
+      :demand t
+      :config 
+      (load-theme 'doom-opera-light t)
+      (set-face-attribute 'default nil :font "Hack"))
 #+END_SRC
-#+BEGIN_SRC emacs-lisp
-(load-theme 'tango-plus t)
-(set-face-attribute 'default nil :font "Hack")
-#+END_SRC
+
 ** Multiple Cursors
 #+BEGIN_SRC emacs-lisp
-(require 'multiple-cursors)
-(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
-(global-set-key (kbd "C->")         'mc/mark-next-like-this)
-(global-set-key (kbd "C-<")         'mc/mark-previous-like-this)
-(global-set-key (kbd "C-c C-<")     'mc/mark-all-like-this)
+(use-package multiple-cursors
+  :config
+  (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+  (global-set-key (kbd "C->")         'mc/mark-next-like-this)
+  (global-set-key (kbd "C-<")         'mc/mark-previous-like-this)
+  (global-set-key (kbd "C-c C-<")     'mc/mark-all-like-this))
 #+END_SRC
 
 
