@@ -190,6 +190,13 @@ alias e="emacsclient -n"
  #+END_SRC
 
 
+* Dired
+#+BEGIN_SRC emacs-lisp
+(add-hook 'dired-load-hook
+ (function (lambda () (load "dired-x"))))
+#+END_SRC
+
+
 * Version Control
 ** Magit
 #+BEGIN_SRC emacs-lisp
@@ -296,10 +303,9 @@ alias e="emacsclient -n"
 ** Theme
 #+BEGIN_SRC emacs-lisp
   (use-package doom-themes
-      :demand t
-      :config 
-      (load-theme 'doom-opera-light t)
-      (set-face-attribute 'default nil :font "Hack"))
+      :demand t)
+  (load-theme 'tango t)
+  (set-face-attribute 'default nil :font "Hack")
 #+END_SRC
 
 ** Multiple Cursors
