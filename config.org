@@ -31,11 +31,12 @@
   (display-time-mode 1)                             ; Enable time in the mode-line
   (show-paren-mode 1)                               ; Show matching parenthesis
   (desktop-save-mode 1)                             ; Save desktop
-  (fringe-mode 0)                                   ; Disable fringes
-  (menu-bar-mode -1)                                ; Disable the menu bar
-  (tool-bar-mode -1)                                ; Disable tool-bar
-  (scroll-bar-mode -1)                              ; Disable Scroll bar
-  (toggle-frame-maximized)                          ; Frame maximized by default
+  (when (display-graphic-p)
+    (fringe-mode 0)                                 ; Disable fringes
+    (menu-bar-mode -1)                              ; Disable the menu bar
+    (tool-bar-mode -1)                              ; Disable tool-bar
+    (scroll-bar-mode -1)                            ; Disable Scroll bar
+    (toggle-frame-maximized))                       ; Frame maximized by default
 #+END_SRC
 
 - Keybindings
@@ -312,7 +313,7 @@ alias e="emacsclient -n"
 * Customization
 ** Theme
 #+BEGIN_SRC emacs-lisp
-(if (display-graphic-p)
+(when (display-graphic-p)
     (load-theme 'tsdh-light t)
     (set-face-attribute 'default nil :font "Hack"))
 #+END_SRC
