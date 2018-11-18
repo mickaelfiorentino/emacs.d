@@ -202,10 +202,18 @@ alias e="emacsclient -n"
 
 
 * Dired
-#+BEGIN_SRC emacs-lisp
-(add-hook 'dired-load-hook
- (function (lambda () (load "dired-x"))))
-#+END_SRC
+  - Load Dired-X
+    #+BEGIN_SRC emacs-lisp
+    (add-hook 'dired-load-hook
+    (function (lambda () (load "dired-x"))))
+    #+END_SRC
+
+  - Reuse buffer when visiting parent firectory 
+    #+BEGIN_SRC emacs-lisp
+    (add-hook 'dired-mode-hook
+      (lambda () (define-key dired-mode-map (kbd "^")
+         (lambda () (interactive) (find-alternate-file "..")))))
+    #+END_SRC
 
 
 * Version Control
@@ -282,6 +290,21 @@ alias e="emacsclient -n"
 #+END_SRC
 
 
+* VHDL 
+#+BEGIN_SRC emacs-lisp
+(add-hook 'vhdl-mode-hook
+    (lambda()
+        (local-set-key (kbd "C-c C-d") 'vhdl-align-region)))
+#+END_SRC
+
+
+* TCL
+- Associate .sdc files (/synopsys design constraints/) to tcl-mode  
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.sdc\\'" . tcl-mode))
+#+END_SRC
+
+
 * C
  #+BEGIN_SRC emacs-lisp
  (add-hook 'c-mode-common-hook 'hs-minor-mode)
@@ -314,7 +337,7 @@ alias e="emacsclient -n"
 ** Theme
 #+BEGIN_SRC emacs-lisp
 (when (display-graphic-p)
-    (load-theme 'tsdh-light t)
+    (load-theme 'tango t)
     (set-face-attribute 'default nil :font "Hack"))
 #+END_SRC
 ** Mode-line
