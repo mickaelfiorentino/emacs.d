@@ -35,8 +35,7 @@
     (fringe-mode 0)                                 ; Disable fringes
     (menu-bar-mode -1)                              ; Disable the menu bar
     (tool-bar-mode -1)                              ; Disable tool-bar
-    (scroll-bar-mode -1)                            ; Disable Scroll bar
-    (toggle-frame-maximized))                       ; Frame maximized by default
+    (scroll-bar-mode -1))                           ; Disable Scroll bar
 #+END_SRC
 
 - Keybindings
@@ -74,7 +73,7 @@
 
 - Add a local directory for custom elisp code
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path "~/Projects/emacs.d/lisp")
+(add-to-list 'load-path (expand-file-name "../lisp" user-emacs-directory))
 #+END_SRC
 
 ** use-package
@@ -82,11 +81,11 @@
 - use-package is used to configure the rest of the packages.
 - Taken from use-package README
 #+BEGIN_SRC emacs-lisp
-(unless (or (package-installed-p 'use-package)
-            (package-installed-p 'diminish))
-  (package-refresh-contents)
-  (package-install 'use-package)
-  (package-install 'diminish))
+  ;; (unless (or (package-installed-p 'use-package)
+  ;;             (package-installed-p 'diminish))
+  ;;   (package-refresh-contents)
+  ;;   (package-install 'use-package)
+  ;;   (package-install 'diminish))
 #+END_SRC
 
 - Install packages if they are not installed
@@ -201,6 +200,12 @@ alias e="emacsclient -n"
  #+END_SRC
 
 
+* Tramp
+#+BEGIN_SRC emacs-lisp
+(setq tramp-default-method "ssh")
+#+END_SRC
+
+
 * Dired
   - Load Dired-X
     #+BEGIN_SRC emacs-lisp
@@ -272,9 +277,10 @@ alias e="emacsclient -n"
 
 - Configuration
 #+BEGIN_SRC emacs-lisp
-(setq bibtex-completion-bibliography "~/Documents/Phd/Biblio/bibliography.bib")
-(setq bibtex-completion-library-path "~/Documents/Phd/Biblio/files/")
-(setq bibtex-completion-notes-path   "~/Documents/Phd/Biblio/bibliography.org")
+(setq user-bibliography-directory    "~/Project/research/bibliography")
+(setq bibtex-completion-bibliography (expand-file-name "bibliography.bib" user-bibliography-directory))
+(setq bibtex-completion-notes-path   (expand-file-name "bibliography.org" user-bibliography-directory))
+(setq bibtex-completion-library-path (expand-file-name "files" user-bibliography-directory))
 (setq bibtex-completion-pdf-field    "file")
 (setq bibtex-completion-pdf-symbol   "⌘")
 (setq bibtex-completion-notes-symbol "✎")
