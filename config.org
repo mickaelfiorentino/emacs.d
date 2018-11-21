@@ -73,7 +73,7 @@
 
 - Add a local directory for custom elisp code
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path (expand-file-name "../lisp" user-emacs-directory))
+(add-to-list 'load-path (expand-file-name "lisp/" user-emacs-directory))
 #+END_SRC
 
 ** use-package
@@ -263,8 +263,17 @@ alias e="emacsclient -n"
 #+END_SRC
 
 
-* Bibtex
-- Use [[https://github.com/tmalsburg/helm-bibtex][ivy-bibtex]]
+* Bibliography
+** Defaults
+#+BEGIN_SRC emacs-lisp
+  (setq my-bibliography-directory  "~/Projects/research/bibliography")
+  (setq my-bibliography-file       (expand-file-name "bibliography.bib" my-bibliography-directory))
+  (setq my-bibliography-notes      (expand-file-name "bibliography.org" my-bibliography-directory))
+  (setq my-bibliography-pdfs       (expand-file-name "files/" my-bibliography-directory))
+  ;; (message (format "Bibliography file: %s" my-bibliography-file))
+#+END_SRC
+
+** Ivy-Bibtex
 #+BEGIN_SRC emacs-lisp
 (use-package ivy-bibtex
   :ensure t
@@ -272,27 +281,39 @@ alias e="emacsclient -n"
   (autoload 'ivy-bibtex "ivy-bibtex" "" t)
   (setq ivy-re-builders-alist
       '((ivy-bibtex . ivy--regex-ignore-order)
-        (t . ivy--regex-plus))))
+        (t . ivy--regex-plus)))
+  :init
+  (setq bibtex-completion-bibliography "~/Projects/research/bibliography/bibliography.bib")
+  (setq bibtex-completion-notes-path   "~/Projects/research/bibliography/bibliography.org")
+  (setq bibtex-completion-library-path "~/Projects/research/bibliography/files/")
+  (setq bibtex-completion-pdf-field    "file")
+  (setq bibtex-completion-pdf-symbol   "⌘")
+  (setq bibtex-completion-notes-symbol "✎")
+  (setq bibtex-completion-pdf-open-function 
+       (lambda (fpath)
+           (call-process "evince" nil 0 nil fpath))))
 #+END_SRC
 
-- Configuration
+** Org-Ref
 #+BEGIN_SRC emacs-lisp
-(setq user-bibliography-directory    "~/Project/research/bibliography")
-(setq bibtex-completion-bibliography (expand-file-name "bibliography.bib" user-bibliography-directory))
-(setq bibtex-completion-notes-path   (expand-file-name "bibliography.org" user-bibliography-directory))
-(setq bibtex-completion-library-path (expand-file-name "files" user-bibliography-directory))
-(setq bibtex-completion-pdf-field    "file")
-(setq bibtex-completion-pdf-symbol   "⌘")
-(setq bibtex-completion-notes-symbol "✎")
-(global-set-key (kbd "C-c n")        'doi-insert-bibtex)
-(global-set-key (kbd "C-c b")        'ivy-bibtex)
-#+END_SRC
-
-- Open PDFs
-#+BEGIN_SRC emacs-lisp
-(setq bibtex-completion-pdf-open-function
-  (lambda (fpath)
-    (call-process "evince" nil 0 nil fpath)))
+  (use-package org-ref
+    :after org
+    :init
+    (setq org-ref-default-bibliography '("~/Projects/research/bibliography/bibliography.bib"))
+    (setq org-ref-bibliography-notes   "~/Projects/research/bibliography/bibliography.org")
+    (setq org-ref-pdf-directory        "~/Projects/research/bibliography/files/")  
+    ;; Use ivy
+    (setq org-ref-completion-library   'org-ref-ivy-cite)
+    ;; variables that control bibtex key format for auto-generation
+    ;; I want firstauthor-year-title-words
+    ;; this usually makes a legitimate filename to store pdfs under.
+    (setq bibtex-autokey-year-length 4
+          bibtex-autokey-name-year-separator "-"
+          bibtex-autokey-year-title-separator "-"
+          bibtex-autokey-titleword-separator "-"
+          bibtex-autokey-titlewords 2
+          bibtex-autokey-titlewords-stretch 1
+          bibtex-autokey-titleword-length 5))
 #+END_SRC
 
 
@@ -357,20 +378,3 @@ alias e="emacsclient -n"
 #+END_SRC
 
 
-* Documentation
-** Woman
-#+BEGIN_SRC emacs-lisp
-(require 'woman)
-(setq woman-manpath
-      (append
-       (let ((manpath (getenv "MANPATH")))
-	     (if manpath (woman-parse-colon-path (replace-regexp-in-string ".*;" "" manpath))
-	       (progn (message "While configuring woman, MANPATH was not set.") nil)))
-       (list (concat
-              "/CMC/tools/cadence/CONFRML17.10.140_lnx86/share/cfm/man"
-              "/CMC/tools/cadence/SSV-ISR6.16.16.000_lnx86/share/voltus/man"
-              "/CMC/tools/cadence/INNOVUS17.11.000_lnx86/share/innovus/man"
-              "CMC/tools/cadence/GENUS17.10.000_lnx86/share/synth/man_legacy"
-              "/CMC/tools/cadence/GENUS17.10.000_lnx86/share/synth/man_common"
-              "/export/tmp/fiorentino/tools/riscv/rv32ima/share/man"))))
-#+END_SRC
