@@ -22,6 +22,7 @@
    show-trailing-whitespace nil                     ; Display trailing whitespaces
    uniquify-buffer-name-style 'forward              ; uniquify buffer names
    window-combination-resize t                      ; Resize windows proportionally
+   visible-bell 1                                   ; Please don't beep at me
    x-stretch-cursor t)                              ; Stretch cursor to the glyph width
   (mouse-avoidance-mode 'banish)                    ; Avoid collision of mouse with point
   (set-default-coding-systems 'utf-8)               ; Default to utf-8 encoding
@@ -314,7 +315,7 @@ alias e="emacsclient -n"
 ** Theme
 #+BEGIN_SRC emacs-lisp
 (when (display-graphic-p)
-    (load-theme 'tsdh-light t)
+    (load-theme 'tango t)
     (set-face-attribute 'default nil :font "Hack"))
 #+END_SRC
 ** Mode-line
