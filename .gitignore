@@ -5,3 +5,4 @@ recentf
 config.el
 /.mc-lists.el
 /server/server
+/tramp

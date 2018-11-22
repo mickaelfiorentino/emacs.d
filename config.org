@@ -36,8 +36,7 @@
     (fringe-mode 0)                                 ; Disable fringes
     (menu-bar-mode -1)                              ; Disable the menu bar
     (tool-bar-mode -1)                              ; Disable tool-bar
-    (scroll-bar-mode -1)                            ; Disable Scroll bar
-    (toggle-frame-maximized))                       ; Frame maximized by default
+    (scroll-bar-mode -1))                           ; Disable Scroll bar
 #+END_SRC
 
 - Keybindings
@@ -75,7 +74,7 @@
 
 - Add a local directory for custom elisp code
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path "~/Projects/emacs.d/lisp")
+(add-to-list 'load-path (expand-file-name "lisp/" user-emacs-directory))
 #+END_SRC
 
 ** use-package
@@ -83,11 +82,11 @@
 - use-package is used to configure the rest of the packages.
 - Taken from use-package README
 #+BEGIN_SRC emacs-lisp
-(unless (or (package-installed-p 'use-package)
-            (package-installed-p 'diminish))
-  (package-refresh-contents)
-  (package-install 'use-package)
-  (package-install 'diminish))
+  ;; (unless (or (package-installed-p 'use-package)
+  ;;             (package-installed-p 'diminish))
+  ;;   (package-refresh-contents)
+  ;;   (package-install 'use-package)
+  ;;   (package-install 'diminish))
 #+END_SRC
 
 - Install packages if they are not installed
@@ -202,11 +201,25 @@ alias e="emacsclient -n"
  #+END_SRC
 
 
-* Dired
+* Tramp
 #+BEGIN_SRC emacs-lisp
-(add-hook 'dired-load-hook
- (function (lambda () (load "dired-x"))))
+(setq tramp-default-method "ssh")
 #+END_SRC
+
+
+* Dired
+  - Load Dired-X
+    #+BEGIN_SRC emacs-lisp
+    (add-hook 'dired-load-hook
+    (function (lambda () (load "dired-x"))))
+    #+END_SRC
+
+  - Reuse buffer when visiting parent firectory 
+    #+BEGIN_SRC emacs-lisp
+    (add-hook 'dired-mode-hook
+      (lambda () (define-key dired-mode-map (kbd "^")
+         (lambda () (interactive) (find-alternate-file "..")))))
+    #+END_SRC
 
 
 * Version Control
@@ -251,8 +264,17 @@ alias e="emacsclient -n"
 #+END_SRC
 
 
-* Bibtex
-- Use [[https://github.com/tmalsburg/helm-bibtex][ivy-bibtex]]
+* Bibliography
+** Defaults
+#+BEGIN_SRC emacs-lisp
+  (setq my-bibliography-directory  "~/Projects/research/bibliography")
+  (setq my-bibliography-file       (expand-file-name "bibliography.bib" my-bibliography-directory))
+  (setq my-bibliography-notes      (expand-file-name "bibliography.org" my-bibliography-directory))
+  (setq my-bibliography-pdfs       (expand-file-name "files/" my-bibliography-directory))
+  ;; (message (format "Bibliography file: %s" my-bibliography-file))
+#+END_SRC
+
+** Ivy-Bibtex
 #+BEGIN_SRC emacs-lisp
 (use-package ivy-bibtex
   :ensure t
@@ -260,26 +282,54 @@ alias e="emacsclient -n"
   (autoload 'ivy-bibtex "ivy-bibtex" "" t)
   (setq ivy-re-builders-alist
       '((ivy-bibtex . ivy--regex-ignore-order)
-        (t . ivy--regex-plus))))
+        (t . ivy--regex-plus)))
+  :init
+  (setq bibtex-completion-bibliography "~/Projects/research/bibliography/bibliography.bib")
+  (setq bibtex-completion-notes-path   "~/Projects/research/bibliography/bibliography.org")
+  (setq bibtex-completion-library-path "~/Projects/research/bibliography/files/")
+  (setq bibtex-completion-pdf-field    "file")
+  (setq bibtex-completion-pdf-symbol   "⌘")
+  (setq bibtex-completion-notes-symbol "✎")
+  (setq bibtex-completion-pdf-open-function 
+       (lambda (fpath)
+           (call-process "evince" nil 0 nil fpath))))
 #+END_SRC
 
-- Configuration
+** Org-Ref
 #+BEGIN_SRC emacs-lisp
-(setq bibtex-completion-bibliography "~/Documents/Phd/Biblio/bibliography.bib")
-(setq bibtex-completion-library-path "~/Documents/Phd/Biblio/files/")
-(setq bibtex-completion-notes-path   "~/Documents/Phd/Biblio/bibliography.org")
-(setq bibtex-completion-pdf-field    "file")
-(setq bibtex-completion-pdf-symbol   "⌘")
-(setq bibtex-completion-notes-symbol "✎")
-(global-set-key (kbd "C-c n")        'doi-insert-bibtex)
-(global-set-key (kbd "C-c b")        'ivy-bibtex)
+  (use-package org-ref
+    :after org
+    :init
+    (setq org-ref-default-bibliography '("~/Projects/research/bibliography/bibliography.bib"))
+    (setq org-ref-bibliography-notes   "~/Projects/research/bibliography/bibliography.org")
+    (setq org-ref-pdf-directory        "~/Projects/research/bibliography/files/")  
+    ;; Use ivy
+    (setq org-ref-completion-library   'org-ref-ivy-cite)
+    ;; variables that control bibtex key format for auto-generation
+    ;; I want firstauthor-year-title-words
+    ;; this usually makes a legitimate filename to store pdfs under.
+    (setq bibtex-autokey-year-length 4
+          bibtex-autokey-name-year-separator "-"
+          bibtex-autokey-year-title-separator "-"
+          bibtex-autokey-titleword-separator "-"
+          bibtex-autokey-titlewords 2
+          bibtex-autokey-titlewords-stretch 1
+          bibtex-autokey-titleword-length 5))
 #+END_SRC
 
-- Open PDFs
+
+* VHDL 
 #+BEGIN_SRC emacs-lisp
-(setq bibtex-completion-pdf-open-function
-  (lambda (fpath)
-    (call-process "evince" nil 0 nil fpath)))
+(add-hook 'vhdl-mode-hook
+    (lambda()
+        (local-set-key (kbd "C-c C-d") 'vhdl-align-region)))
+#+END_SRC
+
+
+* TCL
+- Associate .sdc files (/synopsys design constraints/) to tcl-mode  
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.sdc\\'" . tcl-mode))
 #+END_SRC
 
 
@@ -329,20 +379,3 @@ alias e="emacsclient -n"
 #+END_SRC
 
 
-* Documentation
-** Woman
-#+BEGIN_SRC emacs-lisp
-(require 'woman)
-(setq woman-manpath
-      (append
-       (let ((manpath (getenv "MANPATH")))
-	     (if manpath (woman-parse-colon-path (replace-regexp-in-string ".*;" "" manpath))
-	       (progn (message "While configuring woman, MANPATH was not set.") nil)))
-       (list (concat
-              "/CMC/tools/cadence/CONFRML17.10.140_lnx86/share/cfm/man"
-              "/CMC/tools/cadence/SSV-ISR6.16.16.000_lnx86/share/voltus/man"
-              "/CMC/tools/cadence/INNOVUS17.11.000_lnx86/share/innovus/man"
-              "CMC/tools/cadence/GENUS17.10.000_lnx86/share/synth/man_legacy"
-              "/CMC/tools/cadence/GENUS17.10.000_lnx86/share/synth/man_common"
-              "/export/tmp/fiorentino/tools/riscv/rv32ima/share/man"))))
-#+END_SRC
