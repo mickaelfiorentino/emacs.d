@@ -66,8 +66,8 @@
 - Add Melpa and org repos
 #+BEGIN_SRC emacs-lisp
   (require 'package)
-  ;; (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
-  (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
+  ;; (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/") t)
   (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
   (package-initialize)
 #+END_SRC
@@ -265,15 +265,7 @@ alias e="emacsclient -n"
 
 
 * Bibliography
-** Defaults
-#+BEGIN_SRC emacs-lisp
-  (setq my-bibliography-directory  "~/Projects/research/bibliography")
-  (setq my-bibliography-file       (expand-file-name "bibliography.bib" my-bibliography-directory))
-  (setq my-bibliography-notes      (expand-file-name "bibliography.org" my-bibliography-directory))
-  (setq my-bibliography-pdfs       (expand-file-name "files/" my-bibliography-directory))
-  ;; (message (format "Bibliography file: %s" my-bibliography-file))
-#+END_SRC
-
+  
 ** Ivy-Bibtex
 #+BEGIN_SRC emacs-lisp
 (use-package ivy-bibtex
@@ -284,39 +276,25 @@ alias e="emacsclient -n"
       '((ivy-bibtex . ivy--regex-ignore-order)
         (t . ivy--regex-plus)))
   :init
-  (setq bibtex-completion-bibliography "~/Projects/research/bibliography/bibliography.bib")
-  (setq bibtex-completion-notes-path   "~/Projects/research/bibliography/bibliography.org")
-  (setq bibtex-completion-library-path "~/Projects/research/bibliography/files/")
-  (setq bibtex-completion-pdf-field    "file")
+  (setq bibtex-completion-bibliography "~/Projects/research/bibliography/Library.bib")
+  (setq bibtex-completion-notes-path   "~/Projects/research/bibliography/Library.org")
   (setq bibtex-completion-pdf-symbol   "⌘")
   (setq bibtex-completion-notes-symbol "✎")
   (setq bibtex-completion-pdf-open-function 
        (lambda (fpath)
            (call-process "evince" nil 0 nil fpath))))
 #+END_SRC
-
+   
 ** Org-Ref
 #+BEGIN_SRC emacs-lisp
   (use-package org-ref
     :after org
     :init
-    (setq org-ref-default-bibliography '("~/Projects/research/bibliography/bibliography.bib"))
-    (setq org-ref-bibliography-notes   "~/Projects/research/bibliography/bibliography.org")
-    (setq org-ref-pdf-directory        "~/Projects/research/bibliography/files/")  
-    ;; Use ivy
-    (setq org-ref-completion-library   'org-ref-ivy-cite)
-    ;; variables that control bibtex key format for auto-generation
-    ;; I want firstauthor-year-title-words
-    ;; this usually makes a legitimate filename to store pdfs under.
-    (setq bibtex-autokey-year-length 4
-          bibtex-autokey-name-year-separator "-"
-          bibtex-autokey-year-title-separator "-"
-          bibtex-autokey-titleword-separator "-"
-          bibtex-autokey-titlewords 2
-          bibtex-autokey-titlewords-stretch 1
-          bibtex-autokey-titleword-length 5))
+    (setq org-ref-default-bibliography '("~/Projects/research/bibliography/Library.bib"))
+    (setq org-ref-bibliography-notes   "~/Projects/research/bibliography/Library.org")
+    (setq org-ref-completion-library   'org-ref-ivy-cite))
 #+END_SRC
-
+   
 
 * VHDL 
 #+BEGIN_SRC emacs-lisp
@@ -361,21 +339,6 @@ alias e="emacsclient -n"
 #+END_SRC
 
 
-* Customization
-** Theme
-#+BEGIN_SRC emacs-lisp
-(when (display-graphic-p)
-    (load-theme 'tango t)
-    (set-face-attribute 'default nil :font "Hack"))
-#+END_SRC
-** Mode-line
-#+BEGIN_SRC emacs-lisp
-  (use-package smart-mode-line
-    :init
-    (setq sml/no-confirm-load-theme t)
-    (setq sml/theme 'respectful) ;; automatic light dark respectful
-    :config
-    (sml/setup))
-#+END_SRC
+
 
 
