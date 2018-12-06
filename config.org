@@ -24,7 +24,6 @@
    window-combination-resize t                      ; Resize windows proportionally
    visible-bell 1                                   ; Please don't beep at me
    x-stretch-cursor t)                              ; Stretch cursor to the glyph width
-  (mouse-avoidance-mode 'banish)                    ; Avoid collision of mouse with point
   (set-default-coding-systems 'utf-8)               ; Default to utf-8 encoding
   (fset 'yes-or-no-p 'y-or-n-p)                     ; Replace yes/no prompts with y/n
   (global-subword-mode 1)                           ; Iterate through CamelCase words
@@ -242,15 +241,20 @@ alias e="emacsclient -n"
 
 
 * Latex
-- Ensure auctex
+- Use auctex + evince + synctex
 #+BEGIN_SRC emacs-lisp
 (use-package tex
-  :ensure auctex)
-#+END_SRC
+  :ensure auctex
+  :config
+  (setq TeX-auto-save t
+        TeX-parse-self t
+        TeX-view-program-list '(("Evince" "evince --page-index=%(outpage) %o"))
+        TeX-view-program-selection '((output-pdf "Evince"))
+        TeX-source-correlate-start-server t)
+  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+  (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode))
 
-- Configure the integration with external PDF reader
-#+BEGIN_SRC emacs-lisp
-(setq LaTeX-command-style '(("" "%(PDF)%(latex) --shell-escape %S%(PDFout)")))
+;; (setq LaTeX-command-style '(("" "%(PDF)%(latex) --shell-escape %S%(PDFout)")))  
 #+END_SRC
 
 
@@ -298,6 +302,10 @@ alias e="emacsclient -n"
 - Associate .sdc files (/synopsys design constraints/) to tcl-mode  
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'auto-mode-alist '("\\.sdc\\'" . tcl-mode))
+(add-hook 'inferior-tcl-mode-hook
+           (lambda ()
+             (local-set-key (kbd "C-l") 'comint-clear-buffer)))
+
 #+END_SRC
 
 
