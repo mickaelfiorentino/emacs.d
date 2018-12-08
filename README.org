@@ -5,21 +5,6 @@
 
 - Relies on org-babel to load [[file:config.org][config.org]]
 - [[file:init.el][init.el]] is the bootstrap (.emacs or ~/.emacs.d/init.el)
-- Packages sould be downloded from Melpa prior to using this config
-- Requires the [[https://sourcefoundry.org/hack/][Hack]] font
-
-* Packages
-- [[https://github.com/jwiegley/use-package][use-package]]
-  + diminish
-  + bind-key
-- [[http://oremacs.com/swiper/][ivy]]
-  + counsel
-  + swiper
-- company
-- auctex
-- Magit
-- doom-themes
-- multiple-cursors
 
 * Keybindings 
 |---------+-----------------------------|

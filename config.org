@@ -110,20 +110,32 @@ alias e="emacsclient -n"
 
 
 * Navigation
+
+** Silver Surfer ([[https://github.com/ggreer/the_silver_searcher][ag]])
+#+BEGIN_SRC emacs-lisp
+(defvar executable-ag-available
+  (executable-find "ag"))
+
+(use-package ag
+  :if executable-ag-available
+  :bind
+  ("M-?" . ag-project))
+#+END_SRC
+
 ** Counsel
 #+BEGIN_SRC emacs-lisp
 (use-package counsel
-  :config
-  (global-set-key (kbd "M-x")     'counsel-M-x)
-  (global-set-key (kbd "C-x C-f") 'counsel-find-file)
-  (global-set-key (kbd "C-=")     'counsel-ibuffer))
+  :bind (("M-x"     . counsel-M-x)
+         ("C-x C-f" . counsel-find-file)
+         ("C-M-s"   . counsel-ag)
+         ("C-="     . counsel-ibuffer)))
 #+END_SRC
-
+   
 ** Swiper
 #+BEGIN_SRC emacs-lisp
 (use-package swiper
-  :config
-    (global-set-key (kbd "C-s") 'swiper))
+  :bind
+  ("C-s" . swiper))
 #+END_SRC
 
 ** Ivy
@@ -144,6 +156,7 @@ alias e="emacsclient -n"
   ;; allow input not in order
   '((t   . ivy--regex-ignore-order))))
 #+END_SRC
+
 ** Company
 #+BEGIN_SRC emacs-lisp
 (use-package company
