@@ -1,7 +1,8 @@
-#+STARTUP: overview
+#+STARTUP: content
 #+AUTHOR: Mickael Fiorentino
 
-* Defaults
+* Basics 
+** Defaults
 #+BEGIN_SRC emacs-lisp
   (setq-default
    delete-by-moving-to-trash t                      ; Delete files to trash
@@ -39,7 +40,7 @@
     (scroll-bar-mode -1))                           ; Disable Scroll bar
 #+END_SRC
 
-- Keybindings
+** Keybindings
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "RET")         'newline-and-indent)  
   (global-set-key (kbd "M-0")         'delete-window)
@@ -56,75 +57,74 @@
   (global-set-key (kbd "M-g")         'goto-line)
   (global-set-key (kbd "<C-return>")  "\C-a\C- \C-e\M-w\C-j\C-y") ; Duplicate line
   (global-set-key (kbd "C-c h")       'counsel-command-history)
-
 #+END_SRC
 
+** Packages
+*** Sources
 
-* Packages
-** Sources
+ - Add Melpa and org repos
+ #+BEGIN_SRC emacs-lisp
+   (require 'package)
+   (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
+   ;; (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+   (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+   (package-initialize)
+ #+END_SRC
 
-- Add Melpa and org repos
-#+BEGIN_SRC emacs-lisp
-  (require 'package)
-  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
-  ;; (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/") t)
-  (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
-  (package-initialize)
-#+END_SRC
+ - Add a local directory for custom elisp code
+ #+BEGIN_SRC emacs-lisp
+ (add-to-list 'load-path (expand-file-name "lisp/" user-emacs-directory))
+ #+END_SRC
 
-- Add a local directory for custom elisp code
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path (expand-file-name "lisp/" user-emacs-directory))
-#+END_SRC
+*** use-package
+ - Install packages if they are not installed
+ #+BEGIN_SRC emacs-lisp
+ (mapc
+  (lambda (package)
+    (if (not (package-installed-p package))
+        (progn
+          (package-refresh-contents)
+          (package-install package))))
+    '(use-package diminish bind-key))
 
-** use-package
+ (eval-when-compile (require 'use-package))
+ (require 'diminish)
+ (require 'bind-key)
+ (setq use-package-always-ensure t)
+ #+END_SRC
 
-- Install packages if they are not installed
-#+BEGIN_SRC emacs-lisp
-(mapc
- (lambda (package)
-   (if (not (package-installed-p package))
-       (progn
-         (package-refresh-contents)
-         (package-install package))))
-   '(use-package diminish bind-key))
+** Daemon
+ - Allow access from emacsclient
+ #+BEGIN_SRC emacs-lisp
+ (use-package server
+   :config
+   (unless (server-running-p) (server-start)))
+ #+END_SRC
 
-(eval-when-compile (require 'use-package))
-(require 'diminish)
-(require 'bind-key)
-(setq use-package-always-ensure t)
-#+END_SRC
-
-
-* Emacs Daemon
-- Allow access from emacsclient
-#+BEGIN_SRC emacs-lisp
-(use-package server
-  :config
-  (unless (server-running-p) (server-start)))
-#+END_SRC
-
-- Alias in .bashrc:
-#+BEGIN_SRC shell
-alias e="emacsclient -n"
-#+END_SRC
+ - Alias in .bashrc:
+ #+BEGIN_SRC shell
+ alias e="emacsclient -n"
+ #+END_SRC
 
 
 * Navigation
-** Counsel
+** Projectile 
 #+BEGIN_SRC emacs-lisp
-(use-package counsel
-  :config
-  (global-set-key (kbd "M-x")     'counsel-M-x)
-  (global-set-key (kbd "C-x C-f") 'counsel-find-file)
-  (global-set-key (kbd "C-=")     'counsel-ibuffer))
+ (use-package projectile
+   :config
+   (projectile-mode)
+   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 #+END_SRC
 
-** Swiper
+** Ibuffer
 #+BEGIN_SRC emacs-lisp
-(use-package swiper
-  :config
-    (global-set-key (kbd "C-s") 'swiper))
+(use-package ibuffer-projectile
+  :init
+  (add-hook 'ibuffer-hook
+    (lambda ()
+      (ibuffer-projectile-set-filter-groups)
+      (unless (eq ibuffer-sorting-mode 'alphabetic)
+        (ibuffer-do-sort-by-alphabetic)))))
 #+END_SRC
 
 ** Ivy
@@ -144,6 +144,26 @@ alias e="emacsclient -n"
   (setq ivy-re-builders-alist
   ;; allow input not in order
   '((t   . ivy--regex-ignore-order))))
+#+END_SRC
+
+** Swiper
+#+BEGIN_SRC emacs-lisp
+(use-package swiper
+  :config
+    (global-set-key (kbd "C-s") 'swiper))
+#+END_SRC
+** Counsel
+#+BEGIN_SRC emacs-lisp
+  (use-package counsel
+    :config
+    (global-set-key (kbd "M-x")     'counsel-M-x)
+    (global-set-key (kbd "C-x C-f") 'counsel-find-file))
+
+  (use-package counsel-projectile
+    :config
+    (counsel-projectile-mode)
+    (global-set-key (kbd "C-=") 'counsel-projectile-switch-to-buffer)
+    (global-set-key (kbd "C-+") 'counsel-projectile-switch-project))
 #+END_SRC
 ** Company
 #+BEGIN_SRC emacs-lisp
@@ -165,168 +185,161 @@ alias e="emacsclient -n"
 
 
 * Shell
- - New Shell
- #+BEGIN_SRC emacs-lisp
- (defun new-shell ()
-     "creates a shell with a given name"
-     (interactive);; "Prompt\n shell name:")
-     (let ((shell-name (read-string "shell name: " nil)))
-       (shell (concat "*" shell-name "*"))))
+** Terminal
+  - New shell
+  #+BEGIN_SRC emacs-lisp
+  (defun new-shell ()
+      "creates a shell with a given name"
+      (interactive);; "Prompt\n shell name:")
+      (let ((shell-name (read-string "shell name: " nil)))
+        (shell (concat "*" shell-name "*"))))
 
- (global-set-key (kbd "C-c t") 'new-shell)
- #+END_SRC
+  (global-set-key (kbd "C-c t") 'new-shell)
+  #+END_SRC
  
- - Clear shell
- #+BEGIN_SRC emacs-lisp
- (add-hook 'shell-mode-hook
-           (lambda ()
-             (local-set-key (kbd "C-l") 'comint-clear-buffer)))
- #+END_SRC
+  - Clear shell
+  #+BEGIN_SRC emacs-lisp
+  (add-hook 'shell-mode-hook
+            (lambda ()
+              (local-set-key (kbd "C-l") 'comint-clear-buffer)))
+  #+END_SRC
  
- - Color support
+  - Color support
+  #+BEGIN_SRC emacs-lisp
+  (add-hook 'shell-mode-hook
+            (lambda ()
+              (face-remap-set-base 'comint-highlight-prompt :inherit nil)))
+  #+END_SRC
+
+** Tramp
  #+BEGIN_SRC emacs-lisp
- (add-hook 'shell-mode-hook
-           (lambda ()
-             (face-remap-set-base 'comint-highlight-prompt :inherit nil)))
+ (setq tramp-default-method "ssh")
  #+END_SRC
 
+** Dired
+   - Load Dired-X
+     #+BEGIN_SRC emacs-lisp
+     (add-hook 'dired-load-hook
+     (function (lambda () (load "dired-x"))))
+     #+END_SRC
 
-* Tramp
-#+BEGIN_SRC emacs-lisp
-(setq tramp-default-method "ssh")
-#+END_SRC
+   - Reuse buffer when visiting parent firectory 
+     #+BEGIN_SRC emacs-lisp
+     (add-hook 'dired-mode-hook
+       (lambda () (define-key dired-mode-map (kbd "^")
+          (lambda () (interactive) (find-alternate-file "..")))))
+     #+END_SRC
 
-
-* Dired
-  - Load Dired-X
-    #+BEGIN_SRC emacs-lisp
-    (add-hook 'dired-load-hook
-    (function (lambda () (load "dired-x"))))
-    #+END_SRC
-
-  - Reuse buffer when visiting parent firectory 
-    #+BEGIN_SRC emacs-lisp
-    (add-hook 'dired-mode-hook
-      (lambda () (define-key dired-mode-map (kbd "^")
-         (lambda () (interactive) (find-alternate-file "..")))))
-    #+END_SRC
-
-
-* Version Control
 ** Magit
-#+BEGIN_SRC emacs-lisp
-(use-package magit
-  :bind ("C-x g" . magit-status))
-#+END_SRC
+ #+BEGIN_SRC emacs-lisp
+ (use-package magit
+   :bind ("C-x g" . magit-status))
+ #+END_SRC
 
 
-* Org
-- TODOs
-#+BEGIN_SRC emacs-lisp
-(setq org-todo-keywords '((sequence "TODO" "PROCESS" "|" "DONE" )))
-#+END_SRC
+* Write
+** Org
+ - TODOs
+ #+BEGIN_SRC emacs-lisp
+ (setq org-todo-keywords '((sequence "TODO" "PROCESS" "|" "DONE" )))
+ #+END_SRC
 
-- Export
-#+BEGIN_SRC emacs-lisp
-(require 'ox)
-(setq org-latex-listings 'minted)
-(setq org-latex-pdf-process
-      '("pdflatex --shell-escape --interaction nonstopmode %f"
-        "bibtex %b"
-        "pdflatex --shell-escape --interaction nonstopmode %f"
-        "pdflatex --shell-escape --interaction nonstopmode %f"))
-(add-to-list 'org-latex-packages-alist '("" "listings"))
-(add-to-list 'org-latex-packages-alist '("" "color"))
-(add-to-list 'org-latex-packages-alist '("" "minted"))
-#+END_SRC
+ - Export
+ #+BEGIN_SRC emacs-lisp
+ (require 'ox)
+ (setq org-latex-listings 'minted)
+ (setq org-latex-pdf-process
+       '("pdflatex --shell-escape --interaction nonstopmode %f"
+         "bibtex %b"
+         "pdflatex --shell-escape --interaction nonstopmode %f"
+         "pdflatex --shell-escape --interaction nonstopmode %f"))
+ (add-to-list 'org-latex-packages-alist '("" "listings"))
+ (add-to-list 'org-latex-packages-alist '("" "color"))
+ (add-to-list 'org-latex-packages-alist '("" "minted"))
+ #+END_SRC
 
+** Latex
+ - Ensure auctex
+ #+BEGIN_SRC emacs-lisp
+ (use-package tex
+   :ensure auctex)
+ #+END_SRC
 
-* Latex
-- Ensure auctex
-#+BEGIN_SRC emacs-lisp
-(use-package tex
-  :ensure auctex)
-#+END_SRC
+ - Configure the integration with external PDF reader
+ #+BEGIN_SRC emacs-lisp
+ (setq LaTeX-command-style '(("" "%(PDF)%(latex) --shell-escape %S%(PDFout)")))
+ #+END_SRC
 
-- Configure the integration with external PDF reader
-#+BEGIN_SRC emacs-lisp
-(setq LaTeX-command-style '(("" "%(PDF)%(latex) --shell-escape %S%(PDFout)")))
-#+END_SRC
-
-
-* Bibliography
+** Bibliography
   
-** Ivy-Bibtex
-#+BEGIN_SRC emacs-lisp
-(use-package ivy-bibtex
-  :ensure t
-  :config
-  (autoload 'ivy-bibtex "ivy-bibtex" "" t)
-  (setq ivy-re-builders-alist
-      '((ivy-bibtex . ivy--regex-ignore-order)
-        (t . ivy--regex-plus)))
-  :init
-  (setq bibtex-completion-bibliography "~/Projects/research/bibliography/Library.bib")
-  (setq bibtex-completion-notes-path   "~/Projects/research/bibliography/Library.org")
-  (setq bibtex-completion-pdf-symbol   "⌘")
-  (setq bibtex-completion-notes-symbol "✎")
-  (setq bibtex-completion-pdf-open-function 
-       (lambda (fpath)
-           (call-process "evince" nil 0 nil fpath))))
-#+END_SRC
-   
-** Org-Ref
-#+BEGIN_SRC emacs-lisp
-  (use-package org-ref
-    :after org
-    :init
-    (setq org-ref-default-bibliography '("~/Projects/research/bibliography/Library.bib"))
-    (setq org-ref-bibliography-notes   "~/Projects/research/bibliography/Library.org")
-    (setq org-ref-completion-library   'org-ref-ivy-cite))
-#+END_SRC
-   
-
-* VHDL 
-#+BEGIN_SRC emacs-lisp
-(add-hook 'vhdl-mode-hook
-    (lambda()
-        (local-set-key (kbd "C-c C-d") 'vhdl-align-region)))
-#+END_SRC
-
-
-* TCL
-- Associate .sdc files (/synopsys design constraints/) to tcl-mode  
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'auto-mode-alist '("\\.sdc\\'" . tcl-mode))
-#+END_SRC
-
-
-* C
+*** Ivy-Bibtex
  #+BEGIN_SRC emacs-lisp
- (add-hook 'c-mode-common-hook 'hs-minor-mode)
- (setq c-default-style "linux")
+ (use-package ivy-bibtex
+   :ensure t
+   :config
+   (autoload 'ivy-bibtex "ivy-bibtex" "" t)
+   (setq ivy-re-builders-alist
+       '((ivy-bibtex . ivy--regex-ignore-order)
+         (t . ivy--regex-plus)))
+   :init
+   (setq bibtex-completion-bibliography "~/Projects/research/bibliography/Library.bib")
+   (setq bibtex-completion-notes-path   "~/Projects/research/bibliography/Library.org")
+   (setq bibtex-completion-pdf-symbol   "⌘")
+   (setq bibtex-completion-notes-symbol "✎")
+   (setq bibtex-completion-pdf-open-function 
+        (lambda (fpath)
+            (call-process "evince" nil 0 nil fpath))))
+ #+END_SRC
+   
+*** Org-Ref
+ #+BEGIN_SRC emacs-lisp
+   (use-package org-ref
+     :after org
+     :init
+     (setq org-ref-default-bibliography '("~/Projects/research/bibliography/Library.bib"))
+     (setq org-ref-bibliography-notes   "~/Projects/research/bibliography/Library.org")
+     (setq org-ref-completion-library   'org-ref-ivy-cite))
+ #+END_SRC
+   
+
+* Code
+** VHDL 
+ #+BEGIN_SRC emacs-lisp
+ (add-hook 'vhdl-mode-hook
+     (lambda()
+         (local-set-key (kbd "C-c C-d") 'vhdl-align-region)))
  #+END_SRC
 
-
-* ASM
+** TCL
+ - Associate .sdc files (/synopsys design constraints/) to tcl-mode  
  #+BEGIN_SRC emacs-lisp
- (add-to-list 'auto-mode-alist '("\\.S\\'" . asm-mode))
-
- (add-hook 'asm-mode-hook
-     (lambda () (progn (setq asm-comment-char "//") 
-                       (setq comment-start "//")
-                       (setq comment-add 0))))
-
+ (add-to-list 'auto-mode-alist '("\\.sdc\\'" . tcl-mode))
  #+END_SRC
 
+** C
+  #+BEGIN_SRC emacs-lisp
+  (add-hook 'c-mode-common-hook 'hs-minor-mode)
+  (setq c-default-style "linux")
+  #+END_SRC
 
-* Python
-#+BEGIN_SRC emacs-lisp
-(add-hook 'python-mode-hook
-    (lambda ()
-    (setq indent-tabs-mode nil)
-    (setq python-indent 4)))
-#+END_SRC
+** ASM
+  #+BEGIN_SRC emacs-lisp
+  (add-to-list 'auto-mode-alist '("\\.S\\'" . asm-mode))
+
+  (add-hook 'asm-mode-hook
+      (lambda () (progn (setq asm-comment-char "//") 
+                        (setq comment-start "//")
+                        (setq comment-add 0))))
+
+  #+END_SRC
+
+** Python
+ #+BEGIN_SRC emacs-lisp
+ (add-hook 'python-mode-hook
+     (lambda ()
+     (setq indent-tabs-mode nil)
+     (setq python-indent 4)))
+ #+END_SRC
 
 
 
