@@ -159,17 +159,13 @@
 ** Counsel
 #+BEGIN_SRC emacs-lisp
 (use-package counsel
+  :config
+  (counsel-projectile-mode)
   :bind (("M-x"     . counsel-M-x)
          ("C-x C-f" . counsel-find-file)
+         ("C-="     . counsel-projectile-switch-to-buffer)
+         ("C-+"     . counsel-projectile-switch-project)
          ("C-M-s"   . counsel-ag)))
-
-(use-package counsel-projectile
-   :config
-   (counsel-projectile-mode)
-   :bind
-   (("C-=" 'counsel-projectile-switch-to-buffer)
-    ("C-+" 'counsel-projectile-switch-project)))
-
 #+END_SRC
    
 ** Swiper

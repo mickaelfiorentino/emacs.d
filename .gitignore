@@ -7,3 +7,4 @@ config.el
 /server/server
 /tramp
 *.eld
+/session.*
