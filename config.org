@@ -25,7 +25,6 @@
    window-combination-resize t                      ; Resize windows proportionally
    visible-bell 1                                   ; Please don't beep at me
    x-stretch-cursor t)                              ; Stretch cursor to the glyph width
-  (mouse-avoidance-mode 'banish)                    ; Avoid collision of mouse with point
   (set-default-coding-systems 'utf-8)               ; Default to utf-8 encoding
   (fset 'yes-or-no-p 'y-or-n-p)                     ; Replace yes/no prompts with y/n
   (global-subword-mode 1)                           ; Iterate through CamelCase words
@@ -60,7 +59,6 @@
 #+END_SRC
 
 ** Packages
-*** Sources
 
  - Add Melpa and org repos
  #+BEGIN_SRC emacs-lisp
@@ -76,7 +74,7 @@
  (add-to-list 'load-path (expand-file-name "lisp/" user-emacs-directory))
  #+END_SRC
 
-*** use-package
+** use-package
  - Install packages if they are not installed
  #+BEGIN_SRC emacs-lisp
  (mapc
@@ -127,6 +125,18 @@
         (ibuffer-do-sort-by-alphabetic)))))
 #+END_SRC
 
+** Ag
+- [[https://github.com/ggreer/the_silver_searcher][ag]]
+#+BEGIN_SRC emacs-lisp
+(defvar executable-ag-available
+  (executable-find "ag"))
+
+(use-package ag
+  :if executable-ag-available
+  :bind
+  ("M-?" . ag-project))
+#+END_SRC
+
 ** Ivy
 #+BEGIN_SRC emacs-lisp
 (use-package ivy
@@ -146,25 +156,29 @@
   '((t   . ivy--regex-ignore-order))))
 #+END_SRC
 
+** Counsel
+#+BEGIN_SRC emacs-lisp
+(use-package counsel
+  :bind (("M-x"     . counsel-M-x)
+         ("C-x C-f" . counsel-find-file)
+         ("C-M-s"   . counsel-ag)))
+
+(use-package counsel-projectile
+   :config
+   (counsel-projectile-mode)
+   :bind
+   (("C-=" 'counsel-projectile-switch-to-buffer)
+    ("C-+" 'counsel-projectile-switch-project)))
+
+#+END_SRC
+   
 ** Swiper
 #+BEGIN_SRC emacs-lisp
 (use-package swiper
-  :config
-    (global-set-key (kbd "C-s") 'swiper))
+  :bind
+  ("C-s" . swiper))
 #+END_SRC
-** Counsel
-#+BEGIN_SRC emacs-lisp
-  (use-package counsel
-    :config
-    (global-set-key (kbd "M-x")     'counsel-M-x)
-    (global-set-key (kbd "C-x C-f") 'counsel-find-file))
 
-  (use-package counsel-projectile
-    :config
-    (counsel-projectile-mode)
-    (global-set-key (kbd "C-=") 'counsel-projectile-switch-to-buffer)
-    (global-set-key (kbd "C-+") 'counsel-projectile-switch-project))
-#+END_SRC
 ** Company
 #+BEGIN_SRC emacs-lisp
 (use-package company
@@ -259,19 +273,28 @@
  #+END_SRC
 
 ** Latex
- - Ensure auctex
+ - Use auctex + evince + synctex
  #+BEGIN_SRC emacs-lisp
  (use-package tex
-   :ensure auctex)
+   :ensure auctex
+   :config
+   (setq TeX-auto-save t
+         TeX-parse-self t
+         TeX-view-program-list '(("Evince" "evince --page-index=%(outpage) %o"))
+         TeX-view-program-selection '((output-pdf "Evince"))
+         TeX-source-correlate-start-server t)
+   (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+   (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode))
+
+ ;; (setq LaTeX-command-style '(("" "%(PDF)%(latex) --shell-escape %S%(PDFout)")))  
  #+END_SRC
 
- - Configure the integration with external PDF reader
- #+BEGIN_SRC emacs-lisp
- (setq LaTeX-command-style '(("" "%(PDF)%(latex) --shell-escape %S%(PDFout)")))
- #+END_SRC
+  - Configure the integration with external PDF reader
+  #+BEGIN_SRC emacs-lisp
+  (setq LaTeX-command-style '(("" "%(PDF)%(latex) --shell-escape %S%(PDFout)")))
+  #+END_SRC
 
-** Bibliography
-  
+** Bibliography  
 *** Ivy-Bibtex
  #+BEGIN_SRC emacs-lisp
  (use-package ivy-bibtex
@@ -304,18 +327,22 @@
 
 * Code
 ** VHDL 
- #+BEGIN_SRC emacs-lisp
- (add-hook 'vhdl-mode-hook
-     (lambda()
-         (local-set-key (kbd "C-c C-d") 'vhdl-align-region)))
- #+END_SRC
+#+BEGIN_SRC emacs-lisp
+(add-hook 'vhdl-mode-hook
+    (lambda()
+        (local-set-key (kbd "C-c C-d") 'vhdl-align-region)))
+#+END_SRC
 
 ** TCL
  - Associate .sdc files (/synopsys design constraints/) to tcl-mode  
  #+BEGIN_SRC emacs-lisp
  (add-to-list 'auto-mode-alist '("\\.sdc\\'" . tcl-mode))
- #+END_SRC
+ (add-hook 'inferior-tcl-mode-hook
+            (lambda ()
+              (local-set-key (kbd "C-l") 'comint-clear-buffer)))
 
+ #+END_SRC
+ 
 ** C
   #+BEGIN_SRC emacs-lisp
   (add-hook 'c-mode-common-hook 'hs-minor-mode)
@@ -340,8 +367,3 @@
      (setq indent-tabs-mode nil)
      (setq python-indent 4)))
  #+END_SRC
-
-
-
-
-
