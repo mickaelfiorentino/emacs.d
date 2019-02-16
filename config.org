@@ -178,9 +178,20 @@
 ** Company
 #+BEGIN_SRC emacs-lisp
 (use-package company
-  :diminish company-mode
-  :config
-  (add-hook 'after-init-hook 'global-company-mode))
+  :defer t
+  :diminish (company-mode . "comp")
+  :init (add-hook 'after-init-hook 'global-company-mode)
+  :config 
+  ;; Give Company a decent default configuration.
+  (cl-pushnew '(company-files company-shell-env) company-backends)
+  (setq company-minimum-prefix-length 2
+        company-selection-wrap-around t
+        company-show-numbers t
+        company-tooltip-align-annotations t
+        company-require-match nil
+        company-dabbrev-downcase nil
+        company-dabbrev-ignore-case nil)
+)
 #+END_SRC
 
 ** Multiple Cursors
@@ -225,7 +236,6 @@
  #+BEGIN_SRC emacs-lisp
  (setq tramp-default-method "ssh")
  #+END_SRC
-
 ** Dired
    - Load Dired-X
      #+BEGIN_SRC emacs-lisp
