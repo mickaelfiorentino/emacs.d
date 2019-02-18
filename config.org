@@ -204,6 +204,26 @@
   (global-set-key (kbd "C-c C-<")     'mc/mark-all-like-this))
 #+END_SRC
 
+** Speedbar
+#+BEGIN_SRC emacs-lisp
+  (use-package speedbar 
+    :config 
+    (setq speedbar-use-images nil 
+          speedbar-show-unknown-files t)
+  ) 
+
+  (use-package sr-speedbar 
+    :ensure t
+    :after speedbar
+    :config 
+    (setq sr-speedbar-right-side nil 
+          sr-speedbar-max-width 40
+          sr-speedbar-width 30 
+          sr-speedbar-default-width 30
+          sr-speedbar-skip-other-window-p t)
+  )
+#+END_SRC
+
 
 * Shell
 ** Terminal
