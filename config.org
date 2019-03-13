@@ -350,6 +350,15 @@
      (setq org-ref-completion-library   'org-ref-ivy-cite))
  #+END_SRC
    
+** Markdown 
+#+BEGIN_SRC emacs-lisp
+(use-package markdown-mode
+  :ensure t
+  :mode (("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode))
+)
+#+END_SRC
+
 
 * Code
 ** VHDL 
