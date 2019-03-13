@@ -177,21 +177,21 @@
 
 ** Company
 #+BEGIN_SRC emacs-lisp
-(use-package company
-  :defer t
-  :diminish (company-mode . "comp")
-  :init (add-hook 'after-init-hook 'global-company-mode)
-  :config 
-  ;; Give Company a decent default configuration.
-  (cl-pushnew '(company-files company-shell-env) company-backends)
-  (setq company-minimum-prefix-length 2
-        company-selection-wrap-around t
-        company-show-numbers t
-        company-tooltip-align-annotations t
-        company-require-match nil
-        company-dabbrev-downcase nil
-        company-dabbrev-ignore-case nil)
-)
+  (use-package company
+    :defer t
+    :diminish (company-mode . "comp")
+    :init (add-hook 'after-init-hook 'global-company-mode)
+    :config 
+    ;; Give Company a decent default configuration.
+    (cl-pushnew '(company-files company-shell-env) company-backends)
+    (setq company-minimum-prefix-length 2
+          company-selection-wrap-around t
+          company-show-numbers t
+          company-tooltip-align-annotations t
+          company-require-match nil
+          company-dabbrev-downcase nil
+          company-dabbrev-ignore-case nil)
+  )
 #+END_SRC
 
 ** Multiple Cursors
@@ -263,7 +263,7 @@
      (function (lambda () (load "dired-x"))))
      #+END_SRC
 
-   - Reuse buffer when visiting parent firectory 
+   - Reuse buffer when visiting parent directory 
      #+BEGIN_SRC emacs-lisp
      (add-hook 'dired-mode-hook
        (lambda () (define-key dired-mode-map (kbd "^")
@@ -353,6 +353,15 @@
 
 * Code
 ** VHDL 
+
+- Unbind SPC because vhdl-electric-space has a weird behavior
+#+BEGIN_SRC emacs-lisp
+(eval-after-load "vhdl-mode"
+  '(progn
+    (define-key vhdl-mode-map (kbd "SPC") nil))) 
+#+END_SRC
+
+- Customize VHDL-mode
 #+BEGIN_SRC emacs-lisp
 (add-hook 'vhdl-mode-hook
     (lambda()
