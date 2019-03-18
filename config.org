@@ -254,7 +254,11 @@
 
 ** Tramp
  #+BEGIN_SRC emacs-lisp
- (setq tramp-default-method "ssh")
+ (use-package tramp
+   :config
+   (progn
+      (setq tramp-default-method "ssh"))
+ )          
  #+END_SRC
 ** Dired
    - Load Dired-X
