@@ -8,3 +8,5 @@ config.el
 /tramp
 *.eld
 /session.*
+desktop/
+lisp/

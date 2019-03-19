@@ -31,7 +31,6 @@
   (delete-selection-mode 1)                         ; Replace region when inserting text
   (display-time-mode 1)                             ; Enable time in the mode-line
   (show-paren-mode 1)                               ; Show matching parenthesis
-  (desktop-save-mode 1)                             ; Save desktop
   (when (display-graphic-p)
     (fringe-mode 0)                                 ; Disable fringes
     (menu-bar-mode -1)                              ; Disable the menu bar
@@ -103,6 +102,19 @@
  #+BEGIN_SRC shell
  alias e="emacsclient -n"
  #+END_SRC
+
+** Desktops
+  #+BEGIN_SRC emacs-lisp
+  (use-package desktop+
+    :ensure t
+    :config
+    (setq desktop-save t)   
+    (setq desktop-buffers-not-to-save "^$")
+    (setq desktop-files-not-to-save (not desktop-buffers-not-to-save))
+    (setq desktop+-base-dir (expand-file-name "desktop/" user-emacs-directory))
+    :bind ("C-c d" . desktop+-load)
+    :init (add-hook 'after-init-hook (lambda () (desktop+-load "default"))))
+  #+END_SRC
 
 
 * Navigation
@@ -257,8 +269,9 @@
  (use-package tramp
    :config
    (progn
-      (setq tramp-default-method "ssh"))
- )          
+      (setq tramp-default-method "ssh")))
+ 
+ (add-to-list 'tramp-remote-path 'tramp-own-remote-path)          
  #+END_SRC
 ** Dired
    - Load Dired-X
