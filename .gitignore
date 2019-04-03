@@ -10,3 +10,4 @@ config.el
 /session.*
 desktop/
 lisp/
+url/

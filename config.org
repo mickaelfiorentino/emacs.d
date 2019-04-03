@@ -379,34 +379,32 @@
 
 * Code
 ** VHDL 
+   - Unbind SPC because vhdl-electric-space has a weird behavior
+   #+BEGIN_SRC emacs-lisp
+     (eval-after-load "vhdl-mode"
+        '(progn (define-key vhdl-mode-map (kbd "SPC") nil))) 
+   #+END_SRC
 
-- Unbind SPC because vhdl-electric-space has a weird behavior
-#+BEGIN_SRC emacs-lisp
-(eval-after-load "vhdl-mode"
-  '(progn
-    (define-key vhdl-mode-map (kbd "SPC") nil))) 
-#+END_SRC
-
-- Customize VHDL-mode
-#+BEGIN_SRC emacs-lisp
-(add-hook 'vhdl-mode-hook
-    (lambda()
-        (local-set-key (kbd "C-c C-d") 'vhdl-align-region)))
-#+END_SRC
+   - Customize VHDL-mode
+   #+BEGIN_SRC emacs-lisp
+   (add-hook 'vhdl-mode-hook
+     (lambda() (local-set-key (kbd "C-c C-d") 'vhdl-align-region)))
+   #+END_SRC
 
 ** TCL
- - Associate .sdc & .do files to tcl-mode  
- #+BEGIN_SRC emacs-lisp
- (add-to-list 'auto-mode-alist '("\\.sdc\\'" . tcl-mode))
- (add-to-list 'auto-mode-alist '("\\.do\\'" . tcl-mode))
- (add-hook 'inferior-tcl-mode-hook
-   (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
- #+END_SRC
+   - Associate .sdc & .do files to tcl-mode  
+   #+BEGIN_SRC emacs-lisp
+   (add-to-list 'auto-mode-alist '("\\.sdc\\'" . tcl-mode))
+   (add-to-list 'auto-mode-alist '("\\.do\\'" . tcl-mode))
+   (add-hook 'inferior-tcl-mode-hook
+     (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
+    #+END_SRC
  
 ** C
   #+BEGIN_SRC emacs-lisp
-  (add-hook 'c-mode-common-hook 'hs-minor-mode)
-  (setq c-default-style "linux")
+  (add-hook 'c-mode-common-hook 
+      (lambda () (setq-default c-default-style "linux"
+                               c-basic-offset  4)))
   #+END_SRC
 
 ** ASM
