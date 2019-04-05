@@ -206,6 +206,15 @@
   )
 #+END_SRC
 
+** Expand-Region
+   #+BEGIN_SRC emacs-lisp
+   (use-package expand-region
+	  :ensure
+      :bind (
+	   ("C-."  . er/expand-region)
+	   ("C-M-." . er/contract-region)))
+   #+END_SRC
+
 ** Multiple Cursors
 #+BEGIN_SRC emacs-lisp
 (use-package multiple-cursors
