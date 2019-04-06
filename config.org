@@ -45,13 +45,10 @@
   (global-set-key (kbd "M-1")         'delete-other-windows)
   (global-set-key (kbd "M-2")         'split-window-vertically)
   (global-set-key (kbd "M-3")         'split-window-horizontally)
-  (global-set-key (kbd "M-o")         'other-window)
   (global-set-key (kbd "M-u")         'undo)
+  (global-set-key (kbd "M-o")         'other-window)
   (global-set-key (kbd "M-k")         'kill-buffer-and-window)
-  (global-set-key (kbd "M-r")         'replace-string)
   (global-set-key (kbd "C-x C-b")     'ibuffer)
-  (global-set-key (kbd "C-r")         'query-replace)
-  (global-set-key (kbd "C-S-r")       'query-replace-regexp)
   (global-set-key (kbd "M-g")         'goto-line)
   (global-set-key (kbd "<C-return>")  "\C-a\C- \C-e\M-w\C-j\C-y") ; Duplicate line
   (global-set-key (kbd "C-c h")       'counsel-command-history)
@@ -181,12 +178,18 @@
 #+END_SRC
    
 ** Swiper
-#+BEGIN_SRC emacs-lisp
-(use-package swiper
-  :bind
-  ("C-s" . swiper))
-#+END_SRC
-
+   #+BEGIN_SRC emacs-lisp
+   (use-package swiper
+     :bind ("C-s" . swiper))
+   #+END_SRC
+** ace-window
+   - Move accross windows.
+   - If <n> windows (more than 2) use ~C-M-o <n>~ to switch to that window.
+   - To show the list of possible action use ~C-M-o ?~
+   #+BEGIN_SRC emacs-lisp
+   (use-package ace-window
+   :bind ("C-M-o" . ace-window))
+   #+END_SRC
 ** Company
 #+BEGIN_SRC emacs-lisp
   (use-package company
@@ -216,35 +219,45 @@
    #+END_SRC
 
 ** Multiple Cursors
-#+BEGIN_SRC emacs-lisp
-(use-package multiple-cursors
-  :config
-  (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
-  (global-set-key (kbd "C->")         'mc/mark-next-like-this)
-  (global-set-key (kbd "C-<")         'mc/mark-previous-like-this)
-  (global-set-key (kbd "C-c C-<")     'mc/mark-all-like-this))
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp
+   (use-package multiple-cursors
+   :ensure
+   :bind (("C-S-c C-S-c" . mc/edit-lines)
+          ("C->"         . mc/mark-next-like-this)
+          ("C-<"         . mc/mark-previous-like-this)
+          ("C-c C-<"     . mc/mark-all-like-this)))
+   #+END_SRC
 
+** idedit
+   - Edit one occurrence of some text in a buffer or region, and simultaneously have other
+     occurrences edited in the same way
+   #+BEGIN_SRC emacs-lisp
+   (use-package iedit
+    :ensure
+    :bind (("C-;" . iedit-mode) 
+           ("C-:" . iedit-mode-from-isearch)))
+   #+END_SRC
 ** Speedbar
-#+BEGIN_SRC emacs-lisp
-  (use-package speedbar 
-    :config 
-    (setq speedbar-use-images nil 
-          speedbar-show-unknown-files t)
-  ) 
+   - speedbar
+   #+BEGIN_SRC emacs-lisp
+   (use-package speedbar 
+   :config 
+   (setq speedbar-use-images nil 
+         speedbar-show-unknown-files t)) 
+   #+END_SRC
 
+   - sr-speedbar
+   #+BEGIN_SRC emacs-lisp
   (use-package sr-speedbar 
-    :ensure t
-    :after speedbar
-    :config 
-    (setq sr-speedbar-right-side nil 
-          sr-speedbar-max-width 40
-          sr-speedbar-width 30 
-          sr-speedbar-default-width 30
-          sr-speedbar-skip-other-window-p t)
-  )
-#+END_SRC
-
+   :ensure t
+   :after speedbar
+   :config 
+   (setq sr-speedbar-right-side nil 
+         sr-speedbar-max-width 40
+         sr-speedbar-width 30 
+         sr-speedbar-default-width 30
+         sr-speedbar-skip-other-window-p t))
+   #+END_SRC
 
 * Shell
 ** Terminal
