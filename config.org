@@ -259,6 +259,7 @@
          sr-speedbar-skip-other-window-p t))
    #+END_SRC
 
+
 * Shell
 ** Terminal
   - New shell
@@ -401,17 +402,19 @@
 
 * Code
 ** VHDL 
-   - Unbind SPC because vhdl-electric-space has a weird behavior
-   #+BEGIN_SRC emacs-lisp
-     (eval-after-load "vhdl-mode"
-        '(progn (define-key vhdl-mode-map (kbd "SPC") nil))) 
-   #+END_SRC
 
    - Customize VHDL-mode
    #+BEGIN_SRC emacs-lisp
-   (add-hook 'vhdl-mode-hook
-     (lambda() (local-set-key (kbd "C-c C-d") 'vhdl-align-region)))
+   (defun my-vhdl-mode-hook ()
+     (setq vhdl-standard (quote (08 nil)))
+     (define-key vhdl-mode-map (kbd "<backtab>") 'vhdl-align-region)
+     (define-key vhdl-mode-map "SPC" nil))     
    #+END_SRC
+   
+   - VHDL-Hook
+   #+BEGIN_SRC emacs-lisp
+   (add-hook 'vhdl-mode-hook 'my-vhdl-mode-hook)
+   #+END_SRC 
 
 ** TCL
    - Associate .sdc & .do files to tcl-mode  
