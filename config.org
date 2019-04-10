@@ -113,6 +113,17 @@
     :init (add-hook 'after-init-hook (lambda () (desktop+-load "default"))))
   #+END_SRC
 
+** Modeline
+   #+BEGIN_SRC emacs-lisp
+   (when (display-graphic-p)
+     (use-package smart-mode-line
+       :init
+       (setq sml/no-confirm-load-theme t)
+       (setq sml/theme 'light-powerline) ;; automatic light dark respectful
+       :config
+       (sml/setup)))
+   #+END_SRC
+
 
 * Navigation
 ** Projectile 
@@ -222,10 +233,10 @@
    #+BEGIN_SRC emacs-lisp
    (use-package multiple-cursors
    :ensure
-   :bind (("C-S-c C-S-c" . mc/edit-lines)
-          ("C->"         . mc/mark-next-like-this)
-          ("C-<"         . mc/mark-previous-like-this)
-          ("C-c C-<"     . mc/mark-all-like-this)))
+   :bind (("C->"     . mc/mark-next-like-this)
+          ("C-<"     . mc/mark-previous-like-this)
+          ("C-c C->" . mc/edit-lines)
+          ("C-c C-<" . mc/mark-all-like-this)))
    #+END_SRC
 
 ** idedit
@@ -360,8 +371,7 @@
   (setq LaTeX-command-style '(("" "%(PDF)%(latex) --shell-escape %S%(PDFout)")))
   #+END_SRC
 
-** Bibliography  
-*** Ivy-Bibtex
+** Bibtex
  #+BEGIN_SRC emacs-lisp
  (use-package ivy-bibtex
    :ensure t
@@ -380,17 +390,17 @@
             (call-process "evince" nil 0 nil fpath))))
  #+END_SRC
    
-*** Org-Ref
- #+BEGIN_SRC emacs-lisp
-   (use-package org-ref
-     :after org
-     :init
-     (setq org-ref-default-bibliography '("~/Projects/research/bibliography/Library.bib"))
-     (setq org-ref-bibliography-notes   "~/Projects/research/bibliography/Library.org")
-     (setq org-ref-completion-library   'org-ref-ivy-cite))
- #+END_SRC
+** Org-Ref
+#+BEGIN_SRC emacs-lisp
+  (use-package org-ref
+    :after org
+    :init
+    (setq org-ref-default-bibliography '("~/Projects/research/bibliography/Library.bib"))
+    (setq org-ref-bibliography-notes   "~/Projects/research/bibliography/Library.org")
+    (setq org-ref-completion-library   'org-ref-ivy-cite))
+#+END_SRC
    
-** Markdown 
+** Markdown
 #+BEGIN_SRC emacs-lisp
 (use-package markdown-mode
   :ensure t
@@ -408,7 +418,7 @@
    (defun my-vhdl-mode-hook ()
      (setq vhdl-standard (quote (08 nil)))
      (define-key vhdl-mode-map (kbd "<backtab>") 'vhdl-align-region)
-     (define-key vhdl-mode-map "SPC" nil))     
+     (define-key vhdl-mode-map " " nil))     
    #+END_SRC
    
    - VHDL-Hook
