@@ -119,7 +119,7 @@
      (use-package smart-mode-line
        :init
        (setq sml/no-confirm-load-theme t)
-       (setq sml/theme 'light-powerline) ;; automatic light dark respectful
+       (setq sml/theme 'light) ;; automatic light dark respectful
        :config
        (sml/setup)))
    #+END_SRC
@@ -205,11 +205,15 @@
 #+BEGIN_SRC emacs-lisp
   (use-package company
     :defer t
-    :diminish (company-mode . "comp")
-    :init (add-hook 'after-init-hook 'global-company-mode)
+    :diminish 
+    (company-mode . "cny")
+    :init 
+    (add-hook 'after-init-hook 'global-company-mode)
     :config 
-    ;; Give Company a decent default configuration.
-    (cl-pushnew '(company-files company-shell-env) company-backends)
+    (add-to-list 'company-backends 'company-files t)
+    (add-to-list 'company-backends 'company-shell-env t)
+    (setq company-backends (remove 'company-clang company-backends))
+    ;; (cl-pushnew '(company-files company-shell-env) company-backends)
     (setq company-minimum-prefix-length 2
           company-selection-wrap-around t
           company-show-numbers t
