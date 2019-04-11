@@ -52,6 +52,7 @@
   (global-set-key (kbd "M-g")         'goto-line)
   (global-set-key (kbd "<C-return>")  "\C-a\C- \C-e\M-w\C-j\C-y") ; Duplicate line
   (global-set-key (kbd "C-c h")       'counsel-command-history)
+  (global-set-key (kbd "C-c t")       'org-time-stamp)
 #+END_SRC
 
 ** Packages
@@ -277,22 +278,11 @@
 
 * Shell
 ** Terminal
-  - New shell
-  #+BEGIN_SRC emacs-lisp
-  (defun new-shell ()
-      "creates a shell with a given name"
-      (interactive);; "Prompt\n shell name:")
-      (let ((shell-name (read-string "shell name: " nil)))
-        (shell (concat "*" shell-name "*"))))
 
-  (global-set-key (kbd "C-c t") 'new-shell)
-  #+END_SRC
- 
   - Clear shell
   #+BEGIN_SRC emacs-lisp
   (add-hook 'shell-mode-hook
-            (lambda ()
-              (local-set-key (kbd "C-l") 'comint-clear-buffer)))
+    (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
   #+END_SRC
  
   - Color support
@@ -306,10 +296,10 @@
  #+BEGIN_SRC emacs-lisp
  (use-package tramp
    :config
-   (progn
-      (setq tramp-default-method "ssh")))
- 
- (add-to-list 'tramp-remote-path 'tramp-own-remote-path)          
+   (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+   (progn 
+     (setq tramp-default-method "ssh")))
+  
  #+END_SRC
 ** Dired
    - Load Dired-X
