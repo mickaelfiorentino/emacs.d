@@ -45,7 +45,6 @@
   (global-set-key (kbd "M-1")         'delete-other-windows)
   (global-set-key (kbd "M-2")         'split-window-vertically)
   (global-set-key (kbd "M-3")         'split-window-horizontally)
-  (global-set-key (kbd "M-u")         'undo)
   (global-set-key (kbd "M-o")         'other-window)
   (global-set-key (kbd "M-k")         'kill-buffer-and-window)
   (global-set-key (kbd "C-x C-b")     'ibuffer)
@@ -53,6 +52,7 @@
   (global-set-key (kbd "<C-return>")  "\C-a\C- \C-e\M-w\C-j\C-y") ; Duplicate line
   (global-set-key (kbd "C-c h")       'counsel-command-history)
   (global-set-key (kbd "C-c t")       'org-time-stamp)
+  (global-set-key (kbd "C-c q")       'quick-calc) ;; convert hexa --> 16#<hex> RET 
 #+END_SRC
 
 ** Packages
@@ -253,6 +253,7 @@
     :bind (("C-;" . iedit-mode) 
            ("C-:" . iedit-mode-from-isearch)))
    #+END_SRC
+
 ** Speedbar
    - speedbar
    #+BEGIN_SRC emacs-lisp
@@ -273,6 +274,14 @@
          sr-speedbar-width 30 
          sr-speedbar-default-width 30
          sr-speedbar-skip-other-window-p t))
+   #+END_SRC
+** Undo-tree
+   #+BEGIN_SRC emacs-lisp
+   (use-package undo-tree
+     :diminish undo-tree-mode
+     :config (global-undo-tree-mode 1)
+     :bind ("M-u"   . undo-tree-undo) 
+           ("C-M-u" . undo-tree-redo))
    #+END_SRC
 
 
@@ -318,9 +327,9 @@
 ** Magit
  #+BEGIN_SRC emacs-lisp
  (use-package magit
+   :ensure
    :bind ("C-x g" . magit-status))
  #+END_SRC
-
 
 * Write
 ** Org
