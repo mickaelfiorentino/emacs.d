@@ -53,6 +53,10 @@
   (global-set-key (kbd "C-c h")       'counsel-command-history)
   (global-set-key (kbd "C-c t")       'org-time-stamp)
   (global-set-key (kbd "C-c q")       'quick-calc) ;; convert hexa --> 16#<hex> RET 
+  (global-set-key (kbd "C-c l")       'downcase-dwim)
+  (global-set-key (kbd "C-c u")       'upcase-dwim)
+  (global-set-key (kbd "C-c l")       'downcase-dwim)
+  (global-set-key (kbd "C-c a")       'align-regexp)
 #+END_SRC
 
 ** Packages
@@ -330,6 +334,7 @@
    :ensure
    :bind ("C-x g" . magit-status))
  #+END_SRC
+
 
 * Write
 ** Org
