@@ -118,15 +118,22 @@
     :init (add-hook 'after-init-hook (lambda () (desktop+-load "default"))))
   #+END_SRC
 
-** Modeline
+** Themes
+   - Modeline
    #+BEGIN_SRC emacs-lisp
-   (when (display-graphic-p)
-     (use-package smart-mode-line
-       :init
-       (setq sml/no-confirm-load-theme t)
-       (setq sml/theme 'light) ;; automatic light dark respectful
-       :config
-       (sml/setup)))
+    (when (display-graphic-p)
+      (use-package smart-mode-line
+        :init
+        (setq sml/no-confirm-load-theme t)
+        (setq sml/theme 'light) ;; automatic light dark respectful
+        :config
+        (sml/setup)))
+   #+END_SRC
+   - Global
+   #+BEGIN_SRC emacs-lisp
+    (when (display-graphic-p)
+      (load-theme 'tango-plus t)
+      (set-face-attribute 'default nil :font "Hack"))
    #+END_SRC
 
 
