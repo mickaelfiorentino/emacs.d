@@ -9,5 +9,4 @@ config.el
 *.eld
 /session.*
 desktop/
-lisp/
 url/
