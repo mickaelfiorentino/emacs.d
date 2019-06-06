@@ -131,9 +131,9 @@
    #+END_SRC
    - Global
    #+BEGIN_SRC emacs-lisp
-    (when (display-graphic-p)
-      (load-theme 'tango-plus t)
-      (set-face-attribute 'default nil :font "Hack"))
+     (when (display-graphic-p)
+       (load-theme 'tango-plus t)
+       (set-face-attribute 'default nil :font "Hack"))
    #+END_SRC
 
 
@@ -141,6 +141,8 @@
 ** Projectile 
 #+BEGIN_SRC emacs-lisp
  (use-package projectile
+   :diminish 
+   (projectile-mode . "Prj")   
    :config
    (projectile-mode)
    (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
@@ -218,7 +220,7 @@
   (use-package company
     :defer t
     :diminish 
-    (company-mode . "cny")
+    (company-mode . "Cmp")
     :init 
     (add-hook 'after-init-hook 'global-company-mode)
     :config 
