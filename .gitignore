@@ -10,3 +10,5 @@ config.el
 /session.*
 desktop/
 url/
+transient/
+.emacs-buffers
