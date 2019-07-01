@@ -141,7 +141,26 @@
         (sml/setup)))
    #+END_SRC
 
+** YaSnippets
+   #+BEGIN_SRC emacs-lisp
+   (use-package yasnippet                  ; Snippets
+   :ensure t
+   :diminish yas
+   :config
+   (setq yas-verbosity 1                      
+         yas-wrap-around-region t)
 
+   (add-to-list #'yas-snippet-dirs "~/.emacs.d/emacs.d/yasnippets")
+   (yas-reload-all)
+   (yas-global-mode))
+
+   #+END_SRC
+
+   #+BEGIN_SRC emacs-lisp
+   (use-package yasnippet-snippets         
+   :ensure t)
+   #+END_SRC
+   
 * Navigation
 ** Projectile 
 #+BEGIN_SRC emacs-lisp
@@ -430,6 +449,17 @@
          ("\\.markdown\\'" . markdown-mode))
 )
 #+END_SRC
+
+** Dokuwiki
+   - Dokuwiki Login
+   #+BEGIN_SRC emacs-lisp
+   (setq dokuwiki-xml-rpc-url "https://nastasia.no-ip.ca/dokuwiki/lib/exe/xmlrpc.php")
+   (setq dokuwiki-login-user-name "mickael")   
+   #+END_SRC
+   - Dokuwiki mode 
+   #+BEGIN_SRC emacs-lisp
+   (add-to-list 'auto-mode-alist '("\\.dwiki\\'" . dokuwiki-mode))
+   #+END_SRC
 
 
 * Code
