@@ -141,26 +141,7 @@
         (sml/setup)))
    #+END_SRC
 
-** YaSnippets
-   #+BEGIN_SRC emacs-lisp
-   (use-package yasnippet                  ; Snippets
-   :ensure t
-   :diminish yas
-   :config
-   (setq yas-verbosity 1                      
-         yas-wrap-around-region t)
 
-   (add-to-list #'yas-snippet-dirs "~/.emacs.d/emacs.d/yasnippets")
-   (yas-reload-all)
-   (yas-global-mode))
-
-   #+END_SRC
-
-   #+BEGIN_SRC emacs-lisp
-   (use-package yasnippet-snippets         
-   :ensure t)
-   #+END_SRC
-   
 * Navigation
 ** Projectile 
 #+BEGIN_SRC emacs-lisp
@@ -339,14 +320,20 @@
   #+END_SRC
 
 ** Tramp
- #+BEGIN_SRC emacs-lisp
- (use-package tramp
-   :config
-   (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
-   (progn 
-     (setq tramp-default-method "ssh")))
-  
- #+END_SRC
+   #+BEGIN_SRC emacs-lisp
+   (use-package tramp
+     :config
+     (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+     (progn 
+       (setq tramp-default-method "ssh")))
+   #+END_SRC
+
+   * To open a (remote) file with sudo follow the explanation from [[https://www.emacswiki.org/emacs/TrampMode#toc17][EmacsWiki]]:
+     - Sudo on local host: ~C-x C-f /sudo:: <TAB>~
+     - With Ivy, the hydra (M-o) r opens file as root
+     - Sudo on /remote/ with any /user/ when ssh/config knows /abbrev/: 
+       ~C-x C-f /ssh:abbrev|sudo:user@remote:/path/to/file~
+
 ** Dired
    - Load Dired-X
      #+BEGIN_SRC emacs-lisp
@@ -367,7 +354,7 @@
    :ensure
    :bind ("C-x g" . magit-status))
  #+END_SRC
-
+ 
 
 * Write
 ** Org
@@ -461,6 +448,26 @@
    (add-to-list 'auto-mode-alist '("\\.dwiki\\'" . dokuwiki-mode))
    #+END_SRC
 
+** YaSnippets
+   #+BEGIN_SRC emacs-lisp
+   (use-package yasnippet                  ; Snippets
+   :ensure t
+   :diminish yas
+   :config
+   (setq yas-verbosity 1                      
+         yas-wrap-around-region t)
+
+   (add-to-list #'yas-snippet-dirs "~/.emacs.d/emacs.d/yasnippets")
+   (yas-reload-all)
+   (yas-global-mode))
+
+   #+END_SRC
+
+   #+BEGIN_SRC emacs-lisp
+   (use-package yasnippet-snippets         
+   :ensure t)
+   #+END_SRC
+   
 
 * Code
 ** VHDL 
