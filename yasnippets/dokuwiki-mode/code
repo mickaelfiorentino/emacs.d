@@ -1,7 +1,8 @@
 # -*- mode: snippet -*-
-# name: Code block
-# key: code
+# name: Code
+# contributor: Mickael Fiorentino <mickael.fiorentino@polymtl.ca>
+# key: <c
 # --
-\`\`\`$1
+<code:${1:language}>
 $0
-\`\`\`
+</code>

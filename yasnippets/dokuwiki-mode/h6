@@ -1,8 +1,8 @@
 # -*- mode: snippet -*-
-# name: Header 6
-# contributor: Peng Deng <dengpeng@gmail.com>
-# key: h6
+# name: Header 6 (=)
+# contributor: Mickael Fiorentino <mickael.fiorentino@polymtl.ca>
+# key: h
 # --
-###### ${1:Header 6} ######
+= ${1:Header 6} =
 
 $0

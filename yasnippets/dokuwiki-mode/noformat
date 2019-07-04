@@ -1,9 +1,6 @@
 # -*- mode: snippet -*-
-# name: Header 3 (====)
+# name: No Format
 # contributor: Mickael Fiorentino <mickael.fiorentino@polymtl.ca>
-# key: h
+# key: %
 # --
-
-==== ${1:Header 3} ====
-
-$0
+%%${1:Text}%% $0

@@ -1,9 +1,6 @@
 # -*- mode: snippet -*-
-# name: Header 3 (====)
+# name: deleted
 # contributor: Mickael Fiorentino <mickael.fiorentino@polymtl.ca>
-# key: h
+# key: <del
 # --
-
-==== ${1:Header 3} ====
-
-$0
+<del>${1:Text}</del> $0

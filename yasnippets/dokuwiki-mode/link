@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
 # name: Link
-# contributor: Peng Deng <dengpeng@gmail.com>
-# key: link
+# contributor: Mickael Fiorentino <mickael.fiorentino@polymtl.ca>
+# key: [[
 # --
-[${1:Link Text}](${2:URL} $3) $0
+[[${1:Link}|${2:Text}]] $0

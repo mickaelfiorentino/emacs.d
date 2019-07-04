@@ -5,25 +5,30 @@
 ** Defaults
 #+BEGIN_SRC emacs-lisp
   (setq-default
-   delete-by-moving-to-trash t                      ; Delete files to trash
-   display-time-format "%H:%M"                      ; Format the time string
-   fill-column 100                                  ; Set width for automatic line breaks
-   help-window-select t                             ; Focus new help windows when opened
+   inhibit-startup-screen t                         ; Disable start-up screen
+   initial-scratch-message ""                       ; Empty the initial *scratch* buffer
+   visible-bell 1                                   ; Please don't beep at me
    indent-tabs-mode nil                             ; Stop using tabs to indent
    tab-width 4                                      ; Set width for tabs
    tab-always-indent 'complete                      ; Tabs perform completion
-   inhibit-startup-screen t                         ; Disable start-up screen
-   initial-scratch-message ""                       ; Empty the initial *scratch* buffer
    make-backup-files nil                            ; No backup files
    auto-save-default nil                            ; No auto-save
    mouse-yank-at-point t                            ; Yank at point rather than pointer
+   fill-column 100                                  ; Set width for automatic line breaks
+   gc-cons-threshold            50000000            ; Garbage collection size -> 50Mb
+   large-file-warning-threshold 100000000           ; File size limit warning -> 100Mb
+   delete-by-moving-to-trash t                      ; Delete files to trash
+   display-time-format "%H:%M"                      ; Format the time string
+   help-window-select t                             ; Focus new help windows when opened
    scroll-conservatively most-positive-fixnum       ; Always scroll by one line
    scroll-margin 0                                  ; Add a margin when scrolling vertically
-   select-enable-clipboard t                        ; Merge system's and Emacs' clipboard
+   select-enable-clipboard t                        ; Merge system's and Emacs' clipboard   
    show-trailing-whitespace nil                     ; Display trailing whitespaces
    uniquify-buffer-name-style 'forward              ; uniquify buffer names
    window-combination-resize t                      ; Resize windows proportionally
-   visible-bell 1                                   ; Please don't beep at me
+   column-number-mode 1                             ; Column number next to line number 
+   delete-selection-mode 1                          ; Typed text replaces the selection
+   global-auto-revert-mode 1                        ; Automatically revert buffer from file
    x-stretch-cursor t)                              ; Stretch cursor to the glyph width
   (set-default-coding-systems 'utf-8)               ; Default to utf-8 encoding
   (fset 'yes-or-no-p 'y-or-n-p)                     ; Replace yes/no prompts with y/n
@@ -36,6 +41,7 @@
     (menu-bar-mode -1)                              ; Disable the menu bar
     (tool-bar-mode -1)                              ; Disable tool-bar
     (scroll-bar-mode -1))                           ; Disable Scroll bar
+  (add-hook 'text-mode-hook 'turn-on-visual-line-mode)
 #+END_SRC
 
 ** Keybindings
@@ -123,22 +129,22 @@
   #+END_SRC
 
 ** Themes
-   - Global
    #+BEGIN_SRC emacs-lisp
      (when (display-graphic-p)
        (load-theme 'tango-plus t)
        (set-face-attribute 'default nil :font "Hack"))
    #+END_SRC
-
-   - Modeline
+** Modeline
    #+BEGIN_SRC emacs-lisp
-    (when (display-graphic-p)
-      (use-package smart-mode-line
-        :init
-        (setq sml/no-confirm-load-theme t)
-        (setq sml/theme 'light) ;; automatic light dark respectful
-        :config
-        (sml/setup)))
+     (when (display-graphic-p)
+       (use-package smart-mode-line
+         :init
+         (setq sml/no-confirm-load-theme t)
+         (setq sml/theme 'light) ;; automatic light dark respectful
+         :config
+         (sml/setup)
+       )
+     )
    #+END_SRC
 
 
@@ -177,35 +183,46 @@
 #+END_SRC
 
 ** Ivy
-#+BEGIN_SRC emacs-lisp
-(use-package ivy
-  :ensure t
-  :diminish (ivy-mode . "")
-  :bind 
-  (:map ivy-mode-map ("C-'" . ivy-avy))
-  :config
-  (ivy-mode 1)
-  (setq ivy-use-virtual-buffers t)
-  (setq ivy-height 10)
-  (setq ivy-count-format "(%d/%d)")
-  (setq ivy-display-style 'fancy)
-  (setq ivy-initial-inputs-alist nil)
-  (setq ivy-re-builders-alist
-  ;; allow input not in order
-  '((t   . ivy--regex-ignore-order))))
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp
+   (use-package ivy
+     :ensure t
+     :diminish (ivy-mode . "")
+     :config (ivy-mode)
+     :custom
+     (ivy-use-virtual-buffers t)
+     (ivy-height 10)
+     (ivy-count-format "(%d/%d)")
+     (ivy-display-style 'fancy)
+     (ivy-initial-inputs-alist nil)
+     (ivy-re-builders-alist     
+        '((t . ivy--regex-ignore-order))) ;; allow input not in order
+   )
+   #+END_SRC
+
+   #+BEGIN_SRC emacs-lisp
+   (use-package ivy-rich
+     :after ivy
+     :custom
+     (ivy-virtual-abbreviate 'full)
+     (ivy-rich-switch-buffer-align-virtual-buffer t)
+     (ivy-rich-path-style 'abbrev)
+     :config
+     (ivy-rich-mode 1)     
+   )
+   #+END_SRC
 
 ** Counsel
-#+BEGIN_SRC emacs-lisp
-(use-package counsel
-  :config
-  (counsel-projectile-mode)
-  :bind (("M-x"     . counsel-M-x)
-         ("C-x C-f" . counsel-find-file)
-         ("C-="     . counsel-projectile-switch-to-buffer)
-         ("C-+"     . counsel-projectile-switch-project)
-         ("C-M-s"   . counsel-ag)))
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp
+   (use-package counsel
+     :after ivy
+     :config
+     (counsel-projectile-mode)
+     :bind (("M-x"     . counsel-M-x)
+            ("C-x C-f" . counsel-find-file)
+            ("C-="     . counsel-projectile-switch-to-buffer)
+            ("C-+"     . counsel-projectile-switch-project)
+            ("C-M-s"   . counsel-ag)))
+   #+END_SRC
    
 ** Swiper
    #+BEGIN_SRC emacs-lisp
@@ -219,6 +236,18 @@
    #+BEGIN_SRC emacs-lisp
    (use-package ace-window
    :bind ("C-M-o" . ace-window))
+   #+END_SRC
+
+
+* Edit
+** Multiple Cursors
+   #+BEGIN_SRC emacs-lisp
+   (use-package multiple-cursors
+   :ensure
+   :bind (("C->"     . mc/mark-next-like-this)
+          ("C-<"     . mc/mark-previous-like-this)
+          ("C-c C->" . mc/edit-lines)
+          ("C-c C-<" . mc/mark-all-like-this)))
    #+END_SRC
 ** Company
 #+BEGIN_SRC emacs-lisp
@@ -250,16 +279,6 @@
       :bind (
 	   ("C-."  . er/expand-region)
 	   ("C-M-." . er/contract-region)))
-   #+END_SRC
-
-** Multiple Cursors
-   #+BEGIN_SRC emacs-lisp
-   (use-package multiple-cursors
-   :ensure
-   :bind (("C->"     . mc/mark-next-like-this)
-          ("C-<"     . mc/mark-previous-like-this)
-          ("C-c C->" . mc/edit-lines)
-          ("C-c C-<" . mc/mark-all-like-this)))
    #+END_SRC
 
 ** idedit
@@ -301,6 +320,27 @@
      :bind ("M-u"   . undo-tree-undo) 
            ("C-M-u" . undo-tree-redo))
    #+END_SRC
+
+** YaSnippets
+   #+BEGIN_SRC emacs-lisp
+   (use-package yasnippet                  ; Snippets
+   :ensure t
+   :diminish 
+   (yas-minor-mode . "YaS")
+   :config
+   (setq yas-verbosity 1                      
+         yas-wrap-around-region t)
+
+   (add-to-list #'yas-snippet-dirs "~/.emacs.d/emacs.d/yasnippets")
+   (yas-reload-all)
+   (yas-global-mode))
+
+   #+END_SRC
+
+   #+BEGIN_SRC emacs-lisp
+   (use-package yasnippet-snippets         
+   :ensure t)
+   #+END_SRC  
 
 
 * Shell
@@ -438,36 +478,39 @@
 #+END_SRC
 
 ** Dokuwiki
+
    - Dokuwiki Login
    #+BEGIN_SRC emacs-lisp
-   (setq dokuwiki-xml-rpc-url "https://nastasia.no-ip.ca/dokuwiki/lib/exe/xmlrpc.php")
-   (setq dokuwiki-login-user-name "mickael")   
-   #+END_SRC
-   - Dokuwiki mode 
-   #+BEGIN_SRC emacs-lisp
-   (add-to-list 'auto-mode-alist '("\\.dwiki\\'" . dokuwiki-mode))
-   #+END_SRC
-
-** YaSnippets
-   #+BEGIN_SRC emacs-lisp
-   (use-package yasnippet                  ; Snippets
-   :ensure t
-   :diminish yas
-   :config
-   (setq yas-verbosity 1                      
-         yas-wrap-around-region t)
-
-   (add-to-list #'yas-snippet-dirs "~/.emacs.d/emacs.d/yasnippets")
-   (yas-reload-all)
-   (yas-global-mode))
-
-   #+END_SRC
-
-   #+BEGIN_SRC emacs-lisp
-   (use-package yasnippet-snippets         
-   :ensure t)
+   (use-package dokuwiki
+     :ensure t
+     :config (setq dokuwiki-xml-rpc-url "https://nastasia.no-ip.ca/dokuwiki/lib/exe/xmlrpc.php")
+             (setq dokuwiki-login-user-name "mickael")
+   )
    #+END_SRC
    
+   - Dokuwiki mode 
+   #+BEGIN_SRC emacs-lisp
+   (use-package dokuwiki-mode
+     :ensure t
+     :mode "\\.dwiki\\'"
+     :bind (:map dokuwiki-mode-map 
+                 ("C-c C-l" . dokuwiki-list-pages)
+                 ("C-c C-s" . dokuwiki-save-page))
+   )
+   #+END_SRC   
+
+** Outline 
+   #+BEGIN_SRC emacs-lisp
+   (use-package outline
+     :hook (dokuwiki-mode latex-mode)
+     :bind (:map outline-minor-mode-map
+                 ("<tab>"     . outline-show-entry)
+                 ("<backtab>" . outline-hide-entry)
+                 ("C-<tab>"   . outline-next-heading)
+                 ("C-#"       . outline-previous-heading))
+   )
+   #+END_SRC
+
 
 * Code
 ** VHDL 
@@ -485,6 +528,34 @@
    (add-hook 'vhdl-mode-hook 'my-vhdl-mode-hook)
    #+END_SRC 
 
+** Verilog
+   #+BEGIN_SRC emacs-lisp
+   (use-package verilog-mode
+   :mode (("\\.[st]*v[hp]*\\'" . verilog-mode) ;.v, .sv, .svh, .tv, .vp
+          ("\\.f\\'"           . verilog-mode) ;verilog file lists
+          ("\\.psl\\'"         . verilog-mode)
+          ("\\.vams\\'"        . verilog-mode)
+          ("\\.vinc\\'"        . verilog-mode))
+   :config
+     (setq verilog-indent-level             4);   3 
+     (setq verilog-indent-level-module      4);   3
+     (setq verilog-indent-level-declaration 4);   3
+     (setq verilog-indent-level-behavioral  4);   3
+     (setq verilog-indent-level-directive   0);   1
+     (setq verilog-case-indent              4);   2
+     (setq verilog-tab-always-indent        t); t
+     (setq verilog-indent-begin-after-if    nil); t
+     (setq verilog-auto-newline             nil); t
+     (setq verilog-auto-indent-on-newline   t);   t
+     (setq verilog-minimum-comment-distance 10);  10
+     (setq verilog-indent-begin-after-if    t);   t
+     (setq verilog-auto-lineup              'declarations) ;'declarations
+     (setq verilog-align-ifelse             t);   nil
+     (setq verilog-auto-endcomments         nil); t
+     (setq verilog-tab-to-comment           nil); nil
+     (setq verilog-date-scientific-format   t);   t
+   )
+   #+END_SRC
 ** TCL
    - Associate .sdc & .do files to tcl-mode  
    #+BEGIN_SRC emacs-lisp

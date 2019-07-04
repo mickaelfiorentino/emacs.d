@@ -1,9 +1,6 @@
 # -*- mode: snippet -*-
-# name: Header 3 (====)
+# name: subscript
 # contributor: Mickael Fiorentino <mickael.fiorentino@polymtl.ca>
-# key: h
+# key: <sub
 # --
-
-==== ${1:Header 3} ====
-
-$0
+<sub>${1:Text}</sub> $0

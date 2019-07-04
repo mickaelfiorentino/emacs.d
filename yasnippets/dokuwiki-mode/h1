@@ -1,9 +1,8 @@
 # -*- mode: snippet -*-
 # name: Header 1 (======)
 # contributor: Mickael Fiorentino <mickael.fiorentino@polymtl.ca>
-# key: h1
+# key: h
 # --
-
 ====== ${1:Header 1} ======
 
 $0

@@ -16,7 +16,7 @@
  '(menu-bar-mode nil)
  '(package-selected-packages
    (quote
-    (yasnippet-snippets yasnippet dokuwiki-mode dokuwiki counsel-projectile markdown-mode org-ref ivy-bibtex auctex magit undo-tree sr-speedbar iedit multiple-cursors expand-region company ace-window counsel ivy ag ibuffer-projectile projectile use-package tango-plus-theme smart-mode-line diminish desktop+)))
+    (ivy-rich yasnippet-snippets yasnippet dokuwiki-mode dokuwiki counsel-projectile markdown-mode org-ref ivy-bibtex auctex magit undo-tree sr-speedbar iedit multiple-cursors expand-region company ace-window counsel ivy ag ibuffer-projectile projectile use-package tango-plus-theme smart-mode-line diminish desktop+)))
  '(show-paren-mode t)
  '(tcl-application "tclsh")
  '(tool-bar-mode nil))
