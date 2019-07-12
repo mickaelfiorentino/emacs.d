@@ -16,10 +16,12 @@
  '(menu-bar-mode nil)
  '(package-selected-packages
    (quote
-    (ivy-rich yasnippet-snippets yasnippet dokuwiki-mode dokuwiki counsel-projectile markdown-mode org-ref ivy-bibtex auctex magit undo-tree sr-speedbar iedit multiple-cursors expand-region company ace-window counsel ivy ag ibuffer-projectile projectile use-package tango-plus-theme smart-mode-line diminish desktop+)))
+    (ivy-prescient company-prescient prescient ivy-rich yasnippet-snippets yasnippet dokuwiki-mode dokuwiki counsel-projectile markdown-mode org-ref ivy-bibtex auctex magit undo-tree sr-speedbar iedit multiple-cursors expand-region company ace-window counsel ivy ag ibuffer-projectile projectile use-package tango-plus-theme smart-mode-line diminish desktop+)))
  '(show-paren-mode t)
  '(tcl-application "tclsh")
- '(tool-bar-mode nil))
+ '(tool-bar-mode nil)
+ '(verilog-indent-begin-after-if nil)
+ '(verilog-indent-level-behavioral 0))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
