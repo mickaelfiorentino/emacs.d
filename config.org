@@ -1,5 +1,6 @@
-#+STARTUP: content
+#+TITLE: Emacs Configuration
 #+AUTHOR: Mickael Fiorentino
+#+EMAIL: mickael.fiorentino@mailbox.org
 
 * Basics 
 ** Defaults
@@ -431,24 +432,28 @@
 
 * Write
 ** Org
- - TODOs
- #+BEGIN_SRC emacs-lisp
- (setq org-todo-keywords '((sequence "TODO" "PROCESS" "|" "DONE" )))
- #+END_SRC
 
- - Export
- #+BEGIN_SRC emacs-lisp
- (require 'ox)
- (setq org-latex-listings 'minted)
- (setq org-latex-pdf-process
-       '("pdflatex --shell-escape --interaction nonstopmode %f"
-         "bibtex %b"
-         "pdflatex --shell-escape --interaction nonstopmode %f"
-         "pdflatex --shell-escape --interaction nonstopmode %f"))
- (add-to-list 'org-latex-packages-alist '("" "listings"))
- (add-to-list 'org-latex-packages-alist '("" "color"))
- (add-to-list 'org-latex-packages-alist '("" "minted"))
- #+END_SRC
+   - Config
+   #+BEGIN_SRC emacs-lisp
+     (setq org-todo-keywords '((sequence "TODO" "PROCESS" "|" "DONE" )))
+     (setq org-startup-folded (quote content))
+     (setq org-startup-indented t)
+     (setq org-hide-leading-stars t) 
+   #+END_SRC
+
+   - Export
+   #+BEGIN_SRC emacs-lisp
+     (require 'ox)
+     (setq org-latex-listings 'minted)
+     (setq org-latex-pdf-process
+     '("pdflatex --shell-escape --interaction nonstopmode %f"
+     "bibtex %b"
+     "pdflatex --shell-escape --interaction nonstopmode %f"
+     "pdflatex --shell-escape --interaction nonstopmode %f"))
+     (add-to-list 'org-latex-packages-alist '("" "listings"))
+     (add-to-list 'org-latex-packages-alist '("" "color"))
+     (add-to-list 'org-latex-packages-alist '("" "minted"))   
+   #+END_SRC
 
 ** Latex
  - Use auctex + evince + synctex
