@@ -13,3 +13,4 @@ url/
 transient/
 .emacs-buffers
 /network-security.data
+/lisp/smart-mode-line/smart-mode-line-autoloads.el

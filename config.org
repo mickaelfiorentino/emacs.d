@@ -2,57 +2,53 @@
 #+AUTHOR: Mickael Fiorentino
 #+EMAIL: mickael.fiorentino@mailbox.org
 
-* Basics 
+* Basics
 ** Defaults
 #+BEGIN_SRC emacs-lisp
   (setq-default
-   inhibit-startup-screen t                         ; Disable start-up screen
-   initial-scratch-message ""                       ; Empty the initial *scratch* buffer
-   visible-bell 1                                   ; Please don't beep at me
-   indent-tabs-mode nil                             ; Stop using tabs to indent
-   tab-width 4                                      ; Set width for tabs
-   tab-always-indent 'complete                      ; Tabs perform completion
-   make-backup-files nil                            ; No backup files
-   auto-save-default nil                            ; No auto-save
-   mouse-yank-at-point t                            ; Yank at point rather than pointer
-   fill-column 100                                  ; Set width for automatic line breaks
-   gc-cons-threshold            50000000            ; Garbage collection size -> 50Mb
-   large-file-warning-threshold 100000000           ; File size limit warning -> 100Mb
-   delete-by-moving-to-trash t                      ; Delete files to trash
-   require-final-newline t                          ; May prevent some problems	                    
-   load-prefer-newer t                              ; Prefer newer file by default 
-   display-time-format "%H:%M"                      ; Format the time string
-   help-window-select t                             ; Focus new help windows when opened
-   scroll-conservatively most-positive-fixnum       ; Always scroll by one line
-   scroll-margin 0                                  ; Add a margin when scrolling vertically
-   select-enable-clipboard t                        ; Merge system's and Emacs' clipboard   
-   show-trailing-whitespace nil                     ; Display trailing whitespaces
-   uniquify-buffer-name-style 'forward              ; uniquify buffer names
-   window-combination-resize t                      ; Resize windows proportionally   
-   x-stretch-cursor t)                              ; Stretch cursor to the glyph width
-  (set-default-coding-systems 'utf-8)               ; Default to utf-8 encoding
-  (fset 'yes-or-no-p 'y-or-n-p)                     ; Replace yes/no prompts with y/n
-  (column-number-mode 1)                            ; Column number next to line number 
-  (global-subword-mode 0)                           ; Iterate through CamelCase words
-  (delete-selection-mode 1)                         ; Replace region when inserting text
-  (global-auto-revert-mode 1)                       ; Automatically revert buffer from file
-  (display-time-mode 1)                             ; Enable time in the mode-line
-  (show-paren-mode 1)                               ; Show matching parenthesis
+   inhibit-startup-screen t                            ; Disable start-up screen
+   initial-scratch-message ""                          ; Empty the initial *scratch* buffer
+   visible-bell 1                                      ; Please don't beep at me
+   indent-tabs-mode nil                                ; Stop using tabs to indent
+   tab-width 4                                         ; Set width for tabs
+   tab-always-indent 'complete                         ; Tabs perform completion
+   make-backup-files nil                               ; No backup files
+   auto-save-default nil                               ; No auto-save
+   mouse-yank-at-point t                               ; Yank at point rather than pointer
+   fill-column 100                                     ; Set width for automatic line breaks
+   gc-cons-threshold            50000000               ; Garbage collection size -> 50Mb
+   large-file-warning-threshold 100000000              ; File size limit warning -> 100Mb
+   delete-by-moving-to-trash t                         ; Delete files to trash
+   require-final-newline t                             ; May prevent some problems
+   load-prefer-newer t                                 ; Prefer newer file by default
+   display-time-format "%H:%M"                         ; Format the time string
+   help-window-select t                                ; Focus new help windows when opened
+   scroll-conservatively most-positive-fixnum          ; Always scroll by one line
+   scroll-margin 0                                     ; Add a margin when scrolling vertically
+   select-enable-clipboard t                           ; Merge system's and Emacs' clipboard
+   show-trailing-whitespace nil                        ; Display trailing whitespaces
+   uniquify-buffer-name-style 'forward                 ; uniquify buffer names
+   window-combination-resize t                         ; Resize windows proportionally
+   x-stretch-cursor t)                                 ; Stretch cursor to the glyph width
+  (set-default-coding-systems 'utf-8)                  ; Default to utf-8 encoding
+  (fset 'yes-or-no-p 'y-or-n-p)                        ; Replace yes/no prompts with y/n
+  (column-number-mode 1)                               ; Column number next to line number
+  (global-subword-mode 0)                              ; Iterate through CamelCase words
+  (delete-selection-mode 1)                            ; Replace region when inserting text
+  (global-auto-revert-mode 1)                          ; Automatically revert buffer from file
+  (display-time-mode 1)                                ; Enable time in the mode-line
+  (show-paren-mode 1)                                  ; Show matching parenthesis
+  (add-hook 'text-mode-hook 'turn-on-visual-line-mode) ; Wrap text at end-of-line in text-mode
   (when (display-graphic-p)
-    (fringe-mode 0)                                 ; Disable fringes
-    (menu-bar-mode -1)                              ; Disable the menu bar
-    (tool-bar-mode -1)                              ; Disable tool-bar
-    (scroll-bar-mode -1))                           ; Disable Scroll bar
-  (add-hook 'text-mode-hook 'turn-on-visual-line-mode)
-
-
-
-
+   (fringe-mode 0)                                     ; Disable fringes
+   (menu-bar-mode -1)                                  ; Disable the menu bar
+   (tool-bar-mode -1)                                  ; Disable tool-bar
+   (scroll-bar-mode -1))                               ; Disable Scroll bar
 #+END_SRC
 
 ** Keybindings
 #+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "RET")         'newline-and-indent)  
+  (global-set-key (kbd "RET")         'newline-and-indent)
   (global-set-key (kbd "M-0")         'delete-window)
   (global-set-key (kbd "M-1")         'delete-other-windows)
   (global-set-key (kbd "M-2")         'split-window-vertically)
@@ -66,8 +62,7 @@
   (global-set-key (kbd "<C-return>")  "\C-a\C- \C-e\M-w\C-j\C-y") ; Duplicate line
   (global-set-key (kbd "C-c h")       'counsel-command-history)
   (global-set-key (kbd "C-c t")       'org-time-stamp)
-  (global-set-key (kbd "C-c q")       'quick-calc) ;; convert hexa --> 16#<hex> RET 
-  (global-set-key (kbd "C-c l")       'downcase-dwim)
+  (global-set-key (kbd "C-c q")       'quick-calc)
   (global-set-key (kbd "C-c u")       'upcase-dwim)
   (global-set-key (kbd "C-c l")       'downcase-dwim)
   (global-set-key (kbd "C-c a")       'align-regexp)
@@ -77,410 +72,387 @@
 
 ** Packages
 
- - Add Melpa and org repos
+ - Melpa and Org repos
  #+BEGIN_SRC emacs-lisp
    (require 'package)
    (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
-   ;; (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/") t)
    (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
    (package-initialize)
  #+END_SRC
 
- - Add a local directory for custom elisp code
+ - Local directory for custom elisp code
  #+BEGIN_SRC emacs-lisp
- (add-to-list 'load-path (expand-file-name "lisp/" user-emacs-directory))
+   (add-to-list 'load-path (expand-file-name "lisp/" user-emacs-directory))
  #+END_SRC
 
-** use-package
  - Install packages if they are not installed
+ - ~:ensure t~ must be specified for each package we want to auto install
  #+BEGIN_SRC emacs-lisp
- (mapc
-  (lambda (package)
-    (if (not (package-installed-p package))
-        (progn
-          (package-refresh-contents)
-          (package-install package))))
-    '(use-package diminish bind-key))
+   (mapc
+    (lambda (package)
+      (if (not (package-installed-p package))
+          (progn
+            (package-refresh-contents)
+            (package-install package))))
+      '(use-package diminish bind-key))
 
- (eval-when-compile (require 'use-package))
- (require 'diminish)
- (require 'bind-key)
- (setq use-package-always-ensure t)
+   (eval-when-compile (require 'use-package))
+   (require 'diminish)
+   (require 'bind-key)
+   (setq use-package-always-ensure t)
  #+END_SRC
 
 ** Daemon
- - Allow access from emacsclient
- #+BEGIN_SRC emacs-lisp
- (use-package server
+
+- Allow access from emacsclient
+#+BEGIN_SRC emacs-lisp
+  (use-package server
+   :ensure t
    :config
    (unless (server-running-p) (server-start)))
- #+END_SRC
+#+END_SRC
 
- - Alias in .bashrc:
- #+BEGIN_SRC shell
- alias e="emacsclient -n"
- #+END_SRC
+- Alias in .bashrc:
+#+BEGIN_SRC shell
+  alias e="emacsclient -n"
+#+END_SRC
 
 ** Desktops
-  #+BEGIN_SRC emacs-lisp
+
+- Desktop+ allows to save/load multiple desktops
+#+BEGIN_SRC emacs-lisp
   (use-package desktop+
-    :ensure t
-    :config
-    (setq desktop-save t)   
-    (setq desktop-buffers-not-to-save "^$")
-    (setq desktop-files-not-to-save (not desktop-buffers-not-to-save))
-    (setq desktop+-base-dir (expand-file-name "desktop/" user-emacs-directory))
-    :bind ("C-c d" . desktop+-load)
-    :init (add-hook 'after-init-hook (lambda () (desktop+-load "default"))))
-  #+END_SRC
+   :ensure t
+   :bind ("C-c d" . desktop+-load)
+   :config
+   (setq desktop-save t)
+   (setq desktop-buffers-not-to-save "^$")
+   (setq desktop-files-not-to-save (not desktop-buffers-not-to-save))
+   (setq desktop+-base-dir (expand-file-name "desktop/" user-emacs-directory))
+   :init (add-hook 'after-init-hook (lambda () (desktop+-load "default"))))
+#+END_SRC
 
 ** Themes
-   #+BEGIN_SRC emacs-lisp
-     (when (display-graphic-p)
-       (load-theme 'tango-plus t)
-       (set-face-attribute 'default nil :font "Hack"))
-   #+END_SRC
-** Modeline
-   #+BEGIN_SRC emacs-lisp
-     (when (display-graphic-p)
-       (use-package smart-mode-line
-         :init
-         (setq sml/no-confirm-load-theme t)
-         (setq sml/theme 'light) ;; automatic light dark respectful
-         :config
-         (sml/setup)
-       )
-     )
-   #+END_SRC
 
+- Using tango-plus theme + Hack font
+#+BEGIN_SRC emacs-lisp
+  (when (display-graphic-p)
+   (use-package tango-plus-theme)  
+   (set-face-attribute 'default nil :font "Hack")
+   (load-theme 'tango-plus t))   
+#+END_SRC
+
+** Modeline
+
+- Using smart-mode-line with light theme
+#+BEGIN_SRC emacs-lisp
+  (when (display-graphic-p)
+   (use-package smart-mode-line
+    :ensure t
+    :init (add-hook 'after-init-hook 'sml/setup)
+    :config
+    (setq sml/no-confirm-load-theme t)
+    (setq sml/theme 'light))) ;; automatic light dark respectful    
+#+END_SRC
 
 * Navigation
-** Projectile 
+** Projectile
+
 #+BEGIN_SRC emacs-lisp
- (use-package projectile
-   :diminish 
-   (projectile-mode . "Prj")   
-   :config
-   (projectile-mode)
-   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
+  (use-package projectile
+   :ensure t
+   :diminish (projectile-mode . "P")
+   :config (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+   :init (projectile-mode))
 #+END_SRC
 
-** Ibuffer
+** Speedbar
+
+- speedbar
 #+BEGIN_SRC emacs-lisp
-(use-package ibuffer-projectile
-  :init
-  (add-hook 'ibuffer-hook
-    (lambda ()
-      (ibuffer-projectile-set-filter-groups)
-      (unless (eq ibuffer-sorting-mode 'alphabetic)
-        (ibuffer-do-sort-by-alphabetic)))))
+  (use-package speedbar
+   :ensure nil
+   :config
+   (setq speedbar-use-images nil
+         speedbar-show-unknown-files t))
 #+END_SRC
+
+- sr-speedbar
+#+BEGIN_SRC emacs-lisp
+  (use-package sr-speedbar
+   :ensure t
+   :after speedbar
+   :config
+   (setq sr-speedbar-right-side nil
+         sr-speedbar-max-width 40
+         sr-speedbar-width 30
+         sr-speedbar-default-width 30
+         sr-speedbar-skip-other-window-p t))
+ #+END_SRC
 
 ** Ag
-- [[https://github.com/ggreer/the_silver_searcher][ag]]
-#+BEGIN_SRC emacs-lisp
-(defvar executable-ag-available
-  (executable-find "ag"))
 
-(use-package ag
-  :if executable-ag-available
-  :bind
-  ("M-?" . ag-project))
+- Define a variable to find the [[https://github.com/ggreer/the_silver_searcher][ag]] executable
+#+BEGIN_SRC emacs-lisp
+  (defvar executable-ag-available
+   (executable-find "ag"))
+#+END_SRC
+
+- Use package ag if execuatble is present
+#+BEGIN_SRC emacs-lisp
+  (use-package ag
+   :ensure t
+   :if executable-ag-available
+   :bind ("M-?" . ag-project))
 #+END_SRC
 
 ** Ivy
-   
-   - Basic configuration
-   #+BEGIN_SRC emacs-lisp
-   (use-package ivy
-     :ensure t
-     :diminish (ivy-mode . "")
-     :config (ivy-mode)
-     :custom
-     (ivy-use-virtual-buffers t)
-     (ivy-height 10)
-     (ivy-count-format "(%d/%d)")
-     (ivy-display-style 'fancy)
-     (ivy-initial-inputs-alist nil)
-     (ivy-re-builders-alist     
-        '((t . ivy--regex-ignore-order))) ;; allow input not in order
-   )
-   #+END_SRC
 
-   - Ivy-rich
-   #+BEGIN_SRC emacs-lisp
-   (use-package ivy-rich
-     :after ivy
-     :custom
-     (ivy-virtual-abbreviate 'full)
-     (ivy-rich-switch-buffer-align-virtual-buffer t)
-     (ivy-rich-path-style 'abbrev)
-     :config
-     (ivy-rich-mode 1)     
-   )
-   #+END_SRC
+- Basic configuration
+#+BEGIN_SRC emacs-lisp
+  (use-package ivy
+   :ensure t
+   :diminish (ivy-mode . "")
+   :config (ivy-mode)
+   :custom
+   (ivy-re-builders-alist
+     '((t . ivy--regex-ignore-order))) ;; allow input not in order
+   (ivy-height 10)
+   (ivy-count-format "(%d/%d)")
+   (ivy-display-style 'fancy)
+   (ivy-initial-inputs-alist nil)
+   (ivy-use-virtual-buffers t))
+#+END_SRC
 
-   - Prescient
-   #+BEGIN_SRC emacs-lisp
-   (use-package ivy-prescient
-     :after ivy
-     :config
-     (ivy-prescient-mode)
-   )
-   #+END_SRC
+- Using Ivy-rich to have more information in minibuffer
+#+BEGIN_SRC emacs-lisp
+  (use-package ivy-rich
+    :ensure t
+    :after ivy
+    :custom
+    (ivy-virtual-abbreviate 'full)
+    (ivy-rich-switch-buffer-align-virtual-buffer t)
+    (ivy-rich-path-style 'abbrev)
+    :config
+    (ivy-rich-mode 1))
+#+END_SRC
 
 ** Counsel
-   #+BEGIN_SRC emacs-lisp
-   (use-package counsel
-     :after ivy
-     :config
-     (counsel-projectile-mode)
-     :bind (("M-x"     . counsel-M-x)
-            ("C-x C-f" . counsel-find-file)
-            ("M-l"     . counsel-imenu)
-            ("C-="     . counsel-projectile-switch-to-buffer)
-            ("C-+"     . counsel-projectile-switch-project)
-            ("C-M-s"   . counsel-git-grep)))
-   #+END_SRC
-   
+
+- Using Counsel in addition to Ivy
+#+BEGIN_SRC emacs-lisp
+  (use-package counsel
+   :ensure t
+   :after ivy
+   :diminish (counsel-mode . "")   
+   :bind (("M-x"     . counsel-M-x)
+          ("C-x C-f" . counsel-find-file)
+          ("M-l"     . counsel-imenu)
+          ("C-="     . counsel-projectile-switch-to-buffer)
+          ("C-+"     . counsel-projectile-switch-project)
+          ("C-M-s"   . counsel-git-grep)))
+#+END_SRC
+
 ** Swiper
-   #+BEGIN_SRC emacs-lisp
-   (use-package swiper
-     :bind ("C-s" . swiper))
-   #+END_SRC
-** ace-window
-   - Move accross windows.
-   - If <n> windows (more than 2) use ~C-M-o <n>~ to switch to that window.
-   - To show the list of possible action use ~C-M-o ?~
-   #+BEGIN_SRC emacs-lisp
-   (use-package ace-window
-   :bind ("C-M-o" . ace-window))
-   #+END_SRC
 
-** Prescient
-   #+BEGIN_SRC emacs-lisp
-   (use-package prescient
-     :ensure t
-   )
-   #+END_SRC
-
+- Using swiper instead of isearch
+#+BEGIN_SRC emacs-lisp
+  (use-package swiper
+   :ensure t
+   :bind ("C-s" . swiper))
+#+END_SRC
 
 * Edit
 ** Multiple Cursors
-   #+BEGIN_SRC emacs-lisp
-   (use-package multiple-cursors
-   :ensure
-   :bind (("C->"     . mc/mark-next-like-this)
-          ("C-<"     . mc/mark-previous-like-this)
-          ("C-c C->" . mc/edit-lines)
-          ("C-c C-<" . mc/mark-all-like-this)))
-   #+END_SRC
-** Company
-   #+BEGIN_SRC emacs-lisp
-     (use-package company
-       :defer t
-       :diminish 
-       (company-mode . "Cmp")
-       :init 
-       (add-hook 'after-init-hook 'global-company-mode)
-       :config 
-       (add-to-list 'company-backends 'company-files t)
-       (add-to-list 'company-backends 'company-shell-env t)
-       (setq company-backends (remove 'company-clang company-backends))
-       ;; (cl-pushnew '(company-files company-shell-env) company-backends)
-       (setq company-minimum-prefix-length 2
-             company-selection-wrap-around t
-             company-show-numbers t
-             company-tooltip-align-annotations t
-             company-require-match nil
-             company-dabbrev-downcase nil
-             company-dabbrev-ignore-case nil)
-     )
-   #+END_SRC
 
-   - Prescient
-   #+BEGIN_SRC emacs-lisp
-     (use-package company-prescient
-       :after company
-       :config
-       (company-prescient-mode)
-     )
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package multiple-cursors
+   :ensure t
+   :bind (("C->" . mc/mark-next-like-this)
+          ("C-<" . mc/mark-previous-like-this)))
+#+END_SRC
+
+** Company
+
+- Completion
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+   :ensure t
+   :defer t
+   :diminish (company-mode . "C")
+   :init
+   (add-hook 'after-init-hook 'global-company-mode)
+   :config
+   (add-to-list 'company-backends 'company-files t)
+   (add-to-list 'company-backends 'company-shell-env t)
+   (setq company-backends (remove 'company-clang company-backends))
+   ;; (cl-pushnew '(company-files company-shell-env) company-backends)
+   (setq company-minimum-prefix-length 3
+         company-selection-wrap-around t
+         company-show-numbers t
+         company-tooltip-align-annotations t
+         company-require-match nil
+         company-dabbrev-downcase nil
+         company-dabbrev-ignore-case nil))
+#+END_SRC
+
+** Prescient
+
+- Using Prescient to have better defaults
+#+BEGIN_SRC emacs-lisp
+  (use-package prescient
+   :ensure t)
+#+END_SRC
+
+- Prescient with Ivy
+#+BEGIN_SRC emacs-lisp
+  (use-package ivy-prescient
+   :ensure t
+   :after ivy
+   :config (ivy-prescient-mode))
+#+END_SRC
+
+- Prescient with Company
+#+BEGIN_SRC emacs-lisp
+  (use-package company-prescient
+   :ensure t
+   :after company
+   :config (company-prescient-mode))
+#+END_SRC
 
 ** Expand-Region
-   #+BEGIN_SRC emacs-lisp
-   (use-package expand-region
-	  :ensure
-      :bind (
-	   ("C-."  . er/expand-region)
-	   ("C-M-." . er/contract-region)))
-   #+END_SRC
 
-** idedit
-   - Edit one occurrence of some text in a buffer or region, and simultaneously have other
-     occurrences edited in the same way
-   #+BEGIN_SRC emacs-lisp
-   (use-package iedit
-    :ensure
-    :bind (("C-;" . iedit-mode) 
-           ("C-:" . iedit-mode-from-isearch)))
-   #+END_SRC
-
-** Speedbar
-   - speedbar
-   #+BEGIN_SRC emacs-lisp
-   (use-package speedbar 
-   :config 
-   (setq speedbar-use-images nil 
-         speedbar-show-unknown-files t)) 
-   #+END_SRC
-
-   - sr-speedbar
-   #+BEGIN_SRC emacs-lisp
-  (use-package sr-speedbar 
+- Easy selection
+#+BEGIN_SRC emacs-lisp
+  (use-package expand-region
    :ensure t
-   :after speedbar
-   :config 
-   (setq sr-speedbar-right-side nil 
-         sr-speedbar-max-width 40
-         sr-speedbar-width 30 
-         sr-speedbar-default-width 30
-         sr-speedbar-skip-other-window-p t))
-   #+END_SRC
-** Undo-tree
-   #+BEGIN_SRC emacs-lisp
-   (use-package undo-tree
-     :diminish undo-tree-mode
-     :config (global-undo-tree-mode 1)
-     :bind ("M-u"   . undo-tree-undo) 
-           ("C-M-u" . undo-tree-redo))
-   #+END_SRC
+   :bind (("C-."  . er/expand-region)
+          ("C-M-." . er/contract-region)))
+#+END_SRC
 
 ** YaSnippets
-   #+BEGIN_SRC emacs-lisp
-   (use-package yasnippet                  ; Snippets
+
+- Snippets engine
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet
    :ensure t
-   :diminish 
-   (yas-minor-mode . "YaS")
+   :diminish
+   (yas-minor-mode . "Y")
    :config
-   (setq yas-verbosity 1                      
-         yas-wrap-around-region t)
-
+   (setq yas-verbosity 1)
+   (setq yas-wrap-around-region t)
    (add-to-list #'yas-snippet-dirs "~/.emacs.d/emacs.d/yasnippets")
-   (yas-reload-all)
+   :init
+   ;;(yas-reload-all)
    (yas-global-mode))
+#+END_SRC
 
-   #+END_SRC
-
-   #+BEGIN_SRC emacs-lisp
-   (use-package yasnippet-snippets         
-   :ensure t)
-   #+END_SRC  
-
+- Default snippets
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet-snippets)
+#+END_SRC
 
 * Shell
 ** Terminal
 
-  - Clear shell
-  #+BEGIN_SRC emacs-lisp
+- Clear shell
+#+BEGIN_SRC emacs-lisp
   (add-hook 'shell-mode-hook
-    (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
-  #+END_SRC
- 
-  - Color support
-  #+BEGIN_SRC emacs-lisp
+   (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
+#+END_SRC
+
+- Color support
+#+BEGIN_SRC emacs-lisp
   (add-hook 'shell-mode-hook
-            (lambda ()
-              (face-remap-set-base 'comint-highlight-prompt :inherit nil)))
-  #+END_SRC
+   (lambda () (face-remap-set-base 'comint-highlight-prompt :inherit nil)))
+#+END_SRC
 
 ** Tramp
-   #+BEGIN_SRC emacs-lisp
-   (use-package tramp
-     :config
-     (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
-     (setq auto-revert-remote-files t)
-     (progn 
-       (setq tramp-default-method "ssh")))
-   #+END_SRC
 
-   * To open a (remote) file with sudo follow the explanation from [[https://www.emacswiki.org/emacs/TrampMode#toc17][EmacsWiki]]:
-     - Sudo on local host: ~C-x C-f /sudo:: <TAB>~
-     - With Ivy, the hydra (M-o) r opens file as root
-     - Sudo on /remote/ with any /user/ when ssh/config knows /abbrev/: 
-       ~C-x C-f /ssh:abbrev|sudo:user@remote:/path/to/file~
+#+BEGIN_SRC emacs-lisp
+  (use-package tramp
+   :ensure nil
+   :config
+   (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+   (setq auto-revert-remote-files t)
+   (progn
+    (setq tramp-default-method "ssh")))
+#+END_SRC
+
+To open a (remote) file with =sudo= follow the explanation from [[https://www.emacswiki.org/emacs/TrampMode#toc17][EmacsWiki]]:
+- =sudo= on local host: ~C-x C-f /sudo:: <TAB>~
+- With Ivy, the hydra (M-o) r opens file as root
+- Sudo on /remote/ with any /user/ when ssh/config knows /abbrev/:
+  ~C-x C-f /ssh:abbrev|sudo:user@remote:/path/to/file~
 
 ** Dired
-   #+BEGIN_SRC emacs-lisp
-   (use-package dired
-     :ensure nil
-     :init 
-     (add-hook 'dired-load-hook (lambda () (load "dired-x")))
-     :bind (:map dired-mode-map
-                 ("<" . (lambda () (interactive) (find-alternate-file "..")))
-                 ("RET" . dired-find-alternate-file))
-   )
-   #+END_SRC
+
+- Map ~<~ to "previous" & ~RET~ to "Enter Directory"
+- Do not open a new buffer each time
+#+BEGIN_SRC emacs-lisp
+  (use-package dired
+   :ensure nil
+   :config (put 'dired-find-alternate-file 'disabled nil)
+   :init (add-hook 'dired-load-hook (lambda () (load "dired-x")))
+   :bind (:map dired-mode-map
+               ("<" . (lambda () (interactive) (find-alternate-file "..")))
+               ("RET" . dired-find-alternate-file)))
+#+END_SRC
 
 ** Magit
- #+BEGIN_SRC emacs-lisp
- (use-package magit
-   :ensure
+
+#+BEGIN_SRC emacs-lisp
+  (use-package magit
+   :ensure t
    :bind ("C-x g" . magit-status))
- #+END_SRC
- 
+#+END_SRC
 
 * Write
 ** Org
 
-   - Config
-   #+BEGIN_SRC emacs-lisp
-     (setq org-todo-keywords '((sequence "TODO" "PROCESS" "|" "DONE" )))
-     (setq org-startup-folded (quote content))
-     (setq org-startup-indented t)
-     (setq org-hide-leading-stars t) 
-   #+END_SRC
+- Config
+#+BEGIN_SRC emacs-lisp
+  (setq org-todo-keywords '((sequence "TODO" "PROCESS" "|" "DONE" )))
+  (setq org-startup-folded (quote content))
+  (setq org-startup-indented t)
+  (setq org-hide-leading-stars t)
+#+END_SRC
 
-   - Export
-   #+BEGIN_SRC emacs-lisp
-     (require 'ox)
-     (setq org-latex-listings 'minted)
-     (setq org-latex-pdf-process
-     '("pdflatex --shell-escape --interaction nonstopmode %f"
+- Export
+#+BEGIN_SRC emacs-lisp
+  (require 'ox)
+  (setq org-latex-listings 'minted)
+  (setq org-latex-pdf-process
+   '("pdflatex --shell-escape --interaction nonstopmode %f"
      "bibtex %b"
      "pdflatex --shell-escape --interaction nonstopmode %f"
      "pdflatex --shell-escape --interaction nonstopmode %f"))
-     (add-to-list 'org-latex-packages-alist '("" "listings"))
-     (add-to-list 'org-latex-packages-alist '("" "color"))
-     (add-to-list 'org-latex-packages-alist '("" "minted"))   
-   #+END_SRC
+  (add-to-list 'org-latex-packages-alist '("" "listings"))
+  (add-to-list 'org-latex-packages-alist '("" "color"))
+  (add-to-list 'org-latex-packages-alist '("" "minted"))
+#+END_SRC
 
 ** Latex
- - Use auctex + evince + synctex
- #+BEGIN_SRC emacs-lisp
- (use-package tex
-   :ensure auctex
-   :config
-   (setq TeX-auto-save t
-         TeX-parse-self t
-         TeX-view-program-list '(("Evince" "evince --page-index=%(outpage) %o"))
-         TeX-view-program-selection '((output-pdf "Evince"))
-         TeX-source-correlate-start-server t)
-   (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
-   (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode))
 
- ;; (setq LaTeX-command-style '(("" "%(PDF)%(latex) --shell-escape %S%(PDFout)")))  
- #+END_SRC
-
-  - Configure the integration with external PDF reader
-  #+BEGIN_SRC emacs-lisp
+- Use auctex + evince + synctex
+#+BEGIN_SRC emacs-lisp
+  (setq TeX-auto-save t)
+  (setq TeX-parse-self t)
+  (setq TeX-view-program-list '(("Evince" "evince --page-index=%(outpage) %o")))
+  (setq TeX-view-program-selection '((output-pdf "Evince")))
+  (setq TeX-source-correlate-start-server t)
   (setq LaTeX-command-style '(("" "%(PDF)%(latex) --shell-escape %S%(PDFout)")))
-  #+END_SRC
+  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+  (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
+#+END_SRC
 
 ** Bibtex
- #+BEGIN_SRC emacs-lisp
- (use-package ivy-bibtex
+
+- Ivy Bibtex allows to parse bibliography with Ivy
+#+BEGIN_SRC emacs-lisp
+  (use-package ivy-bibtex
    :ensure t
+   :after ivy
    :config
    (autoload 'ivy-bibtex "ivy-bibtex" "" t)
    (setq ivy-re-builders-alist
@@ -491,143 +463,134 @@
    (setq bibtex-completion-notes-path   "~/Projects/research/bibliography/Library.org")
    (setq bibtex-completion-pdf-symbol   "⌘")
    (setq bibtex-completion-notes-symbol "✎")
-   (setq bibtex-completion-pdf-open-function 
-        (lambda (fpath)
-            (call-process "evince" nil 0 nil fpath))))
- #+END_SRC
-   
-** Org-Ref
-#+BEGIN_SRC emacs-lisp
-  (use-package org-ref
-    :after org
-    :init
-    (setq org-ref-default-bibliography '("~/Projects/research/bibliography/Library.bib"))
-    (setq org-ref-bibliography-notes   "~/Projects/research/bibliography/Library.org")
-    (setq org-ref-completion-library   'org-ref-ivy-cite))
+   (setq bibtex-completion-pdf-open-function
+    (lambda (fpath) (call-process "evince" nil 0 nil fpath))))
 #+END_SRC
-   
+
+- [[http://joostkremers.github.io/ebib/][Ebib]] is a BibTeX database manager
+
+#+BEGIN_SRC emacs-lisp
+  (use-package ebib)
+#+END_SRC
+
 ** Markdown
+
 #+BEGIN_SRC emacs-lisp
 (use-package markdown-mode
-  :ensure t
-  :mode (("\\.md\\'" . markdown-mode)
-         ("\\.markdown\\'" . markdown-mode))
-)
+ :ensure t
+ :mode (("\\.md\\'"       . markdown-mode)
+        ("\\.markdown\\'" . markdown-mode)))
 #+END_SRC
 
 ** Dokuwiki
 
-   - Dokuwiki Login
-   #+BEGIN_SRC emacs-lisp
-     (use-package dokuwiki
-       :ensure t
-       :config 
-       (setq dokuwiki-xml-rpc-url "https://intranet.grm.polymtl.ca/wiki/lib/exe/xmlrpc.php")
-       (setq dokuwiki-login-user-name "fiorentino")
-       ;; (setq dokuwiki-xml-rpc-url "https://nastasia.no-ip.ca/dokuwiki/lib/exe/xmlrpc.php")
-       ;; (setq dokuwiki-login-user-name "mickael")
-     )
-   #+END_SRC
-   
-   - Dokuwiki mode 
-   #+BEGIN_SRC emacs-lisp
-   (use-package dokuwiki-mode
-     :ensure t
-     :mode "\\.dwiki\\'"
-     :bind (:map dokuwiki-mode-map 
-                 ("C-c C-l" . dokuwiki-list-pages)
-                 ("C-c C-s" . dokuwiki-save-page))
-   )
-   #+END_SRC   
+- Login
+#+BEGIN_SRC emacs-lisp
+  (use-package dokuwiki
+   :ensure t
+   :config
+   (setq dokuwiki-xml-rpc-url "https://intranet.grm.polymtl.ca/wiki/lib/exe/xmlrpc.php")
+   (setq dokuwiki-login-user-name "fiorentino"))
+#+END_SRC
 
-** Outline 
-   #+BEGIN_SRC emacs-lisp
-   (use-package outline
-     :hook (dokuwiki-mode latex-mode)
-     :bind (:map outline-minor-mode-map
-                 ("<tab>"     . outline-show-entry)
-                 ("<backtab>" . outline-hide-entry)
-                 ("C-<tab>"   . outline-next-heading)
-                 ("C-#"       . outline-previous-heading))
-   )
-   #+END_SRC
+- Dokuwiki mode
+#+BEGIN_SRC emacs-lisp
+  (use-package dokuwiki-mode
+   :ensure t
+   :mode "\\.dwiki\\'"
+   :bind (:map dokuwiki-mode-map
+               ("C-c C-l" . dokuwiki-list-pages)
+               ("C-c C-s" . dokuwiki-save-page)))
+#+END_SRC
 
+** Outline
+
+#+BEGIN_SRC emacs-lisp
+(use-package outline
+ :ensure t
+ :hook (dokuwiki-mode latex-mode)
+ :bind (:map outline-minor-mode-map
+             ("<tab>"     . outline-show-entry)
+             ("<backtab>" . outline-hide-entry)
+             ("C-<tab>"   . outline-next-heading)
+             ("C-#"       . outline-previous-heading)))
+#+END_SRC
 
 * Code
-** VHDL 
+** VHDL
 
-   - Customize VHDL-mode
-   #+BEGIN_SRC emacs-lisp
-   (defun my-vhdl-mode-hook ()
-     (setq vhdl-standard (quote (08 nil)))
-     (define-key vhdl-mode-map (kbd "<backtab>") 'vhdl-align-region)
-     (define-key vhdl-mode-map " " nil))     
-   #+END_SRC
-   
-   - VHDL-Hook
-   #+BEGIN_SRC emacs-lisp
-   (add-hook 'vhdl-mode-hook 'my-vhdl-mode-hook)
-   #+END_SRC 
+- Customize VHDL-mode
+#+BEGIN_SRC emacs-lisp
+  (defun my-vhdl-mode-hook ()
+   (setq vhdl-standard (quote (08 nil)))
+   (define-key vhdl-mode-map (kbd "<backtab>") 'vhdl-align-region)
+   (define-key vhdl-mode-map " " nil))
+
+  (add-hook 'vhdl-mode-hook 'my-vhdl-mode-hook)
+#+END_SRC
 
 ** Verilog
-   #+BEGIN_SRC emacs-lisp
-   (use-package verilog-mode
-   :mode (("\\.[st]*v[hp]*\\'" . verilog-mode) ;.v, .sv, .svh, .tv, .vp
-          ("\\.f\\'"           . verilog-mode) ;verilog file lists
+
+#+BEGIN_SRC emacs-lisp
+  (use-package verilog-mode
+   :mode (("\\.[st]*v[hp]*\\'" . verilog-mode)
+          ("\\.f\\'"           . verilog-mode)
           ("\\.psl\\'"         . verilog-mode)
           ("\\.vams\\'"        . verilog-mode)
           ("\\.vinc\\'"        . verilog-mode))
    :config
-     (setq verilog-indent-level             4);   3 
-     (setq verilog-indent-level-module      4);   3
-     (setq verilog-indent-level-declaration 4);   3
-     (setq verilog-indent-level-behavioral  0);   3
-     (setq verilog-indent-level-directive   0);   1
-     (setq verilog-case-indent              4);   2
-     (setq verilog-tab-always-indent        t); t
-     (setq verilog-indent-begin-after-if    nil); t
-     (setq verilog-auto-newline             nil); t
-     (setq verilog-auto-indent-on-newline   t);   t
-     (setq verilog-minimum-comment-distance 10);  10
-     (setq verilog-indent-begin-after-if    t);   t
-     (setq verilog-auto-lineup              'declarations) ;'declarations
-     (setq verilog-align-ifelse             t);   nil
-     (setq verilog-auto-endcomments         nil); t
-     (setq verilog-tab-to-comment           nil); nil
-     (setq verilog-date-scientific-format   t);   t
-   )
+     (setq verilog-indent-level             4)             ; 3
+     (setq verilog-indent-level-module      4)             ; 3
+     (setq verilog-indent-level-declaration 4)             ; 3
+     (setq verilog-indent-level-behavioral  0)             ; 3
+     (setq verilog-indent-level-directive   0)             ; 1
+     (setq verilog-case-indent              4)             ; 2
+     (setq verilog-tab-always-indent        t)             ; t
+     (setq verilog-indent-begin-after-if    nil)           ; t
+     (setq verilog-auto-newline             nil)           ; t
+     (setq verilog-auto-indent-on-newline   t)             ; t
+     (setq verilog-minimum-comment-distance 10)            ; 10
+     (setq verilog-indent-begin-after-if    t)             ; t
+     (setq verilog-auto-lineup              'declarations) ; 'declarations
+     (setq verilog-align-ifelse             t)             ; nil
+     (setq verilog-auto-endcomments         nil)           ; t
+     (setq verilog-tab-to-comment           nil)           ; nil
+     (setq verilog-date-scientific-format   t))            ; t
    #+END_SRC
+
 ** TCL
-   - Associate .sdc & .do files to tcl-mode  
-   #+BEGIN_SRC emacs-lisp
-   (add-to-list 'auto-mode-alist '("\\.sdc\\'" . tcl-mode))
-   (add-to-list 'auto-mode-alist '("\\.do\\'" . tcl-mode))
-   (add-hook 'inferior-tcl-mode-hook
-     (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
-    #+END_SRC
- 
+
+- Associate .sdc & .do files to tcl-mode
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'auto-mode-alist '("\\.sdc\\'" . tcl-mode))
+  (add-to-list 'auto-mode-alist '("\\.do\\'" . tcl-mode))
+  (setq tcl-application "tclsh")
+  (add-hook 'inferior-tcl-mode-hook
+   (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
+#+END_SRC
+
 ** C
-  #+BEGIN_SRC emacs-lisp
-  (add-hook 'c-mode-common-hook 
-      (lambda () (setq-default c-default-style "linux"
-                               c-basic-offset  4)))
-  #+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'c-mode-common-hook
+   (lambda () (setq-default c-default-style "linux"
+                            c-basic-offset  4)))
+#+END_SRC
 
 ** ASM
-  #+BEGIN_SRC emacs-lisp
+
+#+BEGIN_SRC emacs-lisp
   (add-to-list 'auto-mode-alist '("\\.S\\'" . asm-mode))
-
   (add-hook 'asm-mode-hook
-      (lambda () (progn (setq asm-comment-char "//") 
-                        (setq comment-start "//")
-                        (setq comment-add 0))))
-
-  #+END_SRC
+   (lambda () (progn (setq asm-comment-char "//")
+                     (setq comment-start "//")
+                     (setq comment-add 0))))
+#+END_SRC
 
 ** Python
- #+BEGIN_SRC emacs-lisp
- (add-hook 'python-mode-hook
-     (lambda ()
-     (setq indent-tabs-mode nil)
-     (setq python-indent 4)))
- #+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'python-mode-hook
+   (lambda () (setq indent-tabs-mode nil)
+              (setq python-indent 4)))
+#+END_SRC
