@@ -57,6 +57,7 @@
   (global-set-key (kbd "M-O")         'other-frame)
   (global-set-key (kbd "M-k")         'kill-buffer-and-window)
   (global-set-key (kbd "M-g")         'goto-line)
+  (global-set-key (kbd "M-u")         'undo)
   (global-set-key (kbd "M-/")         'shell-command-on-region)
   (global-set-key (kbd "C-x C-b")     'ibuffer)
   (global-set-key (kbd "<C-return>")  "\C-a\C- \C-e\M-w\C-j\C-y") ; Duplicate line
@@ -248,8 +249,6 @@
    :bind (("M-x"     . counsel-M-x)
           ("C-x C-f" . counsel-find-file)
           ("M-l"     . counsel-imenu)
-          ("C-="     . counsel-projectile-switch-to-buffer)
-          ("C-+"     . counsel-projectile-switch-project)
           ("C-M-s"   . counsel-git-grep)))
 #+END_SRC
 
