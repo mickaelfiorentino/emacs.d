@@ -220,6 +220,9 @@
    :ensure t
    :diminish (ivy-mode . "")
    :config (ivy-mode)
+   :bind (("C-x b" . ivy-switch-buffer)
+          ("C-x B" . ivy-switch-buffer-other-window)
+          ("M-H"   . ivy-resume))
    :custom
    (ivy-re-builders-alist
      '((t . ivy--regex-ignore-order))) ;; allow input not in order
@@ -227,6 +230,7 @@
    (ivy-count-format "(%d/%d)")
    (ivy-display-style 'fancy)
    (ivy-initial-inputs-alist nil)
+   (ivy-wrap t)
    (ivy-use-virtual-buffers t))
 #+END_SRC
 
