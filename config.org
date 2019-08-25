@@ -234,19 +234,6 @@
    (ivy-use-virtual-buffers t))
 #+END_SRC
 
-- Using Ivy-rich to have more information in minibuffer
-#+BEGIN_SRC emacs-lisp
-  (use-package ivy-rich
-    :ensure t
-    :after ivy
-    :custom
-    (ivy-virtual-abbreviate 'full)
-    (ivy-rich-switch-buffer-align-virtual-buffer t)
-    (ivy-rich-path-style 'abbrev)
-    :config
-    (ivy-rich-mode 1))
-#+END_SRC
-
 ** Counsel
 
 - Using Counsel in addition to Ivy
@@ -259,6 +246,14 @@
           ("C-x C-f" . counsel-find-file)
           ("M-l"     . counsel-imenu)
           ("C-M-s"   . counsel-git-grep)))
+#+END_SRC
+
+- Counsel-projectile
+#+BEGIN_SRC emacs-lisp
+(use-package counsel-projectile
+ :ensure t
+ :after ivy
+ :bind (("C-=" . counsel-projectile-find-file)))
 #+END_SRC
 
 ** Swiper
@@ -413,7 +408,10 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 #+BEGIN_SRC emacs-lisp
   (use-package magit
    :ensure t
-   :bind ("C-x g" . magit-status))
+   :bind ("C-x g" . magit-status)
+   :config
+   (setq auto-revert-buffer-list-filter
+         'magit-auto-revert-repository-buffers-p))
 #+END_SRC
 
 * Write
@@ -572,6 +570,7 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 - Associate .sdc & .do files to tcl-mode
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'auto-mode-alist '("\\.sdc\\'" . tcl-mode))
+  (add-to-list 'auto-mode-alist '("\\.xdc\\'" . tcl-mode))
   (add-to-list 'auto-mode-alist '("\\.do\\'" . tcl-mode))
   (setq tcl-application "tclsh")
   (add-hook 'inferior-tcl-mode-hook

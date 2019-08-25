@@ -31,6 +31,7 @@
  '(ivy-rich-switch-buffer-align-virtual-buffer t)
  '(ivy-use-virtual-buffers t)
  '(ivy-virtual-abbreviate (quote full))
+ '(ivy-wrap t)
  '(package-selected-packages
    (quote
-    (tango-plus-theme dokuwiki-mode dokuwiki markdown-mode ebib ivy-bibtex auctex yasnippet-snippets yasnippet undo-tree expand-region company-prescient ivy-prescient prescient company multiple-cursors counsel ivy-rich ivy ag sr-speedbar projectile smart-mode-line use-package diminish desktop+))))
+    (counsel-projectile espresso-theme flatui-theme tango-plus-theme dokuwiki-mode dokuwiki markdown-mode ebib ivy-bibtex auctex yasnippet-snippets yasnippet undo-tree expand-region company-prescient ivy-prescient prescient company multiple-cursors counsel ivy ag sr-speedbar projectile smart-mode-line use-package diminish desktop+))))
