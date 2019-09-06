@@ -19,7 +19,7 @@
  '(custom-enabled-themes (quote (tango-plus)))
  '(custom-safe-themes
    (quote
-    ("3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "d9ba913eecb44781beac1b85f31b5807fc4a7362de33c0aabccbc2ad9a3ae7a4" default)))
+    ("39fd36b49d0b69132797968f472615fb29b0e07de166bd8aeb44a8798ec7f681" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "d9ba913eecb44781beac1b85f31b5807fc4a7362de33c0aabccbc2ad9a3ae7a4" default)))
  '(custom-theme-directory "~/.emacs.d/emacs.d/lisp/")
  '(delete-selection-mode nil)
  '(ivy-count-format "(%d/%d)")
@@ -34,4 +34,4 @@
  '(ivy-wrap t)
  '(package-selected-packages
    (quote
-    (counsel-projectile espresso-theme flatui-theme tango-plus-theme dokuwiki-mode dokuwiki markdown-mode ebib ivy-bibtex auctex yasnippet-snippets yasnippet undo-tree expand-region company-prescient ivy-prescient prescient company multiple-cursors counsel ivy ag sr-speedbar projectile smart-mode-line use-package diminish desktop+))))
+    (rainbow-mode counsel-projectile espresso-theme flatui-theme tango-plus-theme dokuwiki-mode dokuwiki markdown-mode ebib ivy-bibtex auctex yasnippet-snippets yasnippet undo-tree expand-region company-prescient ivy-prescient prescient company multiple-cursors counsel ivy ag sr-speedbar projectile smart-mode-line use-package diminish desktop+))))
