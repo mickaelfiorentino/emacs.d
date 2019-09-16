@@ -99,6 +99,7 @@
  #+BEGIN_SRC emacs-lisp
    (setq my-theme-directory (concat user-emacs-directory (convert-standard-filename "/themes/")))
    (add-to-list 'custom-theme-load-path (concat my-theme-directory "/tango++/"))
+   (add-to-list 'custom-theme-load-path (concat my-theme-directory "/sml/"))
  #+END_SRC
 
  - Install packages if they are not installed
@@ -164,7 +165,7 @@
     :ensure t
     :config
      (setq sml/no-confirm-load-theme t)
-     (setq sml/theme 'light) ;; automatic light dark respectful
+     (setq sml/theme 'my-light) ;; automatic light dark respectful
     :hook (after-init . sml/setup)))
 #+END_SRC
 
