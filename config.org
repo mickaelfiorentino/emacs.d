@@ -149,11 +149,9 @@
 #+END_SRC
 
 ** Themes
-
 - Using tango++ theme + Hack font
 #+BEGIN_SRC emacs-lisp
   (when (display-graphic-p)
-   (set-face-attribute 'default nil :font "Hack")
    (load-theme 'tango++ t))
 #+END_SRC
 
@@ -166,7 +164,7 @@
     :ensure t
     :config
      (setq sml/no-confirm-load-theme t)
-     (setq sml/theme 'my-light) ;; automatic light dark respectful
+     (setq sml/theme 'light) ;; automatic light dark respectful
     :hook (after-init . sml/setup)))
 #+END_SRC
 

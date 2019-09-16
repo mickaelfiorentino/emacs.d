@@ -1,6 +1,6 @@
 *.desktop
 *.lock
-/elpa 
+/elpa
 recentf
 config.el
 /.mc-lists.el
@@ -14,3 +14,4 @@ transient/
 .emacs-buffers
 /network-security.data
 /lisp/smart-mode-line/smart-mode-line-autoloads.el
+projectile.cache
