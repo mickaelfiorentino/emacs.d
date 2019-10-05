@@ -81,8 +81,8 @@
  - Melpa and Org repos
  #+BEGIN_SRC emacs-lisp
    (require 'package)
-   (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
-   (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+   (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
    (package-initialize)
  #+END_SRC
 
@@ -455,10 +455,9 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 
 - AUCTex
 #+BEGIN_SRC emacs-lisp
-(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 (use-package auctex
  :defer t
- :ensure t)
+ :ensure nil)
 #+END_SRC
 
 - Use auctex + evince + synctex
