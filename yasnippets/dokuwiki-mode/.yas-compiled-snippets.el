@@ -24,4 +24,4 @@
                        ("*" "**${1:Text}** $0" "bold" nil nil nil "/home/mickael/.emacs.d/emacs.d/yasnippets/dokuwiki-mode/bold" nil nil)))
 
 
-;;; Do not edit! File generated at Thu Aug  1 15:11:13 2019
+;;; Do not edit! File generated at Sat Oct  5 11:06:27 2019

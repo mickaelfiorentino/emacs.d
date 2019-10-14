@@ -33,15 +33,15 @@
    show-trailing-whitespace nil                        ; Display trailing whitespaces
    uniquify-buffer-name-style 'forward                 ; uniquify buffer names
    window-combination-resize t                         ; Resize windows proportionally
-   x-stretch-cursor t)                                 ; Stretch cursor to the glyph width
+   x-stretch-cursor t)                                  ; Stretch cursor to the glyph width
+  (column-number-mode 1)                                ; Column number next to line number
+  (global-subword-mode 1)                               ; Iterate through CamelCase words
+  (delete-selection-mode 1)                             ; Replace region when inserting text
+  (global-auto-revert-mode 1)                           ; Automatically revert buffer from file
+  (display-time-mode 1)                                 ; Enable time in the mode-line
+  (show-paren-mode t)                                  ; Show matching parenthesis
   (set-default-coding-systems 'utf-8)                  ; Default to utf-8 encoding
   (fset 'yes-or-no-p 'y-or-n-p)                        ; Replace yes/no prompts with y/n
-  (column-number-mode 1)                               ; Column number next to line number
-  (global-subword-mode 0)                              ; Iterate through CamelCase words
-  (delete-selection-mode 1)                            ; Replace region when inserting text
-  (global-auto-revert-mode 1)                          ; Automatically revert buffer from file
-  (display-time-mode 1)                                ; Enable time in the mode-line
-  (show-paren-mode 1)                                  ; Show matching parenthesis
   (add-hook 'text-mode-hook 'turn-on-visual-line-mode) ; Wrap text at end-of-line in text-mode
   (add-hook 'before-save-hook 'whitespace-cleanup)     ; Delete whitespaces before saving
   (when (display-graphic-p)
@@ -204,22 +204,6 @@
          sr-speedbar-skip-other-window-p t))
  #+END_SRC
 
-** Ag
-
-- Define a variable to find the [[https://github.com/ggreer/the_silver_searcher][ag]] executable
-#+BEGIN_SRC emacs-lisp
-  (defvar executable-ag-available
-   (executable-find "ag"))
-#+END_SRC
-
-- Use package ag if execuatble is present
-#+BEGIN_SRC emacs-lisp
-  (use-package ag
-   :ensure t
-   :if executable-ag-available
-   :bind ("M-?" . ag-project))
-#+END_SRC
-
 ** Ivy
 
 - Basic configuration
@@ -258,10 +242,10 @@
 
 - Counsel-projectile
 #+BEGIN_SRC emacs-lisp
-(use-package counsel-projectile
- :ensure t
- :after ivy
- :bind (("C-=" . counsel-projectile-find-file)))
+  (use-package counsel-projectile
+   :ensure t
+   :after ivy
+   :bind (("C-=" . counsel-projectile-find-file)))
 #+END_SRC
 
 ** Swiper
@@ -270,6 +254,7 @@
 #+BEGIN_SRC emacs-lisp
   (use-package swiper
    :ensure t
+   :after ivy
    :bind ("C-s" . swiper))
 #+END_SRC
 
@@ -428,7 +413,6 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 
 * Write
 ** Org
-
 - Config
 #+BEGIN_SRC emacs-lisp
   (setq org-todo-keywords '((sequence "TODO" "PROCESS" "|" "DONE" )))
@@ -455,61 +439,52 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 
 - AUCTex
 #+BEGIN_SRC emacs-lisp
-(use-package auctex
- :defer t
- :ensure nil)
-#+END_SRC
-
-- Use auctex + evince + synctex
-#+BEGIN_SRC emacs-lisp
-  (setq TeX-auto-save t)
-  (setq TeX-parse-self t)
-  (setq TeX-view-program-list '(("Evince" "evince --page-index=%(outpage) %o")))
-  (setq TeX-view-program-selection '((output-pdf "Evince")))
-  (setq TeX-source-correlate-start-server t)
-  (setq LaTeX-command-style '(("" "%(PDF)%(latex) --shell-escape %S%(PDFout)")))
-  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
-  (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
+  (use-package auctex
+   :defer t
+   :ensure nil
+   :config
+   (setq TeX-auto-save t)
+   (setq TeX-parse-self t)
+   (setq TeX-view-program-list '(("Evince" "evince --page-index=%(outpage) %o")))
+   (setq TeX-view-program-selection '((output-pdf "Evince")))
+   (setq TeX-source-correlate-start-server t)
+   (setq LaTeX-command-style '(("" "%(PDF)%(latex) --shell-escape %S%(PDFout)")))
+   (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+   (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode))
 #+END_SRC
 
 ** Bibtex
+[[http://joostkremers.github.io/ebib/][Ebib]] is a BibTeX database manager
 
-- Ivy Bibtex allows to parse bibliography with Ivy
+- Global keybinding
 #+BEGIN_SRC emacs-lisp
-  (use-package ivy-bibtex
-   :ensure t
-   :after ivy
-   :config
-   (autoload 'ivy-bibtex "ivy-bibtex" "" t)
-   (setq ivy-re-builders-alist
-       '((ivy-bibtex . ivy--regex-ignore-order)
-         (t . ivy--regex-plus)))
-   :init
-   (setq bibtex-completion-bibliography "~/Projects/research/bibliography/Library.bib")
-   (setq bibtex-completion-notes-path   "~/Projects/research/bibliography/Library.org")
-   (setq bibtex-completion-pdf-symbol   "⌘")
-   (setq bibtex-completion-notes-symbol "✎")
-   (setq bibtex-completion-pdf-open-function
-    (lambda (fpath) (call-process "evince" nil 0 nil fpath))))
+(global-set-key (kbd "C-c e") 'ebib)
+(global-set-key (kbd "M-i") 'ebib-insert-citation)
 #+END_SRC
 
-- [[http://joostkremers.github.io/ebib/][Ebib]] is a BibTeX database manager
-
+- Config
 #+BEGIN_SRC emacs-lisp
-  (use-package ebib)
+  (use-package ebib
+   :ensure t
+   :config (setq ebib-bib-search-dirs '("~/Projects/research/"))
+           (setq ebib-preload-bib-files '("~/Projects/research/Library.bib"))
+           (setq ebib-notes-use-single-file "~/Projects/research/Library.org")
+           (setq ebib-file-associations '(("pdf" . "evince") ("ps" . "gv")))
+           (setq ebib-index-window-size 15)
+           (define-key ebib-multiline-mode-map "\C-c\C-c" 'ebib-cancel-multiline-buffer)
+           (remove-hook 'ebib-notes-new-note-hook 'org-narrow-to-subtree)
+           (remove-hook 'ebib-notes-open-note-after-hook 'org-narrow-to-subtree))
 #+END_SRC
 
 ** Markdown
-
 #+BEGIN_SRC emacs-lisp
-(use-package markdown-mode
- :ensure t
- :mode (("\\.md\\'"       . markdown-mode)
-        ("\\.markdown\\'" . markdown-mode)))
+  (use-package markdown-mode
+   :ensure t
+   :mode (("\\.md\\'"       . markdown-mode)
+          ("\\.markdown\\'" . markdown-mode)))
 #+END_SRC
 
 ** Dokuwiki
-
 - Login
 #+BEGIN_SRC emacs-lisp
   (use-package dokuwiki
@@ -527,19 +502,6 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
    :bind (:map dokuwiki-mode-map
                ("C-c C-l" . dokuwiki-list-pages)
                ("C-c C-s" . dokuwiki-save-page)))
-#+END_SRC
-
-** Outline
-
-#+BEGIN_SRC emacs-lisp
-(use-package outline
- :ensure t
- :hook (dokuwiki-mode latex-mode)
- :bind (:map outline-minor-mode-map
-             ("<tab>"     . outline-show-entry)
-             ("<backtab>" . outline-hide-entry)
-             ("C-<tab>"   . outline-next-heading)
-             ("C-#"       . outline-previous-heading)))
 #+END_SRC
 
 * Code

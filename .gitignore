@@ -15,3 +15,4 @@ transient/
 /network-security.data
 /lisp/smart-mode-line/smart-mode-line-autoloads.el
 projectile.cache
+ido.last
