@@ -86,22 +86,6 @@
    (package-initialize)
  #+END_SRC
 
- - Local directory for custom elisp code
- #+BEGIN_SRC emacs-lisp
-   (setq my-lisp-directory (concat user-emacs-directory (convert-standard-filename "/lisp/")))
-   (add-to-list 'load-path my-lisp-directory)
-   (let ((default-directory my-lisp-directory))
-        (normal-top-level-add-to-load-path '("."))
-        (normal-top-level-add-subdirs-to-load-path))
- #+END_SRC
-
- - Local theme directory
- #+BEGIN_SRC emacs-lisp
-   (setq my-theme-directory (concat user-emacs-directory (convert-standard-filename "/themes/")))
-   (add-to-list 'custom-theme-load-path (concat my-theme-directory "/tango++/"))
-   (add-to-list 'custom-theme-load-path (concat my-theme-directory "/sml/"))
- #+END_SRC
-
  - Install packages if they are not installed
  - ~:ensure t~ must be specified for each package we want to auto install
  #+BEGIN_SRC emacs-lisp
@@ -118,7 +102,6 @@
    (require 'bind-key)
    (setq use-package-always-ensure t)
  #+END_SRC
-
 ** Daemon
 
 - Allow access from emacsclient
@@ -149,23 +132,45 @@
    :init (add-hook 'after-init-hook (lambda () (desktop+-load "default"))))
 #+END_SRC
 
+** Custom
+ - Local directory for custom elisp code
+ #+BEGIN_SRC emacs-lisp
+   (setq my-lisp-directory (concat user-emacs-directory (convert-standard-filename "/lisp/")))
+   (add-to-list 'load-path my-lisp-directory)
+   (let ((default-directory my-lisp-directory))
+        (normal-top-level-add-to-load-path '("."))
+        (normal-top-level-add-subdirs-to-load-path))
+ #+END_SRC
+
+ - Custom functions
+ #+BEGIN_SRC emacs-lisp
+ (require 'my-custom-functions)
+ (global-set-key (kbd "C-c n") 'narrow-or-widen-dwim)
+ (global-set-key (kbd "C-c s") 'toggle-window-split)
+ #+END_SRC
+
+ - Local theme directory
+ #+BEGIN_SRC emacs-lisp
+   (setq my-theme-directory (concat user-emacs-directory (convert-standard-filename "/themes/")))
+   (add-to-list 'custom-theme-load-path (concat my-theme-directory "/tango++/"))
+   (add-to-list 'custom-theme-load-path (concat my-theme-directory "/sml/"))
+ #+END_SRC
+
 ** Themes
-- Using tango++ theme + Hack font
+- Global theme
 #+BEGIN_SRC emacs-lisp
   (when (display-graphic-p)
    (load-theme 'tango++ t))
 #+END_SRC
 
-** Modeline
-
-- Using smart-mode-line with light theme
+- Smart-mode-line
 #+BEGIN_SRC emacs-lisp
   (when (display-graphic-p)
    (use-package smart-mode-line
     :ensure t
     :config
      (setq sml/no-confirm-load-theme t)
-     (setq sml/theme 'my-light) ;; automatic light dark respectful
+     (setq sml/theme 'my-light) ;; automatic light my-light dark respectful
     :hook (after-init . sml/setup)))
 #+END_SRC
 
@@ -435,47 +440,6 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
   (add-to-list 'org-latex-packages-alist '("" "minted"))
 #+END_SRC
 
-** Latex
-
-- AUCTex
-#+BEGIN_SRC emacs-lisp
-  (use-package auctex
-   :defer t
-   :ensure nil
-   :config
-   (setq TeX-auto-save t)
-   (setq TeX-parse-self t)
-   (setq TeX-view-program-list '(("Evince" "evince --page-index=%(outpage) %o")))
-   (setq TeX-view-program-selection '((output-pdf "Evince")))
-   (setq TeX-source-correlate-start-server t)
-   (setq LaTeX-command-style '(("" "%(PDF)%(latex) --shell-escape %S%(PDFout)")))
-   (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
-   (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode))
-#+END_SRC
-
-** Bibtex
-[[http://joostkremers.github.io/ebib/][Ebib]] is a BibTeX database manager
-
-- Global keybinding
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-c e") 'ebib)
-(global-set-key (kbd "M-i") 'ebib-insert-citation)
-#+END_SRC
-
-- Config
-#+BEGIN_SRC emacs-lisp
-  (use-package ebib
-   :ensure t
-   :config (setq ebib-bib-search-dirs '("~/Projects/research/"))
-           (setq ebib-preload-bib-files '("~/Projects/research/Library.bib"))
-           (setq ebib-notes-use-single-file "~/Projects/research/Library.org")
-           (setq ebib-file-associations '(("pdf" . "evince") ("ps" . "gv")))
-           (setq ebib-index-window-size 15)
-           (define-key ebib-multiline-mode-map "\C-c\C-c" 'ebib-cancel-multiline-buffer)
-           (remove-hook 'ebib-notes-new-note-hook 'org-narrow-to-subtree)
-           (remove-hook 'ebib-notes-open-note-after-hook 'org-narrow-to-subtree))
-#+END_SRC
-
 ** Markdown
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
@@ -502,6 +466,57 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
    :bind (:map dokuwiki-mode-map
                ("C-c C-l" . dokuwiki-list-pages)
                ("C-c C-s" . dokuwiki-save-page)))
+#+END_SRC
+
+** PDF
+#+BEGIN_SRC emacs-lisp
+(use-package pdf-tools
+  :ensure t
+  :config
+  (pdf-loader-install)
+  (setq-default pdf-view-display-size 'fit-page))
+#+END_SRC
+
+** Latex
+
+- AUCTex
+#+BEGIN_SRC emacs-lisp
+  (use-package tex
+   :ensure auctex
+   :config
+   (setq TeX-auto-save t)
+   (setq TeX-parse-self t)
+   (setq TeX-source-correlate-start-server t)
+   (setq TeX-view-program-selection '((output-pdf "PDF Tools")))
+   (setq LaTeX-command-style '(("" "%(PDF)%(latex) --shell-escape %S%(PDFout)")))
+   (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+   (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode))
+#+END_SRC
+
+** Bibtex
+[[http://joostkremers.github.io/ebib/][Ebib]] is a BibTeX database manager
+
+- Global keybinding
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-c e") 'ebib)
+(global-set-key (kbd "M-i") 'ebib-insert-citation)
+#+END_SRC
+
+- Config
+#+BEGIN_SRC emacs-lisp
+(use-package ebib
+:ensure t
+:config
+(require 'org-ebib)
+(setq ebib-bib-search-dirs '("~/PhD/Biblio/"))
+(setq ebib-preload-bib-files '("~/PhD/Biblio/Library.bib"))
+(setq ebib-notes-use-single-file "~/PhD/Biblio/Library.org")
+(setq ebib-file-associations '(("pdf" . nil) ("ps" . "gv")))
+(setq ebib-index-window-size 15)
+(setq ebib-notes-template "** %T\n:PROPERTIES:\n%K\n:DOI: %D\n:FILE: %F\n:END:\n>|<")
+(define-key ebib-multiline-mode-map "\C-c\C-c" 'ebib-cancel-multiline-buffer)
+(remove-hook 'ebib-notes-new-note-hook 'org-narrow-to-subtree)
+(remove-hook 'ebib-notes-open-note-after-hook 'org-narrow-to-subtree))
 #+END_SRC
 
 * Code
