@@ -74,7 +74,7 @@ Semantic, and Ansi-Color faces are included.")
       (alum-1 "#c1cdcd") (alum-2 "#d3d7cf") (alum-3 "#babdb6")
       (alum-4 "#666864") (alum-5 "#5f615c") (alum-6 "#2e3436")
       ;; Not in Tango palette; used for better contrast.
-      (white "#f5f5f5") (black "#000000") (plum-0 "#edc4e2")
+      (white "WhiteSmoke") (black "#000000") (plum-0 "#edc4e2")
       (red-0 "#ffe6e6") (cham-0 "#e6ffc2") (cham-4 "#346604")
       (blue-0 "#8cc4ff") (orange-4 "#b35000"))
 

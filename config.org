@@ -418,17 +418,17 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 
 * Write
 ** Org
-- Config
+
 #+BEGIN_SRC emacs-lisp
+(use-package org
+  :ensure org-plus-contrib
+  :config
+  (require 'ox-extra)
+  (ox-extras-activate '(latex-header-blocks ignore-headlines))
   (setq org-todo-keywords '((sequence "TODO" "PROCESS" "|" "DONE" )))
   (setq org-startup-folded (quote content))
   (setq org-startup-indented t)
   (setq org-hide-leading-stars t)
-#+END_SRC
-
-- Export
-#+BEGIN_SRC emacs-lisp
-  (require 'ox)
   (setq org-latex-listings 'minted)
   (setq org-latex-pdf-process
    '("pdflatex --shell-escape --interaction nonstopmode %f"
@@ -437,10 +437,30 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
      "pdflatex --shell-escape --interaction nonstopmode %f"))
   (add-to-list 'org-latex-packages-alist '("" "listings"))
   (add-to-list 'org-latex-packages-alist '("" "color"))
-  (add-to-list 'org-latex-packages-alist '("" "minted"))
+  (add-to-list 'org-latex-packages-alist '("" "minted")))
 #+END_SRC
 
+** Outline
+#+BEGIN_SRC emacs-lisp
+(use-package outline-magic
+ :ensure t
+ :after outline
+ :bind
+ (:map outline-minor-mode-map
+   ("M-<up>"    . outline-move-subtree-up)
+   ("M-<down>"  . outline-move-subtree-down)
+   ("M-<left>"  . outline-promote)
+   ("M-<right>" . outline-demote)
+   ("C-<down>"  . outline-next-heading)
+   ("C-<up>"    . outline-previous-heading))
+ :init
+ (add-hook 'outline-mode-hook (lambda () (require 'outline-magic)))
+ (add-hook 'outline-minor-mode-hook (lambda ()
+     (require 'outline-magic)))
+     (define-key outline-minor-mode-map [(tab)] 'outline-cycle))
+#+END_SRC
 ** Markdown
+
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
    :ensure t
@@ -449,6 +469,7 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 #+END_SRC
 
 ** Dokuwiki
+
 - Login
 #+BEGIN_SRC emacs-lisp
   (use-package dokuwiki
@@ -463,6 +484,7 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
   (use-package dokuwiki-mode
    :ensure t
    :mode "\\.dwiki\\'"
+   :hook (dokuwiki-mode . outline-minor-mode)
    :bind (:map dokuwiki-mode-map
                ("C-c C-l" . dokuwiki-list-pages)
                ("C-c C-s" . dokuwiki-save-page)))
@@ -479,18 +501,25 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 
 ** Latex
 
-- AUCTex
 #+BEGIN_SRC emacs-lisp
   (use-package tex
    :ensure auctex
+   :hook
+   ((LaTeX-mode . TeX-source-correlate-mode)
+    (LaTeX-mode . outline-minor-mode)
+    (LaTeX-mode . TeX-fold-mode)
+    (TeX-after-compilation-finished-functions . TeX-revert-document-buffer))
+   :init
+   (add-hook 'LaTeX-mode-hook (lambda ()
+     (setq outline-promotion-headings
+       '("\\chapter" "\\section" "\\subsection" "\\subsubsection" "\\paragraph" "\\subparagraph"))))
    :config
    (setq TeX-auto-save t)
    (setq TeX-parse-self t)
    (setq TeX-source-correlate-start-server t)
    (setq TeX-view-program-selection '((output-pdf "PDF Tools")))
    (setq LaTeX-command-style '(("" "%(PDF)%(latex) --shell-escape %S%(PDFout)")))
-   (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
-   (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode))
+   (add-to-list 'TeX-command-list '("Make" "make TEXINPUTS=/usr/share/texmf/tex:$TEXINPUTS" TeX-run-compile nil t)))
 #+END_SRC
 
 ** Bibtex
