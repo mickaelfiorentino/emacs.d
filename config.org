@@ -429,6 +429,7 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
   (setq org-startup-folded (quote content))
   (setq org-startup-indented t)
   (setq org-hide-leading-stars t)
+  (setq org-hide-emphasis-markers t)
   (setq org-latex-listings 'minted)
   (setq org-latex-pdf-process
    '("pdflatex --shell-escape --interaction nonstopmode %f"
@@ -457,7 +458,9 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
  (add-hook 'outline-mode-hook (lambda () (require 'outline-magic)))
  (add-hook 'outline-minor-mode-hook (lambda ()
      (require 'outline-magic)))
-     (define-key outline-minor-mode-map [(tab)] 'outline-cycle))
+     (define-key outline-minor-mode-map [(tab)] 'outline-cycle)
+ :config
+ (setq outline-cycle-emulate-tab t))
 #+END_SRC
 ** Markdown
 
@@ -493,15 +496,29 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 ** PDF
 #+BEGIN_SRC emacs-lisp
 (use-package pdf-tools
-  :if (memq window-system '(ns))
   :ensure t
   :config
   (pdf-loader-install)
-  (setq-default pdf-view-display-size 'fit-page))
+  (setq-default pdf-view-display-size 'fit-width))
 #+END_SRC
 
 ** Latex
 
+- [[https://stackoverflow.com/questions/7587287/how-do-i-bind-latexmk-to-one-key-in-emacs-and-have-it-show-errors-if-there-are-a][Latexmk]]
+#+BEGIN_SRC emacs-lisp
+(defun run-latexmk ()
+  (interactive)
+  (let ((TeX-save-query nil)
+        (TeX-process-asynchronous nil)
+        (master-file (TeX-master-file)))
+    (TeX-save-document "")
+    (TeX-run-TeX "run-latexmk" "latexmk" master-file)
+    (if (plist-get TeX-error-report-switches (intern master-file))
+        (TeX-next-error 1 t)
+      (minibuffer-message "done"))))
+#+END_SRC
+
+- Config
 #+BEGIN_SRC emacs-lisp
   (use-package tex
    :ensure auctex
@@ -509,18 +526,22 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
    ((LaTeX-mode . TeX-source-correlate-mode)
     (LaTeX-mode . outline-minor-mode)
     (LaTeX-mode . TeX-fold-mode)
+    (LaTeX-mode . (lambda () (setq TeX-command-default "Latexmk")))
     (TeX-after-compilation-finished-functions . TeX-revert-document-buffer))
-   :init
-   (add-hook 'LaTeX-mode-hook (lambda ()
-     (setq outline-promotion-headings
-       '("\\chapter" "\\section" "\\subsection" "\\subsubsection" "\\paragraph" "\\subparagraph"))))
+   :bind (:map LaTeX-mode-map
+         ("C-x C-s" . (lambda () (interactive) (save-buffer) (TeX-fold-buffer))))
    :config
+   (add-to-list 'TeX-command-list
+     '("Latexmk" "(run-latexmk)" TeX-run-function nil t :help "Run Latexmk") t)
+   (add-to-list 'TeX-command-list
+     '("Make" "make TEXINPUTS=/usr/share/texmf/tex:$TEXINPUTS" TeX-run-compile nil t :help "Run makefile") t)
+   (setq outline-promotion-headings
+       '("\\chapter" "\\section" "\\subsection" "\\subsubsection" "\\paragraph" "\\subparagraph"))
    (setq TeX-auto-save t)
    (setq TeX-parse-self t)
    (setq TeX-source-correlate-start-server t)
    (setq TeX-view-program-selection '((output-pdf "PDF Tools")))
-   (setq LaTeX-command-style '(("" "%(PDF)%(latex) --shell-escape %S%(PDFout)")))
-   (add-to-list 'TeX-command-list '("Make" "make TEXINPUTS=/usr/share/texmf/tex:$TEXINPUTS" TeX-run-compile nil t)))
+   (setq LaTeX-command-style '(("" "%(PDF)%(latex) --synctex=1 %S%(PDFout)"))))
 #+END_SRC
 
 ** Bibtex
@@ -541,7 +562,7 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 (setq ebib-bib-search-dirs '("~/PhD/Biblio/"))
 (setq ebib-preload-bib-files '("~/PhD/Biblio/Library.bib"))
 (setq ebib-notes-use-single-file "~/PhD/Biblio/Library.org")
-(setq ebib-file-associations '(("pdf" . nil) ("ps" . "gv")))
+(setq ebib-file-associations '(("pdf" . "evince") ("ps" . "gv")))
 (setq ebib-index-window-size 15)
 (setq ebib-notes-template "** %T\n:PROPERTIES:\n%K\n:DOI: %D\n:FILE: %F\n:END:\n>|<")
 (define-key ebib-multiline-mode-map "\C-c\C-c" 'ebib-cancel-multiline-buffer)
