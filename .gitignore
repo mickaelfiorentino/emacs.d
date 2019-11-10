@@ -16,3 +16,4 @@ transient/
 /lisp/smart-mode-line/smart-mode-line-autoloads.el
 projectile.cache
 ido.last
+eshell/

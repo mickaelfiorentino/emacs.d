@@ -496,7 +496,8 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 ** PDF
 #+BEGIN_SRC emacs-lisp
 (use-package pdf-tools
-  :ensure t
+  :if (string-match-p "fc" operating-system-release)
+  :ensure nil
   :config
   (pdf-loader-install)
   (setq-default pdf-view-display-size 'fit-width))
