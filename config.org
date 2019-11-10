@@ -521,27 +521,29 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 - Config
 #+BEGIN_SRC emacs-lisp
   (use-package tex
+   :defer t
    :ensure auctex
+   :mode ("\\.tex\\'" . LaTeX-mode)
+   :init
+   (setq TeX-auto-save t)
+   (setq TeX-parse-self t)
+   (setq TeX-source-correlate-start-server t)
+   (setq TeX-view-program-selection '((output-pdf "PDF Tools")))
+   (setq LaTeX-command-style '(("" "%(PDF)%(latex) --synctex=1 %S%(PDFout)")))
    :hook
    ((LaTeX-mode . TeX-source-correlate-mode)
     (LaTeX-mode . outline-minor-mode)
     (LaTeX-mode . TeX-fold-mode)
-    (LaTeX-mode . (lambda () (setq TeX-command-default "Latexmk")))
-    (TeX-after-compilation-finished-functions . TeX-revert-document-buffer))
-   :bind (:map LaTeX-mode-map
-         ("C-x C-s" . (lambda () (interactive) (save-buffer) (TeX-fold-buffer))))
+    (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
+    (LaTeX-mode . (lambda () (define-key LaTeX-mode-map
+      (kbd "C-x C-s") (lambda () (interactive) (save-buffer) (TeX-fold-buffer))))))
    :config
    (add-to-list 'TeX-command-list
      '("Latexmk" "(run-latexmk)" TeX-run-function nil t :help "Run Latexmk") t)
    (add-to-list 'TeX-command-list
      '("Make" "make TEXINPUTS=/usr/share/texmf/tex:$TEXINPUTS" TeX-run-compile nil t :help "Run makefile") t)
    (setq outline-promotion-headings
-       '("\\chapter" "\\section" "\\subsection" "\\subsubsection" "\\paragraph" "\\subparagraph"))
-   (setq TeX-auto-save t)
-   (setq TeX-parse-self t)
-   (setq TeX-source-correlate-start-server t)
-   (setq TeX-view-program-selection '((output-pdf "PDF Tools")))
-   (setq LaTeX-command-style '(("" "%(PDF)%(latex) --synctex=1 %S%(PDFout)"))))
+       '("\\chapter" "\\section" "\\subsection" "\\subsubsection" "\\paragraph" "\\subparagraph")))
 #+END_SRC
 
 ** Bibtex
@@ -616,12 +618,32 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 
 - Associate .sdc & .do files to tcl-mode
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'auto-mode-alist '("\\.sdc\\'" . tcl-mode))
-  (add-to-list 'auto-mode-alist '("\\.xdc\\'" . tcl-mode))
-  (add-to-list 'auto-mode-alist '("\\.do\\'" . tcl-mode))
-  (setq tcl-application "tclsh")
-  (add-hook 'inferior-tcl-mode-hook
-   (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
+  (use-package tcl
+    :ensure nil
+    :mode (("\\.tcl\\'" . tcl-mode)
+           ("\\.sdc\\'" . tcl-mode)
+           ("\\.xdc\\'" . tcl-mode)
+           ("\\.do\\'"  . tcl-mode))
+    :config
+    (setq tcl-application "tclsh")
+    :hook (inferior-tcl-mode . (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer))))
+    ;; (add-to-list 'auto-mode-alist '("\\.sdc\\'" . tcl-mode))
+    ;; (add-to-list 'auto-mode-alist '("\\.xdc\\'" . tcl-mode))
+    ;; (add-to-list 'auto-mode-alist '("\\.do\\'" . tcl-mode))
+    ;; (setq tcl-application "tclsh")
+    ;; (add-hook 'inferior-tcl-mode-hook
+    ;;  (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
+#+END_SRC
+
+** Python
+#+BEGIN_SRC emacs-lisp
+(use-package python
+  :ensure nil
+  :mode ("\\.py\\'" . python-mode)
+  :config
+  (setq python-shell-interpreter "python3")
+  (setq indent-tabs-mode nil)
+  (setq python-indent 4))
 #+END_SRC
 
 ** C
@@ -640,12 +662,4 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
    (lambda () (progn (setq asm-comment-char "//")
                      (setq comment-start "//")
                      (setq comment-add 0))))
-#+END_SRC
-
-** Python
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'python-mode-hook
-   (lambda () (setq indent-tabs-mode nil)
-              (setq python-indent 4)))
 #+END_SRC
