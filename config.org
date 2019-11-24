@@ -33,12 +33,12 @@
    show-trailing-whitespace nil                        ; Display trailing whitespaces
    uniquify-buffer-name-style 'forward                 ; uniquify buffer names
    window-combination-resize t                         ; Resize windows proportionally
-   x-stretch-cursor t)                                  ; Stretch cursor to the glyph width
-  (column-number-mode 1)                                ; Column number next to line number
-  (global-subword-mode 1)                               ; Iterate through CamelCase words
-  (delete-selection-mode 1)                             ; Replace region when inserting text
-  (global-auto-revert-mode 1)                           ; Automatically revert buffer from file
-  (display-time-mode 1)                                 ; Enable time in the mode-line
+   x-stretch-cursor t)                                 ; Stretch cursor to the glyph width
+  (column-number-mode t)                               ; Column number next to line number
+  (global-subword-mode t)                              ; Iterate through CamelCase words
+  (delete-selection-mode t)                            ; Replace region when inserting text
+  (global-auto-revert-mode t)                          ; Automatically revert buffer from file
+  (display-time-mode t)                                ; Enable time in the mode-line
   (show-paren-mode t)                                  ; Show matching parenthesis
   (set-default-coding-systems 'utf-8)                  ; Default to utf-8 encoding
   (fset 'yes-or-no-p 'y-or-n-p)                        ; Replace yes/no prompts with y/n
@@ -65,6 +65,7 @@
   (global-set-key (kbd "M-u")         'undo)
   (global-set-key (kbd "M-/")         'shell-command-on-region)
   (global-set-key (kbd "C-x C-b")     'ibuffer)
+  (global-set-key (kbd "<backtab>")   'dabbrev-completion)
   (global-set-key (kbd "<C-return>")  "\C-a\C- \C-e\M-w\C-j\C-y") ; Duplicate line
   (global-set-key (kbd "C-c h")       'counsel-command-history)
   (global-set-key (kbd "C-c t")       'org-time-stamp)
@@ -121,15 +122,27 @@
 
 - Desktop+ allows to save/load multiple desktops
 #+BEGIN_SRC emacs-lisp
-  (use-package desktop+
-   :ensure t
-   :bind ("C-c d" . desktop+-load)
-   :config
-   (setq desktop-save t)
-   (setq desktop-buffers-not-to-save "^$")
-   (setq desktop-files-not-to-save (not desktop-buffers-not-to-save))
-   (setq desktop+-base-dir (expand-file-name "desktop/" user-emacs-directory))
-   :init (add-hook 'after-init-hook (lambda () (desktop+-load "default"))))
+    (use-package desktop+
+     :ensure t
+     :bind ("C-c d" . desktop+-load)
+     :hook (after-init . (lambda () (desktop+-load "default")))
+     :config
+     (setq desktop-save t)
+     (setq desktop-buffers-not-to-save "^$")
+     (setq desktop-files-not-to-save (not desktop-buffers-not-to-save))
+     (setq desktop+-base-dir (expand-file-name "desktop/" user-emacs-directory))
+     (setq savehist-save-minibuffer-history t)
+     (setq savehist-additional-variables
+       '(kill-ring
+         search-ring
+         regexp-search-ring
+         last-kbd-macro
+         kmacro-ring
+         shell-command-history))
+     :init
+     (savehist-mode t)
+     (save-place-mode t))
+  ;; (add-hook 'after-init-hook (lambda () (desktop+-load "default"))))
 #+END_SRC
 
 ** Custom
