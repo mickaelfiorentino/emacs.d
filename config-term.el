@@ -1,6 +1,6 @@
 ;;=====================================================================================
 ;;
-;; Quick emacs configuration
+;; Basic configuration for quick emacs in terminals
 ;;
 ;;=====================================================================================
 (setq-default
@@ -24,11 +24,10 @@
  scroll-conservatively most-positive-fixnum                  ; Always scroll by one line
  scroll-margin 0                                             ; Add a margin when scrolling vertically
  uniquify-buffer-name-style 'forward                         ; uniquify buffer names
+ transient-mark-mode t                                       ; visual feedback on selections
  window-combination-resize t)                                ; Resize windows proportionally
 (set-default-coding-systems 'utf-8)                          ; Default to utf-8 encoding
 (menu-bar-mode 1)                                            ; Enable menu bar
-(tool-bar-mode -1)                                           ; Disable tool-bar
-(scroll-bar-mode -1)                                         ; Disable scroll bar
 (show-paren-mode 1)                                          ; Show matching parenthesis
 (blink-cursor-mode -1)                                       ; Cursor stays still
 (display-time-mode 1)                                        ; Enable time in the mode-line
@@ -37,7 +36,7 @@
 (column-number-mode 1)                                       ; Column number next to line number
 (ido-mode t)                                                 ; Use Ido in the minibuffer
 (icomplete-mode t)                                           ; Use Completion in the minibuffer
-(cua-mode nil)                                               ; NOT Use CUA Mode
+(cua-mode nil)                                               ; Use CUA Mode
 (fset 'yes-or-no-p 'y-or-n-p)                                ; Replace yes/no prompts with y/n
 (add-hook 'text-mode-hook 'turn-on-visual-line-mode)         ; Wrap text but only for test-modes
 (add-to-list 'default-frame-alist '(fullscreen . maximized)) ; Start maximized
@@ -55,19 +54,18 @@
 (setq save-place-file (concat user-emacs-directory "places")
       backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))))
 
+;; Mouse support in PuTTY
+(require 'mouse)
+(xterm-mouse-mode t)
+(setq mouse-wheel-follow-mouse 't)
+(defvar alternating-scroll-down-next t)
+(defvar alternating-scroll-up-next t)
+(global-set-key (kbd "<mouse-4>") 'scroll-down-line)
+(global-set-key (kbd "<mouse-5>") 'scroll-up-line)
+
 ;; Imenu
 (require 'imenu)
 (add-hook 'emacs-lisp-mode-hook 'imenu-add-menubar-index)    ; Imenu for emacs-lisp
 (add-hook 'vhdl-mode-hook       'imenu-add-menubar-index)    ; Imenu for VHDL
 (add-hook 'tcl-mode-hook        'imenu-add-menubar-index)    ; Imenu for TCL
 (add-hook 'c-mode-hook          'imenu-add-menubar-index)    ; Imenu for C
-
-;; Dired
-(require 'dired)
-(setq dired-listing-switches "-laGh1v --group-directories-first")
-(add-hook 'dired-load-hook (lambda () (load "dired-x")))
-(eval-after-load "dired"
-  '(progn
-     (define-key dired-mode-map (kbd "<") '(lambda () (interactive) (find-alternate-file "..")))
-     (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
-     (put 'dired-find-alternate-file 'disabled nil) ))
