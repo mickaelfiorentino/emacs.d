@@ -54,12 +54,10 @@
 (setq save-place-file (concat user-emacs-directory "places")
       backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))))
 
-;; Mouse support in PuTTY
+;; Mouse support in Terminal
 (require 'mouse)
 (xterm-mouse-mode t)
 (setq mouse-wheel-follow-mouse 't)
-(defvar alternating-scroll-down-next t)
-(defvar alternating-scroll-up-next t)
 (global-set-key (kbd "<mouse-4>") 'scroll-down-line)
 (global-set-key (kbd "<mouse-5>") 'scroll-up-line)
 
@@ -68,4 +66,22 @@
 (add-hook 'emacs-lisp-mode-hook 'imenu-add-menubar-index)    ; Imenu for emacs-lisp
 (add-hook 'vhdl-mode-hook       'imenu-add-menubar-index)    ; Imenu for VHDL
 (add-hook 'tcl-mode-hook        'imenu-add-menubar-index)    ; Imenu for TCL
+(add-hook 'python-mode-hook     'imenu-add-menubar-index)    ; Imenu for Python
 (add-hook 'c-mode-hook          'imenu-add-menubar-index)    ; Imenu for C
+
+;; Dired
+(put 'dired-find-alternate-file 'disabled nil)
+(setq dired-listing-switches "-laGh1v --group-directories-first")
+(add-hook 'dired-load-hook (lambda () (load-library "dired-x")))
+(define-key dired-mode-map (kbd "<") (lambda () (interactive) (find-alternate-file "..")))
+(define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
+
+;; Scripting
+(setq python-shell-interpreter "python3")
+(setq tcl-application "tclsh")
+(setq python-indent 4)
+(add-hook 'inferior-python-mode-hook
+          (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
+(add-hook 'inferior-tcl-mode-hook
+          (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
+
