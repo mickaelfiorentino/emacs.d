@@ -433,25 +433,26 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 ** Org
 
 #+BEGIN_SRC emacs-lisp
-(use-package org
-  :ensure org-plus-contrib
-  :config
-  (require 'ox-extra)
-  (ox-extras-activate '(latex-header-blocks ignore-headlines))
-  (setq org-todo-keywords '((sequence "TODO" "PROCESS" "|" "DONE" )))
-  (setq org-startup-folded (quote content))
-  (setq org-startup-indented t)
-  (setq org-hide-leading-stars t)
-  (setq org-hide-emphasis-markers t)
-  (setq org-latex-listings 'minted)
-  (setq org-latex-pdf-process
-   '("pdflatex --shell-escape --interaction nonstopmode %f"
-     "bibtex %b"
-     "pdflatex --shell-escape --interaction nonstopmode %f"
-     "pdflatex --shell-escape --interaction nonstopmode %f"))
-  (add-to-list 'org-latex-packages-alist '("" "listings"))
-  (add-to-list 'org-latex-packages-alist '("" "color"))
-  (add-to-list 'org-latex-packages-alist '("" "minted")))
+  (use-package org
+    :ensure nil
+    :config
+    (require 'ox-extra)
+    (ox-extras-activate '(latex-header-blocks ignore-headlines))
+    (setq org-todo-keywords '((sequence "TODO" "PROCESS" "|" "DONE" )))
+    (setq org-startup-folded (quote content))
+    (setq org-startup-indented t)
+    (setq org-hide-leading-stars t)
+    (setq org-hide-emphasis-markers t)
+    (setq org-latex-listings 'minted)
+    (setq org-latex-pdf-process
+     '("pdflatex --shell-escape --interaction nonstopmode %f"
+       "bibtex %b"
+       "pdflatex --shell-escape --interaction nonstopmode %f"
+       "pdflatex --shell-escape --interaction nonstopmode %f"))
+    (add-to-list 'org-latex-packages-alist '("" "listings"))
+    (add-to-list 'org-latex-packages-alist '("" "color"))
+    (add-to-list 'org-latex-packages-alist '("" "minted"))
+    (org-reload))
 #+END_SRC
 
 ** Outline
@@ -509,7 +510,7 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 ** PDF
 #+BEGIN_SRC emacs-lisp
 (use-package pdf-tools
-  :if (string-match-p "fc" operating-system-release)
+  :if (string-match-p "fc" (cond ((not operating-system-release) "") (t operating-system-release)))
   :ensure nil
   :config
   (pdf-loader-install)
