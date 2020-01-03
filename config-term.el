@@ -56,7 +56,7 @@
 
 ;; Mouse support in Terminal
 (require 'mouse)
-(xterm-mouse-mode t)
+;; (xterm-mouse-mode t)
 (setq mouse-wheel-follow-mouse 't)
 (global-set-key (kbd "<mouse-4>") 'scroll-down-line)
 (global-set-key (kbd "<mouse-5>") 'scroll-up-line)
@@ -73,8 +73,9 @@
 (put 'dired-find-alternate-file 'disabled nil)
 (setq dired-listing-switches "-laGh1v --group-directories-first")
 (add-hook 'dired-load-hook (lambda () (load-library "dired-x")))
-(define-key dired-mode-map (kbd "<") (lambda () (interactive) (find-alternate-file "..")))
-(define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
+(eval-after-load "dired" '(progn
+  (define-key dired-mode-map (kbd "<") (lambda () (interactive) (find-alternate-file "..")))
+  (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file) ))
 
 ;; Scripting
 (setq python-shell-interpreter "python3")
@@ -84,4 +85,5 @@
           (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
 (add-hook 'inferior-tcl-mode-hook
           (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
-
+(add-hook 'shell-mode-hook
+          (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
