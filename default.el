@@ -81,9 +81,15 @@
 (add-hook 'inferior-tcl-mode-hook (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
 (add-hook 'shell-mode-hook (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
 
+(defun default/gui-mode ()
+  "Configuration specific to gui emacs sessions"
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+)
+
 ;; Mouse support in Terminal
-(defun my/mouse-term-support ()
-  "Add mouse support in terminal emacs sessions"
+(defun default/term-mode ()
+  "Configuration specific to terminal emacs sessions"
   (require 'mouse)
   (xterm-mouse-mode t)
   (setq mouse-wheel-follow-mouse 't)
