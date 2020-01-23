@@ -1,6 +1,6 @@
 ;;=====================================================================================
 ;;
-;; Basic configuration for quick emacs in terminals
+;; Default configuration for quick emacs
 ;;
 ;;=====================================================================================
 (setq-default
@@ -34,12 +34,15 @@
 (delete-selection-mode 1)                                    ; Typed text replaces the selection
 (global-auto-revert-mode 1)                                  ; Automatically revert buffer from file
 (column-number-mode 1)                                       ; Column number next to line number
-(ido-mode t)                                                 ; Use Ido in the minibuffer
-(icomplete-mode t)                                           ; Use Completion in the minibuffer
-(cua-mode nil)                                               ; Use CUA Mode
 (fset 'yes-or-no-p 'y-or-n-p)                                ; Replace yes/no prompts with y/n
 (add-hook 'text-mode-hook 'turn-on-visual-line-mode)         ; Wrap text but only for test-modes
 (add-to-list 'default-frame-alist '(fullscreen . maximized)) ; Start maximized
+
+;; Ido
+(setq ido-enable-flex-matching t)
+(setq ido-everywhere t)
+(setq icomplete-mode t)
+(ido-mode t)
 
 ;; Keybindings
 (global-set-key (kbd "C-x C-b") 'ibuffer)
@@ -53,13 +56,6 @@
 ;; Backup directories
 (setq save-place-file (concat user-emacs-directory "places")
       backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))))
-
-;; Mouse support in Terminal
-(require 'mouse)
-;; (xterm-mouse-mode t)
-(setq mouse-wheel-follow-mouse 't)
-(global-set-key (kbd "<mouse-4>") 'scroll-down-line)
-(global-set-key (kbd "<mouse-5>") 'scroll-up-line)
 
 ;; Imenu
 (require 'imenu)
@@ -81,9 +77,16 @@
 (setq python-shell-interpreter "python3")
 (setq tcl-application "tclsh")
 (setq python-indent 4)
-(add-hook 'inferior-python-mode-hook
-          (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
-(add-hook 'inferior-tcl-mode-hook
-          (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
-(add-hook 'shell-mode-hook
-          (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
+(add-hook 'inferior-python-mode-hook (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
+(add-hook 'inferior-tcl-mode-hook (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
+(add-hook 'shell-mode-hook (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
+
+;; Mouse support in Terminal
+(defun my/mouse-term-support ()
+  "Add mouse support in terminal emacs sessions"
+  (require 'mouse)
+  (xterm-mouse-mode t)
+  (setq mouse-wheel-follow-mouse 't)
+  (global-set-key (kbd "<mouse-4>") 'scroll-down-line)
+  (global-set-key (kbd "<mouse-5>") 'scroll-up-line)
+)
