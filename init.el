@@ -1,5 +1,7 @@
 ;; CONFIG
 ;; ======
+(setq package-check-signature nil)
+(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 (package-initialize)
 (require 'org)
 (setq-default user-emacs-directory "~/.emacs.d/emacs.d")
@@ -10,7 +12,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "Hack" :foundry "SRC" :slant normal :weight normal :height 113 :width normal)))))
+ '(default ((t (:family "Monospace" :foundry "SRC" :slant normal :weight normal :height 113 :width normal)))))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -18,6 +20,7 @@
  ;; If there is more than one, they won't work right.
  '(ansi-color-names-vector
    ["#21252B" "#E06C75" "#98C379" "#E5C07B" "#61AFEF" "#C678DD" "#56B6C2" "#ABB2BF"])
+ '(column-number-mode t)
  '(company-quickhelp-color-background "#4F4F4F")
  '(company-quickhelp-color-foreground "#DCDCCC")
  '(compilation-message-face (quote default))
@@ -29,7 +32,9 @@
    (quote
     ("39fd36b49d0b69132797968f472615fb29b0e07de166bd8aeb44a8798ec7f681" "669e02142a56f63861288cc585bee81643ded48a19e36bfdf02b66d745bcc626" default)))
  '(delete-selection-mode nil)
+ '(display-time-mode t)
  '(fci-rule-color "#3E4451")
+ '(font-use-system-font t)
  '(highlight-changes-colors (quote ("#d33682" "#6c71c4")))
  '(highlight-symbol-colors
    (--map
@@ -61,14 +66,16 @@
  '(ivy-re-builders-alist (quote ((t . ivy-prescient-re-builder))) t)
  '(ivy-use-virtual-buffers t)
  '(ivy-wrap t)
+ '(menu-bar-mode nil)
  '(nrepl-message-colors
    (quote
     ("#dc322f" "#cb4b16" "#b58900" "#546E00" "#B4C342" "#00629D" "#2aa198" "#d33682" "#6c71c4")))
  '(package-selected-packages
    (quote
-    (outline-magic doom-themes spacemacs-theme solarized-theme zenburn-theme pdf-tools smart-mode-line-atom-one-dark-theme atom-one-dark-theme swiper yasnippet-snippets use-package tango-plus-theme sr-speedbar smart-mode-line rainbow-mode multiple-cursors markdown-mode magit ivy-prescient ivy-bibtex flatui-theme expand-region espresso-theme ebib dokuwiki-mode dokuwiki diminish desktop+ counsel-projectile company-prescient avy auctex ag)))
+    (auctex neotree outline-magic doom-themes spacemacs-theme solarized-theme zenburn-theme pdf-tools smart-mode-line-atom-one-dark-theme atom-one-dark-theme swiper yasnippet-snippets use-package tango-plus-theme sr-speedbar smart-mode-line rainbow-mode multiple-cursors markdown-mode magit ivy-prescient ivy-bibtex flatui-theme expand-region espresso-theme ebib dokuwiki-mode dokuwiki diminish desktop+ counsel-projectile company-prescient avy ag)))
  '(pos-tip-background-color "#eee8d5")
  '(pos-tip-foreground-color "#586e75")
+ '(show-paren-mode t)
  '(smartrep-mode-line-active-bg (solarized-color-blend "#859900" "#eee8d5" 0.2))
  '(term-default-bg-color "#fdf6e3")
  '(term-default-fg-color "#657b83")
@@ -80,6 +87,7 @@
     [152 195 121]
     [198 120 221]
     [86 182 194]])
+ '(tool-bar-mode nil)
  '(vc-annotate-background nil)
  '(vc-annotate-background-mode nil)
  '(vc-annotate-color-map

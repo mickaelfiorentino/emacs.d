@@ -6,6 +6,7 @@
 ** Defaults
 #+BEGIN_SRC emacs-lisp
   (setq-default
+   load-prefer-newer t                                 ; Prefer newer file by default
    inhibit-startup-screen t                            ; Disable start-up screen
    initial-scratch-message ""                          ; Empty the initial *scratch* buffer
    visible-bell 1                                      ; Please don't beep at me
@@ -21,7 +22,6 @@
    large-file-warning-threshold 100000000              ; File size limit warning -> 100Mb
    delete-by-moving-to-trash t                         ; Delete files to trash
    require-final-newline t                             ; May prevent some problems
-   load-prefer-newer t                                 ; Prefer newer file by default
    display-time-format "%H:%M"                         ; Format the time string
    help-window-select t                                ; Focus new help windows when opened
    scroll-conservatively most-positive-fixnum          ; Always scroll by one line
@@ -222,6 +222,29 @@
          sr-speedbar-skip-other-window-p t))
  #+END_SRC
 
+** Neotree
+#+BEGIN_SRC emacs-lisp
+  (use-package neotree
+    :commands (neotree-toggle my/neotree-project-dir)
+    :bind (("<f8>" . my/neotree-project-dir))
+    :functions (neo-global--window-exists-p neotree-dir neotree-find)
+    :config
+    (setq neo-theme 'arrow)
+    ;; from https://www.emacswiki.org/emacs/NeoTree
+    (defun my/neotree-project-dir ()
+      "Open NeoTree using the git root."
+      (interactive)
+      (let ((project-dir (projectile-project-root))
+            (file-name (buffer-file-name)))
+        (neotree-toggle)
+        (if project-dir
+            (if (neo-global--window-exists-p)
+                (progn
+                  (neotree-dir project-dir)
+                  (neotree-find file-name)))
+          (message "Could not find git project root."))))
+  )
+#+END_SRC
 ** Ivy
 
 - Basic configuration
@@ -436,8 +459,6 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
   (use-package org
     :ensure nil
     :config
-    (require 'ox-extra)
-    (ox-extras-activate '(latex-header-blocks ignore-headlines))
     (setq org-todo-keywords '((sequence "TODO" "PROCESS" "|" "DONE" )))
     (setq org-startup-folded (quote content))
     (setq org-startup-indented t)
