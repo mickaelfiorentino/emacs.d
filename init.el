@@ -72,7 +72,7 @@
     ("#dc322f" "#cb4b16" "#b58900" "#546E00" "#B4C342" "#00629D" "#2aa198" "#d33682" "#6c71c4")))
  '(package-selected-packages
    (quote
-    (auctex neotree outline-magic doom-themes spacemacs-theme solarized-theme zenburn-theme pdf-tools smart-mode-line-atom-one-dark-theme atom-one-dark-theme swiper yasnippet-snippets use-package tango-plus-theme sr-speedbar smart-mode-line rainbow-mode multiple-cursors markdown-mode magit ivy-prescient ivy-bibtex flatui-theme expand-region espresso-theme ebib dokuwiki-mode dokuwiki diminish desktop+ counsel-projectile company-prescient avy ag)))
+    (auctex neotree outline-magic doom-themes spacemacs-theme solarized-theme zenburn-theme pdf-tools smart-mode-line-atom-one-dark-theme swiper yasnippet-snippets use-package tango-plus-theme sr-speedbar smart-mode-line rainbow-mode multiple-cursors markdown-mode magit ivy-prescient ivy-bibtex flatui-theme expand-region espresso-theme ebib dokuwiki-mode dokuwiki diminish desktop+ counsel-projectile company-prescient avy ag)))
  '(pos-tip-background-color "#eee8d5")
  '(pos-tip-foreground-color "#586e75")
  '(show-paren-mode t)
