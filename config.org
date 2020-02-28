@@ -102,22 +102,6 @@
    (setq use-package-always-ensure nil)
  #+END_SRC
 
-- straight-use-package
-#+BEGIN_SRC emacs-lisp
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
-#+END_SRC
-
 ** Daemon
 
 - Allow access from emacsclient
@@ -376,11 +360,11 @@
 #+BEGIN_SRC emacs-lisp
 (use-package dabbrev
   :commands (dabbrev-expand dabbrev-completion)
-  :bind ("<C-tab>" . dabbrev-completion)
+  :bind ("<backtab>" . dabbrev-completion)
   :config
   (setq dabbrev-abbrev-char-regexp "\\sw\\|\\s_")
   (setq dabbrev-abbrev-skip-leading-regexp "\\$\\|\\*\\|/\\|=")
-  (setq dabbrev-backward-only nil)
+  (setq dabbrev-backward-only t)
   (setq dabbrev-case-distinction nil)
   (setq dabbrev-case-fold-search t)
   (setq dabbrev-case-replace nil)
@@ -392,8 +376,8 @@
 
 #+BEGIN_SRC emacs-lisp
 (use-package hippie-exp
-:after dabbrev
-  :bind ("<backtab>" . hippie-expand)
+  :after dabbrev
+  ;; :hook (prog-mode . (lambda () (local-set-key (kbd "<tab>") 'hippie-expand)))
   :config
   (setq hippie-expand-try-functions-list
         '(try-expand-dabbrev-visible
@@ -409,6 +393,8 @@
           try-expand-all-abbrevs))
   (setq hippie-expand-verbose nil)
 )
+(add-hook 'prog-mode-hook
+     (lambda () (local-set-key (kbd "<tab>") 'hippie-expand)))
 #+END_SRC
 
 ** Expand-Region
