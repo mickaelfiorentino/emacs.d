@@ -23,7 +23,6 @@
    delete-by-moving-to-trash t                         ; Delete files to trash
    require-final-newline t                             ; May prevent some problems
    display-time-format "%H:%M"                         ; Format the time string
-   help-window-select t                                ; Focus new help windows when opened
    scroll-conservatively most-positive-fixnum          ; Always scroll by one line
    scroll-preserve-screen-position t                   ; Preserve screen position
    scroll-margin 0                                     ; Add a margin when scrolling vertically
@@ -32,7 +31,6 @@
    select-enable-clipboard t                           ; Merge system's and Emacs' clipboard
    show-trailing-whitespace nil                        ; Display trailing whitespaces
    uniquify-buffer-name-style 'forward                 ; uniquify buffer names
-   window-combination-resize t                         ; Resize windows proportionally
    x-stretch-cursor t)                                 ; Stretch cursor to the glyph width
   (column-number-mode t)                               ; Column number next to line number
   (global-subword-mode t)                              ; Iterate through CamelCase words
@@ -54,13 +52,6 @@
 ** Keybindings
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "RET")         'newline-and-indent)
-  (global-set-key (kbd "M-0")         'delete-window)
-  (global-set-key (kbd "M-1")         'delete-other-windows)
-  (global-set-key (kbd "M-2")         'split-window-vertically)
-  (global-set-key (kbd "M-3")         'split-window-horizontally)
-  (global-set-key (kbd "M-o")         'other-window)
-  (global-set-key (kbd "M-O")         'other-frame)
-  (global-set-key (kbd "M-k")         'kill-buffer-and-window)
   (global-set-key (kbd "M-g")         'goto-line)
   (global-set-key (kbd "M-u")         'undo)
   (global-set-key (kbd "M-/")         'shell-command-on-region)
@@ -123,8 +114,10 @@
 #+BEGIN_SRC emacs-lisp
 (use-package desktop+
   :ensure t
-  :bind ("C-c d" . desktop+-load)
-  :hook (after-init . (lambda () (desktop+-load "default")))
+  :bind
+  ("C-c d" . desktop+-load)
+  :hook
+  (after-init . (lambda () (desktop+-load "default")))
   :config
   (setq desktop-save t)
   (setq desktop-buffers-not-to-save "^$")
@@ -186,8 +179,7 @@
 
   - Custom functions
   #+BEGIN_SRC emacs-lisp
-  (require 'my-custom-functions)
-  (global-set-key (kbd "C-c n") 'narrow-or-widen-dwim)
+
   (global-set-key (kbd "C-c s") 'toggle-window-split)
   #+END_SRC
 
@@ -217,7 +209,111 @@
 #+END_SRC
 
 * Navigation
-** Prescient
+** Windows
+#+BEGIN_SRC emacs-lisp
+(use-package window
+  :bind
+  ("C-c s" . my/toggle-window-split)
+  ("M-0"   . delete-window)
+  ("M-1"   . delete-other-windows)
+  ("M-2"   . split-window-vertically)
+  ("M-3"   . split-window-horizontally)
+  ("M-o"   . other-window)
+  ("M-O"   . other-frame)
+  ("M-k"   . kill-buffer-and-window)
+  :hook
+  ((help-mode . visual-line-mode)
+   (custom-mode . visual-line-mode))
+  :init
+  (setq help-window-select t)           ; Focus new help windows when opened
+  (setq window-combination-resize t)    ; Resize windows proportionally
+  (setq display-buffer-alist
+        '(;; top side window
+          ("\\*\\(Flycheck\\|Package-Lint\\).*"
+           (display-buffer-in-side-window)
+           (window-height . 0.20)
+           (side . top)
+           (slot . 0)
+           (window-parameters . ((no-other-window . t))))
+          ("\\*\\(Backtrace\\|Warnings\\|Compile-Log\\|Messages\\)\\*"
+           (display-buffer-in-side-window)
+           (window-height . 0.20)
+           (side . top)
+           (slot . 1)
+           (window-parameters . ((no-other-window . t))))
+          ;; bottom side window
+          (".*\\*Completions.*"
+           (display-buffer-in-side-window)
+           (window-height . 0.20)
+           (side . bottom)
+           (slot . 0)
+           (window-parameters . ((no-other-window . t))))
+          (".*\\*Occur.*"
+           (display-buffer-in-side-window)
+           (window-height . 0.20)
+           (side . bottom)
+           (slot . 0)
+           (window-parameters . ((no-other-window . t))))
+          ("\\*e?shell.*"
+           (display-buffer-in-side-window)
+           (window-height . 0.20)
+           (side . bottom)
+           (slot . 1))
+          ;; left side window
+          ("\\*Help.*"
+           (display-buffer-in-side-window)
+           (window-width . 0.20)       ; See the :hook
+           (side . left)
+           (slot . 0)
+           (window-parameters . ((no-other-window . t))))
+          ;; right side window
+          ("\\*Faces\\*"
+           (display-buffer-in-side-window)
+           (window-width . 0.25)
+           (side . right)
+           (slot . 0)
+           (window-parameters . ((no-other-window . t)
+                                 (mode-line-format . (" "
+                                                      mode-line-buffer-identification)))))
+          ("\\*Custom.*"
+           (display-buffer-in-side-window)
+           (window-width . 0.25)
+           (side . right)
+           (slot . 1))))
+  :config
+  (defun my/toggle-window-split ()
+  "
+  Toggle window view between horizontal and vertical modes
+  Only when the window count is equal to 2
+  "
+    (interactive)
+    (if (= (count-windows) 2)
+      (let* ((this-win-buffer (window-buffer))
+         (next-win-buffer (window-buffer (next-window)))
+         (this-win-edges (window-edges (selected-window)))
+         (next-win-edges (window-edges (next-window)))
+         (this-win-2nd (not (and (<= (car this-win-edges)
+                     (car next-win-edges))
+                     (<= (cadr this-win-edges)
+                     (cadr next-win-edges)))))
+         (splitter
+          (if (= (car this-win-edges)
+             (car (window-edges (next-window))))
+          'split-window-horizontally
+        'split-window-vertically)))
+    (delete-other-windows)
+    (let ((first-win (selected-window)))
+      (funcall splitter)
+      (if this-win-2nd (other-window 1))
+      (set-window-buffer (selected-window) this-win-buffer)
+      (set-window-buffer (next-window) next-win-buffer)
+      (select-window first-win)
+      (if this-win-2nd (other-window 1)))))
+  )
+)
+#+END_SRC
+** Minibuffer
+*** Prescient
 #+BEGIN_SRC emacs-lisp
 (use-package prescient
   :ensure t
@@ -226,8 +322,100 @@
 )
 #+END_SRC
 
-** Ivy
+*** Prot
 
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package minibuffer
+  ;;   :bind (("M-v" . prot/focus-minibuffer-or-completions)
+  ;;          :map completion-list-mode-map
+  ;;          ("h" . prot/describe-symbol-at-point)
+  ;;          ("n" . next-line)
+  ;;          ("p" . previous-line)
+  ;;          ("f" . next-completion)
+  ;;          ("b" . previous-completion)
+  ;;          ("M-v" . prot/focus-minibuffer))
+  ;;   :config
+  ;;   (setq completion-cycle-threshold 3)
+  ;;   (setq completion-flex-nospace nil)
+  ;;   (setq completion-pcm-complete-word-inserts-delimiters t)
+  ;;   (setq completion-pcm-word-delimiters "-_./:| ")
+  ;;   ;; NOTE: flex completion is introduced in Emacs 27
+  ;;   (setq completion-show-help nil)
+  ;;   (setq completion-styles '(partial-completion substring initials flex))
+  ;;   (setq completion-category-overrides
+  ;;         '((file (styles initials basic))
+  ;;           (buffer (styles initials basic))
+  ;;           (info-menu (styles basic))))
+  ;;   (setq completions-format 'vertical)   ; *Completions* buffer
+  ;;   (setq enable-recursive-minibuffers t)
+  ;;   (setq read-answer-short t)
+  ;;   (setq read-buffer-completion-ignore-case t)
+  ;;   (setq read-file-name-completion-ignore-case t)
+  ;;   (setq resize-mini-windows t)
+
+  ;;   (file-name-shadow-mode 1)
+  ;;   (minibuffer-depth-indicate-mode 1)
+  ;;   (minibuffer-electric-default-mode 1)
+
+  ;;   (defun prot/focus-minibuffer ()
+  ;;   "Focus the active minibuffer.
+  ;;    Bind this to `completion-list-mode-map' to M-v to easily jump
+  ;;    between the list of candidates present in the \\*Completions\\*
+  ;;    buffer and the minibuffer (because by default M-v switches to the
+  ;;    completions if invoked from inside the minibuffer.
+  ;;   "
+  ;;   (interactive)
+  ;;   (let ((mini (active-minibuffer-window)))
+  ;;     (when mini
+  ;;       (select-window mini))))
+
+  ;;   (defun prot/focus-minibuffer-or-completions ()
+  ;;   "Focus the active minibuffer or the \\*Completions\\*.
+  ;;    If both the minibuffer and the Completions are present, this
+  ;;    command will first move per invocation to the former, then the
+  ;;    latter, and then continue to switch between the two.
+  ;;    The continuous switch is essentially the same as running
+  ;;    `prot/focus-minibuffer' and `switch-to-completions' in
+  ;;    succession.
+  ;;   "
+  ;;   (interactive)
+  ;;   (let* ((mini (active-minibuffer-window))
+  ;;           (completions (get-buffer-window "*Completions*")))
+  ;;       (cond ((and mini
+  ;;                   (not (minibufferp)))
+  ;;              (select-window mini nil))
+  ;;             ((and completions
+  ;;                   (not (eq (selected-window)
+  ;;                            completions)))
+  ;;              (select-window completions nil)))))
+  ;; )
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package icomplete
+  ;;   :demand
+  ;;   :bind
+  ;;   (:map icomplete-minibuffer-map
+  ;;    ("<left>"  . icomplete-backward-completions)
+  ;;    ("<up>"    . icomplete-backward-completions)
+  ;;    ("<right>" . icomplete-forward-completions)
+  ;;    ("<down>"  . icomplete-forward-completions))
+  ;;   :config
+  ;;   (setq icomplete-delay-completions-threshold 0)
+  ;;   (setq icomplete-max-delay-chars 0)
+  ;;   (setq icomplete-compute-delay 0)
+  ;;   (setq icomplete-show-matches-on-no-input t)
+  ;;   (setq icomplete-hide-common-prefix nil)
+  ;;   (setq icomplete-prospects-height 1)
+  ;;   (setq icomplete-separator " · ")
+  ;;   (setq icomplete-with-completion-tables t)
+  ;;   (setq icomplete-in-buffer t)
+  ;;   (icomplete-mode 1)
+  ;;  )
+#+END_SRC
+
+*** Ivy
 #+BEGIN_SRC emacs-lisp
   (use-package ivy
      :ensure t
@@ -248,48 +436,71 @@
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-(use-package ivy-prescient
-   :ensure t
-   :after ivy
-   :config (ivy-prescient-mode)
-)
+  (use-package ivy-prescient
+     :ensure t
+     :after ivy
+     :config (ivy-prescient-mode)
+  )
 #+END_SRC
 
-** Counsel
-
-- Using Counsel in addition to Ivy
+*** Counsel
 #+BEGIN_SRC emacs-lisp
-(use-package counsel
-   :ensure t
-   :after ivy
-   :diminish (counsel-mode . "")
-   :bind (("M-x"     . counsel-M-x)
-          ("C-x C-f" . counsel-find-file)
-          ("M-l"     . counsel-imenu)
-          ("C-c h"   . counsel-command-history)
-          ("C-M-s"   . counsel-git-grep))
-)
+  (use-package counsel
+     :ensure t
+     :after ivy
+     :diminish (counsel-mode . "")
+     :bind (("M-x"     . counsel-M-x)
+            ("C-x C-f" . counsel-find-file)
+            ("M-l"     . counsel-imenu)
+            ("C-c h"   . counsel-command-history)
+            ("C-M-s"   . counsel-git-grep))
+  )
 #+END_SRC
 
-- Counsel-projectile
+** Search
+*** Isearch
 #+BEGIN_SRC emacs-lisp
-(use-package counsel-projectile
-   :ensure t
-   :after ivy
-   :bind (("C-=" . counsel-projectile-find-file))
-)
+  (use-package isearch
+    :bind
+    (("M-s M-o" . multi-occur)
+     ("M-s %" . prot/isearch-query-replace-symbol-at-point)
+     :map minibuffer-local-isearch-map
+     ("<tab>" . isearch-complete-edit)
+     :map isearch-mode-map
+     ("<tab>" . isearch-complete)
+     ("C-SPC" . prot/isearch-mark-and-exit))
+    :config
+    (setq search-highlight t)
+    (setq search-whitespace-regexp ".*?")
+    (setq isearch-lax-whitespace t)
+    (setq isearch-regexp-lax-whitespace nil)
+    (setq isearch-lazy-highlight t)
+
+    (defun prot/isearch-mark-and-exit ()
+      "Mark the current search string and exit the search."
+      (interactive)
+      (push-mark isearch-other-end t 'activate)
+      (setq deactivate-mark nil)
+      (isearch-done))
+
+    (defun prot/isearch-query-replace-symbol-at-point ()
+      "Run `query-replace-regexp' for the symbol at point."
+      (interactive)
+      (isearch-forward-symbol-at-point)
+      (isearch-query-replace-regexp))
+  )
 #+END_SRC
 
-** Swiper
+*** Swiper
 #+BEGIN_SRC emacs-lisp
-(use-package swiper
-   :ensure t
-   :after ivy
-   :bind ("C-s" . swiper)
-)
+  ;; (use-package swiper
+  ;;    :ensure t
+  ;;    :after ivy
+  ;;    :bind ("C-s" . swiper)
+  ;; )
 #+END_SRC
-
-** Projectile
+** Projects Management
+*** Projectile
 #+BEGIN_SRC emacs-lisp
 (use-package projectile
    :ensure t
@@ -299,7 +510,7 @@
 )
 #+END_SRC
 
-** Speedbar
+*** Speedbar
 
 - speedbar
 #+BEGIN_SRC emacs-lisp
@@ -322,14 +533,18 @@
          sr-speedbar-skip-other-window-p t))
  #+END_SRC
 
-** Neotree
+*** Neotree
 #+BEGIN_SRC emacs-lisp
 (use-package neotree
-  :commands (neotree-toggle my/neotree-project-dir)
-  :bind (("<f8>" . my/neotree-project-dir))
-  :functions (neo-global--window-exists-p neotree-dir neotree-find)
+  :commands
+  (neotree-toggle my/neotree-project-dir)
+  :bind
+  (("<f8>" . my/neotree-project-dir))
+  :functions
+  (neo-global--window-exists-p neotree-dir neotree-find)
   :config
   (setq neo-theme 'arrow)
+
   ;; from https://www.emacswiki.org/emacs/NeoTree
   (defun my/neotree-project-dir ()
   "Open NeoTree using the git root."
@@ -345,7 +560,6 @@
           (message "Could not find git project root."))))
   )
 #+END_SRC
-
 * Edit
 ** Multiple Cursors
 #+BEGIN_SRC emacs-lisp
@@ -356,7 +570,6 @@
 #+END_SRC
 
 ** Completion
-
 #+BEGIN_SRC emacs-lisp
 (use-package dabbrev
   :commands (dabbrev-expand dabbrev-completion)
@@ -398,18 +611,15 @@
 #+END_SRC
 
 ** Expand-Region
-
-- Easy selection
 #+BEGIN_SRC emacs-lisp
 (use-package expand-region
    :ensure t
    :bind (("C-."  . er/expand-region)
-          ("C-M-." . er/contract-region)))
+          ("C-M-." . er/contract-region))
+)
 #+END_SRC
 
 ** YaSnippets
-
-- Snippets engine
 #+BEGIN_SRC emacs-lisp
 (use-package yasnippet
    :ensure t
@@ -425,7 +635,6 @@
 )
 #+END_SRC
 
-- Default snippets
 #+BEGIN_SRC emacs-lisp
 (use-package yasnippet-snippets)
 #+END_SRC
@@ -492,25 +701,39 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 
 * Write
 ** Org
-
 #+BEGIN_SRC emacs-lisp
 (use-package org
-    :config
-    (setq org-todo-keywords '((sequence "TODO" "PROCESS" "|" "DONE" )))
-    (setq org-startup-folded (quote content))
-    (setq org-startup-indented t)
-    (setq org-hide-leading-stars t)
-    (setq org-hide-emphasis-markers t)
-    (setq org-latex-listings 'minted)
-    (setq org-latex-pdf-process
-     '("pdflatex --shell-escape --interaction nonstopmode %f"
-       "bibtex %b"
-       "pdflatex --shell-escape --interaction nonstopmode %f"
-       "pdflatex --shell-escape --interaction nonstopmode %f"))
-    (add-to-list 'org-latex-packages-alist '("" "listings"))
-    (add-to-list 'org-latex-packages-alist '("" "color"))
-    (add-to-list 'org-latex-packages-alist '("" "minted"))
-    (org-reload))
+  :init
+  (org-reload)
+  :bind
+  ("C-c n" . my/narrow-or-widen-dwim)
+  :config
+  (setq org-todo-keywords '((sequence "TODO" "PROCESS" "|" "DONE" )))
+  (setq org-startup-folded (quote content))
+  (setq org-startup-indented t)
+  (setq org-hide-leading-stars t)
+  (setq org-hide-emphasis-markers t)
+  (setq org-latex-listings 'minted)
+  (setq org-latex-pdf-process
+    '("pdflatex --shell-escape --interaction nonstopmode %f"
+      "bibtex %b"
+      "pdflatex --shell-escape --interaction nonstopmode %f"
+      "pdflatex --shell-escape --interaction nonstopmode %f"))
+  (add-to-list 'org-latex-packages-alist '("" "listings"))
+  (add-to-list 'org-latex-packages-alist '("" "color"))
+  (add-to-list 'org-latex-packages-alist '("" "minted"))
+
+  (defun my/narrow-or-widen-dwim ()
+  " Toggle narrow/widen region
+    If the buffer is narrowed it widens, otherwise it narrows.
+  "
+  (interactive)
+  (cond ((buffer-narrowed-p) (widen))
+    ((region-active-p) (narrow-to-region (region-beginning) (region-end)))
+    ((equal major-mode 'org-mode) (org-narrow-to-subtree))
+    (t (error "Please select a region to narrow to")))
+  )
+)
 #+END_SRC
 
 ** Outline
