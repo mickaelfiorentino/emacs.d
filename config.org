@@ -65,9 +65,7 @@
   (global-set-key (kbd "M-u")         'undo)
   (global-set-key (kbd "M-/")         'shell-command-on-region)
   (global-set-key (kbd "C-x C-b")     'ibuffer)
-  (global-set-key (kbd "<backtab>")   'dabbrev-completion)
   (global-set-key (kbd "<C-return>")  "\C-a\C- \C-e\M-w\C-j\C-y") ; Duplicate line
-  (global-set-key (kbd "C-c h")       'counsel-command-history)
   (global-set-key (kbd "C-c t")       'org-time-stamp)
   (global-set-key (kbd "C-c q")       'quick-calc)
   (global-set-key (kbd "C-c u")       'upcase-dwim)
@@ -101,8 +99,25 @@
    (eval-when-compile (require 'use-package))
    (require 'diminish)
    (require 'bind-key)
-   (setq use-package-always-ensure t)
+   (setq use-package-always-ensure nil)
  #+END_SRC
+
+- straight-use-package
+#+BEGIN_SRC emacs-lisp
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+#+END_SRC
+
 ** Daemon
 
 - Allow access from emacsclient
@@ -122,88 +137,189 @@
 
 - Desktop+ allows to save/load multiple desktops
 #+BEGIN_SRC emacs-lisp
-    (use-package desktop+
-     :ensure t
-     :bind ("C-c d" . desktop+-load)
-     :hook (after-init . (lambda () (desktop+-load "default")))
-     :config
-     (setq desktop-save t)
-     (setq desktop-buffers-not-to-save "^$")
-     (setq desktop-files-not-to-save (not desktop-buffers-not-to-save))
-     (setq desktop+-base-dir (expand-file-name "desktop/" user-emacs-directory))
-     (setq savehist-save-minibuffer-history t)
-     (setq savehist-additional-variables
-       '(kill-ring
-         search-ring
-         regexp-search-ring
-         last-kbd-macro
-         kmacro-ring
-         shell-command-history))
-     :init
-     (savehist-mode t)
-     (save-place-mode t))
-  ;; (add-hook 'after-init-hook (lambda () (desktop+-load "default"))))
+(use-package desktop+
+  :ensure t
+  :bind ("C-c d" . desktop+-load)
+  :hook (after-init . (lambda () (desktop+-load "default")))
+  :config
+  (setq desktop-save t)
+  (setq desktop-buffers-not-to-save "^$")
+  (setq desktop-files-not-to-save (not desktop-buffers-not-to-save))
+  (setq desktop+-base-dir (expand-file-name "desktop/" user-emacs-directory))
+)
+#+END_SRC
+
+- Save History
+#+BEGIN_SRC emacs-lisp
+(use-package savehist
+  :init
+  (savehist-mode 1)
+  :config
+  (setq savehist-file "~/.emacs.d/savehist")
+  (setq history-length 30000)
+  (setq history-delete-duplicates nil)
+  (setq savehist-save-minibuffer-history t)
+  (setq savehist-additional-variables
+    '(kill-ring
+      search-ring
+      regexp-search-ring
+      last-kbd-macro
+      kmacro-ring
+      shell-command-history))
+)
+#+END_SRC
+
+- Save places
+#+BEGIN_SRC emacs-lisp
+(use-package saveplace
+  :init
+  (save-place-mode 1)
+  :config
+  (setq save-place-file "~/.emacs.d/saveplace")
+  (setq save-place-forget-unreadable-files t)
+)
 #+END_SRC
 
 ** Custom
- - Local directory for custom elisp code
- #+BEGIN_SRC emacs-lisp
-   (setq my-lisp-directory (concat user-emacs-directory (convert-standard-filename "/lisp/")))
-   (add-to-list 'load-path my-lisp-directory)
-   (let ((default-directory my-lisp-directory))
-        (normal-top-level-add-to-load-path '("."))
-        (normal-top-level-add-subdirs-to-load-path))
- #+END_SRC
+  - Automatic custom edit to a specific file
+  #+BEGIN_SRC emacs-lisp
+    (use-package cus-edit
+    :config
+    (setq custom-file "~/.emacs.d/custom.el")
+    (unless (file-exists-p custom-file)
+      (write-region "" nil custom-file))
+    (load custom-file))
+  #+END_SRC
 
- - Custom functions
- #+BEGIN_SRC emacs-lisp
- (require 'my-custom-functions)
- (global-set-key (kbd "C-c n") 'narrow-or-widen-dwim)
- (global-set-key (kbd "C-c s") 'toggle-window-split)
- #+END_SRC
+  - Local directory for custom elisp code
+  #+BEGIN_SRC emacs-lisp
+    (setq my-lisp-directory (concat user-emacs-directory (convert-standard-filename "/lisp/")))
+    (add-to-list 'load-path my-lisp-directory)
+    (let ((default-directory my-lisp-directory))
+         (normal-top-level-add-to-load-path '("."))
+         (normal-top-level-add-subdirs-to-load-path))
+  #+END_SRC
 
- - Local theme directory
- #+BEGIN_SRC emacs-lisp
-   (setq my-theme-directory (concat user-emacs-directory (convert-standard-filename "/themes/")))
-   (add-to-list 'custom-theme-load-path (concat my-theme-directory "/tango++/"))
-   (add-to-list 'custom-theme-load-path (concat my-theme-directory "/sml/"))
- #+END_SRC
+  - Custom functions
+  #+BEGIN_SRC emacs-lisp
+  (require 'my-custom-functions)
+  (global-set-key (kbd "C-c n") 'narrow-or-widen-dwim)
+  (global-set-key (kbd "C-c s") 'toggle-window-split)
+  #+END_SRC
+
+  - Local theme directory
+  #+BEGIN_SRC emacs-lisp
+    (setq my-theme-directory (concat user-emacs-directory (convert-standard-filename "/themes/")))
+    (add-to-list 'custom-theme-load-path (concat my-theme-directory "/tango++/"))
+    (add-to-list 'custom-theme-load-path (concat my-theme-directory "/sml/"))
+  #+END_SRC
 
 ** Themes
 - Global theme
 #+BEGIN_SRC emacs-lisp
-  (when (display-graphic-p)
-   (load-theme 'tango++ t))
+(when (display-graphic-p)
+   (load-theme 'modus-operandi t))
 #+END_SRC
 
 - Smart-mode-line
 #+BEGIN_SRC emacs-lisp
-  (when (display-graphic-p)
+(when (display-graphic-p)
    (use-package smart-mode-line
     :ensure t
     :config
      (setq sml/no-confirm-load-theme t)
-     (setq sml/theme 'my-light) ;; automatic light my-light dark respectful
+     (setq sml/theme 'respectful) ;; automatic light my-light dark respectful
     :hook (after-init . sml/setup)))
 #+END_SRC
 
 * Navigation
-** Projectile
+** Prescient
+#+BEGIN_SRC emacs-lisp
+(use-package prescient
+  :ensure t
+  :config
+  (prescient-persist-mode +1)
+)
+#+END_SRC
+
+** Ivy
 
 #+BEGIN_SRC emacs-lisp
-  (use-package projectile
+  (use-package ivy
+     :ensure t
+     :diminish (ivy-mode . "")
+     :config (ivy-mode)
+     :bind (("C-x b" . ivy-switch-buffer)
+            ("C-x B" . ivy-switch-buffer-other-window)
+            ("M-H"   . ivy-resume))
+     :custom
+     (ivy-re-builders-alist
+       '((t . ivy--regex-ignore-order))) ;; allow input not in order
+     (ivy-height 10)
+     (ivy-count-format "(%d/%d)")
+     (ivy-display-style 'fancy)
+     (ivy-initial-inputs-alist nil)
+     (ivy-wrap nil)
+     (ivy-use-virtual-buffers nil))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(use-package ivy-prescient
    :ensure t
-   :diminish (projectile-mode . "P")
+   :after ivy
+   :config (ivy-prescient-mode)
+)
+#+END_SRC
+
+** Counsel
+
+- Using Counsel in addition to Ivy
+#+BEGIN_SRC emacs-lisp
+(use-package counsel
+   :ensure t
+   :after ivy
+   :diminish (counsel-mode . "")
+   :bind (("M-x"     . counsel-M-x)
+          ("C-x C-f" . counsel-find-file)
+          ("M-l"     . counsel-imenu)
+          ("C-c h"   . counsel-command-history)
+          ("C-M-s"   . counsel-git-grep))
+)
+#+END_SRC
+
+- Counsel-projectile
+#+BEGIN_SRC emacs-lisp
+(use-package counsel-projectile
+   :ensure t
+   :after ivy
+   :bind (("C-=" . counsel-projectile-find-file))
+)
+#+END_SRC
+
+** Swiper
+#+BEGIN_SRC emacs-lisp
+(use-package swiper
+   :ensure t
+   :after ivy
+   :bind ("C-s" . swiper)
+)
+#+END_SRC
+
+** Projectile
+#+BEGIN_SRC emacs-lisp
+(use-package projectile
+   :ensure t
+   :diminish (projectile-mode . "")
    :config (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
-   :init (projectile-mode))
+   :init (projectile-mode)
+)
 #+END_SRC
 
 ** Speedbar
 
 - speedbar
 #+BEGIN_SRC emacs-lisp
-  (use-package speedbar
-   :ensure nil
+(use-package speedbar
    :config
    (setq speedbar-use-images nil
          speedbar-show-unknown-files t))
@@ -211,7 +327,7 @@
 
 - sr-speedbar
 #+BEGIN_SRC emacs-lisp
-  (use-package sr-speedbar
+(use-package sr-speedbar
    :ensure t
    :after speedbar
    :config
@@ -224,15 +340,15 @@
 
 ** Neotree
 #+BEGIN_SRC emacs-lisp
-  (use-package neotree
-    :commands (neotree-toggle my/neotree-project-dir)
-    :bind (("<f8>" . my/neotree-project-dir))
-    :functions (neo-global--window-exists-p neotree-dir neotree-find)
-    :config
-    (setq neo-theme 'arrow)
-    ;; from https://www.emacswiki.org/emacs/NeoTree
-    (defun my/neotree-project-dir ()
-      "Open NeoTree using the git root."
+(use-package neotree
+  :commands (neotree-toggle my/neotree-project-dir)
+  :bind (("<f8>" . my/neotree-project-dir))
+  :functions (neo-global--window-exists-p neotree-dir neotree-find)
+  :config
+  (setq neo-theme 'arrow)
+  ;; from https://www.emacswiki.org/emacs/NeoTree
+  (defun my/neotree-project-dir ()
+  "Open NeoTree using the git root."
       (interactive)
       (let ((project-dir (projectile-project-root))
             (file-name (buffer-file-name)))
@@ -245,122 +361,61 @@
           (message "Could not find git project root."))))
   )
 #+END_SRC
-** Ivy
-
-- Basic configuration
-#+BEGIN_SRC emacs-lisp
-  (use-package ivy
-   :ensure t
-   :diminish (ivy-mode . "")
-   :config (ivy-mode)
-   :bind (("C-x b" . ivy-switch-buffer)
-          ("C-x B" . ivy-switch-buffer-other-window)
-          ("M-H"   . ivy-resume))
-   :custom
-   (ivy-re-builders-alist
-     '((t . ivy--regex-ignore-order))) ;; allow input not in order
-   (ivy-height 10)
-   (ivy-count-format "(%d/%d)")
-   (ivy-display-style 'fancy)
-   (ivy-initial-inputs-alist nil)
-   (ivy-wrap t)
-   (ivy-use-virtual-buffers t))
-#+END_SRC
-
-** Counsel
-
-- Using Counsel in addition to Ivy
-#+BEGIN_SRC emacs-lisp
-  (use-package counsel
-   :ensure t
-   :after ivy
-   :diminish (counsel-mode . "")
-   :bind (("M-x"     . counsel-M-x)
-          ("C-x C-f" . counsel-find-file)
-          ("M-l"     . counsel-imenu)
-          ("C-M-s"   . counsel-git-grep)))
-#+END_SRC
-
-- Counsel-projectile
-#+BEGIN_SRC emacs-lisp
-  (use-package counsel-projectile
-   :ensure t
-   :after ivy
-   :bind (("C-=" . counsel-projectile-find-file)))
-#+END_SRC
-
-** Swiper
-
-- Using swiper instead of isearch
-#+BEGIN_SRC emacs-lisp
-  (use-package swiper
-   :ensure t
-   :after ivy
-   :bind ("C-s" . swiper))
-#+END_SRC
 
 * Edit
 ** Multiple Cursors
-
 #+BEGIN_SRC emacs-lisp
-  (use-package multiple-cursors
-   :ensure t
-   :bind (("C->" . mc/mark-next-like-this)
-          ("C-<" . mc/mark-previous-like-this)))
+(use-package multiple-cursors
+  :ensure t
+  :bind (("C->" . mc/mark-next-like-this)
+         ("C-<" . mc/mark-previous-like-this)))
 #+END_SRC
 
-** Company
+** Completion
 
-- Completion
 #+BEGIN_SRC emacs-lisp
-  (use-package company
-   :ensure t
-   :defer t
-   :diminish (company-mode . "C")
-   :hook (prog-mode . company-mode)
-   :config
-   (add-to-list 'company-backends 'company-files t)
-   (add-to-list 'company-backends 'company-shell-env t)
-   (setq company-backends (remove 'company-clang company-backends))
-   ;; (cl-pushnew '(company-files company-shell-env) company-backends)
-   (setq company-minimum-prefix-length 3
-         company-selection-wrap-around t
-         company-show-numbers t
-         company-tooltip-align-annotations t
-         company-require-match nil
-         company-dabbrev-downcase nil
-         company-dabbrev-ignore-case nil))
+(use-package dabbrev
+  :commands (dabbrev-expand dabbrev-completion)
+  :bind ("<C-tab>" . dabbrev-completion)
+  :config
+  (setq dabbrev-abbrev-char-regexp "\\sw\\|\\s_")
+  (setq dabbrev-abbrev-skip-leading-regexp "\\$\\|\\*\\|/\\|=")
+  (setq dabbrev-backward-only nil)
+  (setq dabbrev-case-distinction nil)
+  (setq dabbrev-case-fold-search t)
+  (setq dabbrev-case-replace nil)
+  (setq dabbrev-check-other-buffers t)
+  (setq dabbrev-eliminate-newlines nil)
+  (setq dabbrev-upcase-means-case-search t)
+)
 #+END_SRC
 
-** Prescient
-
-- Using Prescient to have better defaults
 #+BEGIN_SRC emacs-lisp
-  (use-package prescient
-   :ensure t)
-#+END_SRC
-
-- Prescient with Ivy
-#+BEGIN_SRC emacs-lisp
-  (use-package ivy-prescient
-   :ensure t
-   :after ivy
-   :config (ivy-prescient-mode))
-#+END_SRC
-
-- Prescient with Company
-#+BEGIN_SRC emacs-lisp
-  (use-package company-prescient
-   :ensure t
-   :after company
-   :config (company-prescient-mode))
+(use-package hippie-exp
+:after dabbrev
+  :bind ("<backtab>" . hippie-expand)
+  :config
+  (setq hippie-expand-try-functions-list
+        '(try-expand-dabbrev-visible
+          try-expand-dabbrev
+          try-expand-dabbrev-all-buffers
+          try-expand-dabbrev-from-kill
+          try-expand-list-all-buffers
+          try-expand-list
+          try-expand-line-all-buffers
+          try-expand-line
+          try-complete-file-name-partially
+          try-complete-file-name
+          try-expand-all-abbrevs))
+  (setq hippie-expand-verbose nil)
+)
 #+END_SRC
 
 ** Expand-Region
 
 - Easy selection
 #+BEGIN_SRC emacs-lisp
-  (use-package expand-region
+(use-package expand-region
    :ensure t
    :bind (("C-."  . er/expand-region)
           ("C-M-." . er/contract-region)))
@@ -370,22 +425,23 @@
 
 - Snippets engine
 #+BEGIN_SRC emacs-lisp
-  (use-package yasnippet
+(use-package yasnippet
    :ensure t
    :diminish
-   (yas-minor-mode . "Y")
+   (yas-minor-mode . "")
    :config
    (setq yas-verbosity 1)
    (setq yas-wrap-around-region t)
    (add-to-list #'yas-snippet-dirs "~/.emacs.d/emacs.d/yasnippets")
    :init
    ;;(yas-reload-all)
-   (yas-global-mode))
+   (yas-global-mode)
+)
 #+END_SRC
 
 - Default snippets
 #+BEGIN_SRC emacs-lisp
-  (use-package yasnippet-snippets)
+(use-package yasnippet-snippets)
 #+END_SRC
 
 * Shell
@@ -393,21 +449,19 @@
 
 - Clear shell
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'shell-mode-hook
+(add-hook 'shell-mode-hook
    (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
 #+END_SRC
 
 - Color support
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'shell-mode-hook
+(add-hook 'shell-mode-hook
    (lambda () (face-remap-set-base 'comint-highlight-prompt :inherit nil)))
 #+END_SRC
 
 ** Tramp
-
 #+BEGIN_SRC emacs-lisp
   (use-package tramp
-   :ensure nil
    :config
    (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
    (setq tramp-default-method "ssh")
@@ -426,12 +480,10 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
   ~C-x C-f /ssh:abbrev|sudo:user@remote:/path/to/file~
 
 ** Dired
-
 - Map ~<~ to "previous" & ~RET~ to "Enter Directory"
 - Do not open a new buffer each time
 #+BEGIN_SRC emacs-lisp
   (use-package dired
-   :ensure nil
    :config
    (put 'dired-find-alternate-file 'disabled nil)
    (setq dired-listing-switches "-laGh1v --group-directories-first")
@@ -444,7 +496,7 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 ** Magit
 
 #+BEGIN_SRC emacs-lisp
-  (use-package magit
+(use-package magit
    :ensure t
    :bind ("C-x g" . magit-status)
    :config
@@ -456,8 +508,7 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 ** Org
 
 #+BEGIN_SRC emacs-lisp
-  (use-package org
-    :ensure nil
+(use-package org
     :config
     (setq org-todo-keywords '((sequence "TODO" "PROCESS" "|" "DONE" )))
     (setq org-startup-folded (quote content))
@@ -479,28 +530,29 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 ** Outline
 #+BEGIN_SRC emacs-lisp
 (use-package outline-magic
- :ensure t
- :after outline
- :bind
- (:map outline-minor-mode-map
-   ("M-<up>"    . outline-move-subtree-up)
-   ("M-<down>"  . outline-move-subtree-down)
-   ("M-<left>"  . outline-promote)
-   ("M-<right>" . outline-demote)
-   ("C-<down>"  . outline-next-heading)
-   ("C-<up>"    . outline-previous-heading))
- :init
- (add-hook 'outline-mode-hook (lambda () (require 'outline-magic)))
- (add-hook 'outline-minor-mode-hook (lambda ()
-     (require 'outline-magic)))
-     (define-key outline-minor-mode-map [(tab)] 'outline-cycle)
- :config
- (setq outline-cycle-emulate-tab t))
+   :ensure t
+   :after outline
+   :bind
+   (:map outline-minor-mode-map
+     ("M-<up>"    . outline-move-subtree-up)
+     ("M-<down>"  . outline-move-subtree-down)
+     ("M-<left>"  . outline-promote)
+     ("M-<right>" . outline-demote)
+     ("C-<down>"  . outline-next-heading)
+     ("C-<up>"    . outline-previous-heading))
+   :init
+   (add-hook 'outline-mode-hook (lambda () (require 'outline-magic)))
+   (add-hook 'outline-minor-mode-hook (lambda ()
+       (require 'outline-magic)))
+       (define-key outline-minor-mode-map [(tab)] 'outline-cycle)
+   :config
+   (setq outline-cycle-emulate-tab t)
+)
 #+END_SRC
-** Markdown
 
+** Markdown
 #+BEGIN_SRC emacs-lisp
-  (use-package markdown-mode
+(use-package markdown-mode
    :ensure t
    :mode (("\\.md\\'"       . markdown-mode)
           ("\\.markdown\\'" . markdown-mode)))
@@ -510,7 +562,7 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 
 - Login
 #+BEGIN_SRC emacs-lisp
-  (use-package dokuwiki
+(use-package dokuwiki
    :ensure t
    :config
    (setq dokuwiki-xml-rpc-url "https://intranet.grm.polymtl.ca/wiki/lib/exe/xmlrpc.php")
@@ -519,7 +571,7 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 
 - Dokuwiki mode
 #+BEGIN_SRC emacs-lisp
-  (use-package dokuwiki-mode
+(use-package dokuwiki-mode
    :ensure t
    :mode "\\.dwiki\\'"
    :hook (dokuwiki-mode . outline-minor-mode)
@@ -531,8 +583,8 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 ** PDF
 #+BEGIN_SRC emacs-lisp
 (use-package pdf-tools
-  :if (string-match-p "fc" (cond ((not operating-system-release) "") (t operating-system-release)))
-  :ensure nil
+  :if (string-match-p "fc"
+         (cond ((not operating-system-release) "") (t operating-system-release)))
   :config
   (pdf-loader-install)
   (setq-default pdf-view-display-size 'fit-width))
@@ -556,7 +608,7 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 
 - Config
 #+BEGIN_SRC emacs-lisp
-  (use-package tex
+(use-package tex
    :defer t
    :ensure auctex
    :mode ("\\.tex\\'" . LaTeX-mode)
@@ -579,7 +631,8 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
    (add-to-list 'TeX-command-list
      '("Make" "make TEXINPUTS=/usr/share/texmf/tex:$TEXINPUTS" TeX-run-compile nil t :help "Run makefile") t)
    (setq outline-promotion-headings
-       '("\\chapter" "\\section" "\\subsection" "\\subsubsection" "\\paragraph" "\\subparagraph")))
+       '("\\chapter" "\\section" "\\subsection" "\\subsubsection" "\\paragraph" "\\subparagraph"))
+)
 #+END_SRC
 
 ** Bibtex
@@ -594,37 +647,35 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 - Config
 #+BEGIN_SRC emacs-lisp
 (use-package ebib
-:ensure t
-:config
-(require 'org-ebib)
-(setq ebib-bib-search-dirs '("~/PhD/Biblio/"))
-(setq ebib-preload-bib-files '("~/PhD/Biblio/Library.bib"))
-(setq ebib-notes-use-single-file "~/PhD/Biblio/Library.org")
-(setq ebib-file-associations '(("pdf" . "evince") ("ps" . "gv")))
-(setq ebib-index-window-size 15)
-(setq ebib-notes-template "** %T\n:PROPERTIES:\n%K\n:DOI: %D\n:FILE: %F\n:END:\n>|<")
-(define-key ebib-multiline-mode-map "\C-c\C-c" 'ebib-cancel-multiline-buffer)
-(remove-hook 'ebib-notes-new-note-hook 'org-narrow-to-subtree)
-(remove-hook 'ebib-notes-open-note-after-hook 'org-narrow-to-subtree))
+  :ensure t
+  :config
+  (require 'org-ebib)
+  (setq ebib-bib-search-dirs '("~/PhD/Biblio/"))
+  (setq ebib-preload-bib-files '("~/PhD/Biblio/Library.bib"))
+  (setq ebib-notes-use-single-file "~/PhD/Biblio/Library.org")
+  (setq ebib-file-associations '(("pdf" . "evince") ("ps" . "gv")))
+  (setq ebib-index-window-size 15)
+  (setq ebib-notes-template "** %T\n:PROPERTIES:\n%K\n:DOI: %D\n:FILE: %F\n:END:\n>|<")
+  (define-key ebib-multiline-mode-map "\C-c\C-c" 'ebib-cancel-multiline-buffer)
+  (remove-hook 'ebib-notes-new-note-hook 'org-narrow-to-subtree)
+  (remove-hook 'ebib-notes-open-note-after-hook 'org-narrow-to-subtree)
+)
 #+END_SRC
 
 * Code
 ** VHDL
-
-- Customize VHDL-mode
 #+BEGIN_SRC emacs-lisp
-  (defun my-vhdl-mode-hook ()
+(defun my-vhdl-mode-hook ()
    (setq vhdl-standard (quote (08 nil)))
    (define-key vhdl-mode-map (kbd "<backtab>") 'vhdl-align-region)
    (define-key vhdl-mode-map " " nil))
 
-  (add-hook 'vhdl-mode-hook 'my-vhdl-mode-hook)
+(add-hook 'vhdl-mode-hook 'my-vhdl-mode-hook)
 #+END_SRC
 
 ** Verilog
-
 #+BEGIN_SRC emacs-lisp
-  (use-package verilog-mode
+(use-package verilog-mode
    :mode (("\\.[st]*v[hp]*\\'" . verilog-mode)
           ("\\.f\\'"           . verilog-mode)
           ("\\.psl\\'"         . verilog-mode)
@@ -651,50 +702,42 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
    #+END_SRC
 
 ** TCL
-
-- Associate .sdc & .do files to tcl-mode
 #+BEGIN_SRC emacs-lisp
-  (use-package tcl
-    :ensure nil
-    :mode (("\\.tcl\\'" . tcl-mode)
-           ("\\.sdc\\'" . tcl-mode)
-           ("\\.xdc\\'" . tcl-mode)
-           ("\\.do\\'"  . tcl-mode))
-    :config
-    (setq tcl-application "tclsh")
-    :hook (inferior-tcl-mode . (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer))))
-    ;; (add-to-list 'auto-mode-alist '("\\.sdc\\'" . tcl-mode))
-    ;; (add-to-list 'auto-mode-alist '("\\.xdc\\'" . tcl-mode))
-    ;; (add-to-list 'auto-mode-alist '("\\.do\\'" . tcl-mode))
-    ;; (setq tcl-application "tclsh")
-    ;; (add-hook 'inferior-tcl-mode-hook
-    ;;  (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
+(use-package tcl
+  :mode (("\\.tcl\\'" . tcl-mode)
+         ("\\.sdc\\'" . tcl-mode)
+         ("\\.xdc\\'" . tcl-mode)
+         ("\\.do\\'"  . tcl-mode))
+  :config
+  (setq tcl-application "tclsh")
+  (setq tcl-tab-always-indent nil)
+  :hook (inferior-tcl-mode . (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
+)
 #+END_SRC
 
 ** Python
 #+BEGIN_SRC emacs-lisp
 (use-package python
-  :ensure nil
   :mode ("\\.py\\'" . python-mode)
+  :hook (inferior-python-mode . (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
   :config
   (setq python-shell-interpreter "python3")
   (setq indent-tabs-mode nil)
-  (setq python-indent 4))
+  (setq python-indent 4)
+)
 #+END_SRC
 
 ** C
-
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'c-mode-common-hook
+(add-hook 'c-mode-common-hook
    (lambda () (setq-default c-default-style "linux"
                             c-basic-offset  4)))
 #+END_SRC
 
 ** ASM
-
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'auto-mode-alist '("\\.S\\'" . asm-mode))
-  (add-hook 'asm-mode-hook
+(add-to-list 'auto-mode-alist '("\\.S\\'" . asm-mode))
+(add-hook 'asm-mode-hook
    (lambda () (progn (setq asm-comment-char "//")
                      (setq comment-start "//")
                      (setq comment-add 0))))
