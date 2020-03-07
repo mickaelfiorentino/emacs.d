@@ -39,14 +39,15 @@
   (display-time-mode t)                                ; Enable time in the mode-line
   (show-paren-mode t)                                  ; Show matching parenthesis
   (set-default-coding-systems 'utf-8)                  ; Default to utf-8 encoding
+  (prefer-coding-system 'utf-8)                        ; Prefer utf-8
   (fset 'yes-or-no-p 'y-or-n-p)                        ; Replace yes/no prompts with y/n
   (add-hook 'text-mode-hook 'turn-on-visual-line-mode) ; Wrap text at end-of-line in text-mode
   (add-hook 'before-save-hook 'whitespace-cleanup)     ; Delete whitespaces before saving
   (when (display-graphic-p)
-   (fringe-mode 0)                                     ; Disable fringes
-   (menu-bar-mode -1)                                  ; Disable the menu bar
-   (tool-bar-mode -1)                                  ; Disable tool-bar
-   (scroll-bar-mode -1))                               ; Disable Scroll bar
+   (fringe-mode 0)                                     ; Fringes
+   (menu-bar-mode t)                                   ; Menu bar
+   (tool-bar-mode -1)                                  ; Tool-bar
+   (scroll-bar-mode -1))                               ; Scroll bar
 #+END_SRC
 
 ** Keybindings
@@ -97,10 +98,15 @@
 
 - Allow access from emacsclient
 #+BEGIN_SRC emacs-lisp
-  (use-package server
-   :ensure t
-   :config
-   (unless (server-running-p) (server-start)))
+(use-package server
+  :config
+
+  (unless (server-running-p)
+    (server-start))
+
+  (when (equal window-system 'w32)
+    (setq server-use-tcp t))
+)
 #+END_SRC
 
 - Alias in .bashrc:
@@ -158,7 +164,6 @@
 #+END_SRC
 
 ** Custom
-  - Automatic custom edit to a specific file
   #+BEGIN_SRC emacs-lisp
     (use-package cus-edit
     :config
@@ -166,28 +171,6 @@
     (unless (file-exists-p custom-file)
       (write-region "" nil custom-file))
     (load custom-file))
-  #+END_SRC
-
-  - Local directory for custom elisp code
-  #+BEGIN_SRC emacs-lisp
-    (setq my-lisp-directory (concat user-emacs-directory (convert-standard-filename "/lisp/")))
-    (add-to-list 'load-path my-lisp-directory)
-    (let ((default-directory my-lisp-directory))
-         (normal-top-level-add-to-load-path '("."))
-         (normal-top-level-add-subdirs-to-load-path))
-  #+END_SRC
-
-  - Custom functions
-  #+BEGIN_SRC emacs-lisp
-
-  (global-set-key (kbd "C-c s") 'toggle-window-split)
-  #+END_SRC
-
-  - Local theme directory
-  #+BEGIN_SRC emacs-lisp
-    (setq my-theme-directory (concat user-emacs-directory (convert-standard-filename "/themes/")))
-    (add-to-list 'custom-theme-load-path (concat my-theme-directory "/tango++/"))
-    (add-to-list 'custom-theme-load-path (concat my-theme-directory "/sml/"))
   #+END_SRC
 
 ** Themes
@@ -408,7 +391,7 @@
   ;;   (setq icomplete-show-matches-on-no-input t)
   ;;   (setq icomplete-hide-common-prefix nil)
   ;;   (setq icomplete-prospects-height 1)
-  ;;   (setq icomplete-separator " · ")
+  ;;   (setq icomplete-separator " Â· ")
   ;;   (setq icomplete-with-completion-tables t)
   ;;   (setq icomplete-in-buffer t)
   ;;   (icomplete-mode 1)
@@ -636,22 +619,44 @@
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-(use-package yasnippet-snippets)
+(use-package yasnippet-snippets
+    :ensure t
+)
 #+END_SRC
 
 * Shell
-** Terminal
-
-- Clear shell
+** shell-mode
 #+BEGIN_SRC emacs-lisp
-(add-hook 'shell-mode-hook
-   (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
+(use-package shell
+  :init
+  (add-hook 'shell-mode-hook
+    (lambda ()
+      (local-set-key (kbd "C-l") 'comint-clear-buffer))
+      (face-remap-set-base 'comint-highlight-prompt :inherit nil))
+  :config
+  (setq explicit-shell-file-name "C:\\Program Files\\Git\\git-bash.exe")
+  (setq explicit-bash.exe-args '("--login" "-i" "--cd-to-home"))
+)
 #+END_SRC
 
-- Color support
+** eshell-mode
 #+BEGIN_SRC emacs-lisp
-(add-hook 'shell-mode-hook
-   (lambda () (face-remap-set-base 'comint-highlight-prompt :inherit nil)))
+(use-package eshell
+  :init
+  (add-hook 'eshell-mode-hook
+    (lambda ()
+      (add-to-list 'eshell-visual-commands "ssh")
+      (add-to-list 'eshell-visual-commands "plink")
+      (add-to-list 'eshell-visual-commands "git")
+      (add-to-list 'eshell-visual-commands "tail")))
+  :config
+  (setq eshell-scroll-to-bottom-on-input 'all)
+  (setq eshell-error-if-no-glob t)
+  (setq eshell-hist-ignoredups t)
+  (setq eshell-save-history-on-exit t)
+  (setq eshell-prefer-lisp-functions nil)
+  (setq eshell-destroy-buffer-when-process-dies t)
+)
 #+END_SRC
 
 ** Tramp
@@ -659,7 +664,8 @@
   (use-package tramp
    :config
    (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
-   (setq tramp-default-method "ssh")
+   (setq magit-git-executable "git")
+   (setq tramp-default-method "plink")
    (setq auto-revert-remote-files t)
    (setq remote-file-name-inhibit-cache nil) ;; cache file-name forever
    (setq vc-ignore-dir-regexp
@@ -702,38 +708,38 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 * Write
 ** Org
 #+BEGIN_SRC emacs-lisp
-(use-package org
-  :init
-  (org-reload)
-  :bind
-  ("C-c n" . my/narrow-or-widen-dwim)
-  :config
-  (setq org-todo-keywords '((sequence "TODO" "PROCESS" "|" "DONE" )))
-  (setq org-startup-folded (quote content))
-  (setq org-startup-indented t)
-  (setq org-hide-leading-stars t)
-  (setq org-hide-emphasis-markers t)
-  (setq org-latex-listings 'minted)
-  (setq org-latex-pdf-process
-    '("pdflatex --shell-escape --interaction nonstopmode %f"
-      "bibtex %b"
-      "pdflatex --shell-escape --interaction nonstopmode %f"
-      "pdflatex --shell-escape --interaction nonstopmode %f"))
-  (add-to-list 'org-latex-packages-alist '("" "listings"))
-  (add-to-list 'org-latex-packages-alist '("" "color"))
-  (add-to-list 'org-latex-packages-alist '("" "minted"))
+  (use-package org
+    ;; :init
+    ;; (org-reload)
+    :bind
+    ("C-c n" . my/narrow-or-widen-dwim)
+    :config
+    (setq org-todo-keywords '((sequence "TODO" "PROCESS" "|" "DONE" )))
+    (setq org-startup-folded (quote content))
+    (setq org-startup-indented t)
+    (setq org-hide-leading-stars t)
+    (setq org-hide-emphasis-markers t)
+    (setq org-latex-listings 'minted)
+    (setq org-latex-pdf-process
+      '("pdflatex --shell-escape --interaction nonstopmode %f"
+        "bibtex %b"
+        "pdflatex --shell-escape --interaction nonstopmode %f"
+        "pdflatex --shell-escape --interaction nonstopmode %f"))
+    (add-to-list 'org-latex-packages-alist '("" "listings"))
+    (add-to-list 'org-latex-packages-alist '("" "color"))
+    (add-to-list 'org-latex-packages-alist '("" "minted"))
 
-  (defun my/narrow-or-widen-dwim ()
-  " Toggle narrow/widen region
-    If the buffer is narrowed it widens, otherwise it narrows.
-  "
-  (interactive)
-  (cond ((buffer-narrowed-p) (widen))
-    ((region-active-p) (narrow-to-region (region-beginning) (region-end)))
-    ((equal major-mode 'org-mode) (org-narrow-to-subtree))
-    (t (error "Please select a region to narrow to")))
+    (defun my/narrow-or-widen-dwim ()
+    " Toggle narrow/widen region
+      If the buffer is narrowed it widens, otherwise it narrows.
+    "
+    (interactive)
+    (cond ((buffer-narrowed-p) (widen))
+      ((region-active-p) (narrow-to-region (region-beginning) (region-end)))
+      ((equal major-mode 'org-mode) (org-narrow-to-subtree))
+      (t (error "Please select a region to narrow to")))
+    )
   )
-)
 #+END_SRC
 
 ** Outline
@@ -791,57 +797,57 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 
 ** PDF
 #+BEGIN_SRC emacs-lisp
-(use-package pdf-tools
-  :if (string-match-p "fc"
-         (cond ((not operating-system-release) "") (t operating-system-release)))
-  :config
-  (pdf-loader-install)
-  (setq-default pdf-view-display-size 'fit-width))
+;;(use-package pdf-tools
+;;  :if (string-match-p "fc"
+;;         (cond ((not operating-system-release) "") (t operating-system-release)))
+;;  :config
+;;  (pdf-loader-install)
+;;  (setq-default pdf-view-display-size 'fit-width))
 #+END_SRC
 
 ** Latex
 
 - [[https://stackoverflow.com/questions/7587287/how-do-i-bind-latexmk-to-one-key-in-emacs-and-have-it-show-errors-if-there-are-a][Latexmk]]
 #+BEGIN_SRC emacs-lisp
-(defun run-latexmk ()
-  (interactive)
-  (let ((TeX-save-query nil)
-        (TeX-process-asynchronous nil)
-        (master-file (TeX-master-file)))
-    (TeX-save-document "")
-    (TeX-run-TeX "run-latexmk" "latexmk" master-file)
-    (if (plist-get TeX-error-report-switches (intern master-file))
-        (TeX-next-error 1 t)
-      (minibuffer-message "done"))))
+;;(defun run-latexmk ()
+;;  (interactive)
+;;  (let ((TeX-save-query nil)
+;;        (TeX-process-asynchronous nil)
+;;        (master-file (TeX-master-file)))
+;;    (TeX-save-document "")
+;;    (TeX-run-TeX "run-latexmk" "latexmk" master-file)
+;;    (if (plist-get TeX-error-report-switches (intern master-file))
+;;        (TeX-next-error 1 t)
+;;      (minibuffer-message "done"))))
 #+END_SRC
 
 - Config
 #+BEGIN_SRC emacs-lisp
-(use-package tex
-   :defer t
-   :ensure auctex
-   :mode ("\\.tex\\'" . LaTeX-mode)
-   :init
-   (setq TeX-auto-save t)
-   (setq TeX-parse-self t)
-   (setq TeX-source-correlate-start-server t)
-   (setq TeX-view-program-selection '((output-pdf "PDF Tools")))
-   (setq LaTeX-command-style '(("" "%(PDF)%(latex) --synctex=1 %S%(PDFout)")))
-   :hook
-   ((LaTeX-mode . TeX-source-correlate-mode)
-    (LaTeX-mode . outline-minor-mode)
-    (LaTeX-mode . TeX-fold-mode)
-    (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
-    (LaTeX-mode . (lambda () (define-key LaTeX-mode-map
-      (kbd "C-x C-s") (lambda () (interactive) (save-buffer) (TeX-fold-buffer))))))
-   :config
-   (add-to-list 'TeX-command-list
-     '("Latexmk" "(run-latexmk)" TeX-run-function nil t :help "Run Latexmk") t)
-   (add-to-list 'TeX-command-list
-     '("Make" "make TEXINPUTS=/usr/share/texmf/tex:$TEXINPUTS" TeX-run-compile nil t :help "Run makefile") t)
-   (setq outline-promotion-headings
-       '("\\chapter" "\\section" "\\subsection" "\\subsubsection" "\\paragraph" "\\subparagraph"))
-)
+  (use-package tex
+     :defer t
+     :ensure auctex
+     :mode ("\\.tex\\'" . LaTeX-mode)
+     :init
+     (setq TeX-auto-save t)
+     (setq TeX-parse-self t)
+     (setq TeX-source-correlate-start-server t)
+     ;; (setq TeX-view-program-selection '((output-pdf "PDF Tools")))
+     ;; (setq LaTeX-command-style '(("" "%(PDF)%(latex) --synctex=1 %S%(PDFout)")))
+     :hook
+     ((LaTeX-mode . TeX-source-correlate-mode)
+      (LaTeX-mode . outline-minor-mode)
+      (LaTeX-mode . TeX-fold-mode)
+      (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
+      (LaTeX-mode . (lambda () (define-key LaTeX-mode-map
+        (kbd "C-x C-s") (lambda () (interactive) (save-buffer) (TeX-fold-buffer))))))
+     :config
+     ;;(add-to-list 'TeX-command-list
+     ;;  '("Latexmk" "(run-latexmk)" TeX-run-function nil t :help "Run Latexmk") t)
+     ;;(add-to-list 'TeX-command-list
+     ;;  '("Make" "make TEXINPUTS=/usr/share/texmf/tex:$TEXINPUTS" TeX-run-compile nil t :help "Run makefile") t)
+     (setq outline-promotion-headings
+         '("\\chapter" "\\section" "\\subsection" "\\subsubsection" "\\paragraph" "\\subparagraph"))
+  )
 #+END_SRC
 
 ** Bibtex
@@ -859,10 +865,10 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
   :ensure t
   :config
   (require 'org-ebib)
-  (setq ebib-bib-search-dirs '("~/PhD/Biblio/"))
-  (setq ebib-preload-bib-files '("~/PhD/Biblio/Library.bib"))
-  (setq ebib-notes-use-single-file "~/PhD/Biblio/Library.org")
-  (setq ebib-file-associations '(("pdf" . "evince") ("ps" . "gv")))
+;;  (setq ebib-bib-search-dirs '("~/PhD/Biblio/"))
+;;  (setq ebib-preload-bib-files '("~/PhD/Biblio/Library.bib"))
+;;  (setq ebib-notes-use-single-file "~/PhD/Biblio/Library.org")
+;;  (setq ebib-file-associations '(("pdf" . "evince") ("ps" . "gv")))
   (setq ebib-index-window-size 15)
   (setq ebib-notes-template "** %T\n:PROPERTIES:\n%K\n:DOI: %D\n:FILE: %F\n:END:\n>|<")
   (define-key ebib-multiline-mode-map "\C-c\C-c" 'ebib-cancel-multiline-buffer)
