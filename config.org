@@ -45,9 +45,8 @@
   (add-hook 'before-save-hook 'whitespace-cleanup)     ; Delete whitespaces before saving
   (when (display-graphic-p)
    (fringe-mode 0)                                     ; Fringes
-   (menu-bar-mode t)                                   ; Menu bar
-   (tool-bar-mode -1)                                  ; Tool-bar
-   (scroll-bar-mode -1))                               ; Scroll bar
+   (tool-bar-mode -1)                                 ; Tool-bar
+   (scroll-bar-mode -1))                              ; Scroll bar
 #+END_SRC
 
 ** Keybindings
@@ -63,8 +62,8 @@
   (global-set-key (kbd "C-c u")       'upcase-dwim)
   (global-set-key (kbd "C-c l")       'downcase-dwim)
   (global-set-key (kbd "C-c a")       'align-regexp)
-  (global-set-key (kbd "<mouse-9>")   'next-buffer)
-  (global-set-key (kbd "<mouse-8>")   'previous-buffer)
+  (global-set-key (kbd "<mouse-5>")   'next-buffer)
+  (global-set-key (kbd "<mouse-4>")   'previous-buffer)
 #+END_SRC
 
 ** Packages
@@ -211,48 +210,48 @@
   (setq help-window-select t)           ; Focus new help windows when opened
   (setq window-combination-resize t)    ; Resize windows proportionally
   (setq display-buffer-alist
-        '(;; top side window
-          ("\\*\\(Flycheck\\|Package-Lint\\).*"
+        '(
+          ("\\*\\(Flycheck\\|Package-Lint\\|Backtrace\\|Warnings\\|Compile-Log\\|Messages\\)\\*"
            (display-buffer-in-side-window)
-           (window-height . 0.20)
-           (side . top)
-           (slot . 0)
-           (window-parameters . ((no-other-window . t))))
-          ("\\*\\(Backtrace\\|Warnings\\|Compile-Log\\|Messages\\)\\*"
-           (display-buffer-in-side-window)
-           (window-height . 0.20)
-           (side . top)
+           (window-height . 0.33)
+           (side . bottom)
            (slot . 1)
            (window-parameters . ((no-other-window . t))))
-          ;; bottom side window
           (".*\\*Completions.*"
            (display-buffer-in-side-window)
-           (window-height . 0.20)
+           (window-height . 0.33)
            (side . bottom)
            (slot . 0)
            (window-parameters . ((no-other-window . t))))
           (".*\\*Occur.*"
            (display-buffer-in-side-window)
-           (window-height . 0.20)
+           (window-height . 0.33)
            (side . bottom)
            (slot . 0)
            (window-parameters . ((no-other-window . t))))
           ("\\*e?shell.*"
            (display-buffer-in-side-window)
-           (window-height . 0.20)
+           (window-height . 0.33)
            (side . bottom)
-           (slot . 1))
+           (slot . 1)
+           (inhibit-same-window . nil))
+          ("\\*Python*"
+           (display-buffer-in-side-window)
+           (window-height . 0.33)
+           (side . bottom)
+           (slot . 1)
+           (inhibit-same-window . nil))
           ;; left side window
           ("\\*Help.*"
            (display-buffer-in-side-window)
-           (window-width . 0.20)       ; See the :hook
+           (window-width . 0.33)
            (side . left)
            (slot . 0)
            (window-parameters . ((no-other-window . t))))
           ;; right side window
           ("\\*Faces\\*"
            (display-buffer-in-side-window)
-           (window-width . 0.25)
+           (window-width . 0.33)
            (side . right)
            (slot . 0)
            (window-parameters . ((no-other-window . t)
@@ -260,7 +259,7 @@
                                                       mode-line-buffer-identification)))))
           ("\\*Custom.*"
            (display-buffer-in-side-window)
-           (window-width . 0.25)
+           (window-width . 0.33)
            (side . right)
            (slot . 1))))
   :config
@@ -299,159 +298,63 @@
 *** Prescient
 #+BEGIN_SRC emacs-lisp
 (use-package prescient
-  :ensure t
-  :config
-  (prescient-persist-mode +1)
-)
-#+END_SRC
-
-*** Prot
-
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package minibuffer
-  ;;   :bind (("M-v" . prot/focus-minibuffer-or-completions)
-  ;;          :map completion-list-mode-map
-  ;;          ("h" . prot/describe-symbol-at-point)
-  ;;          ("n" . next-line)
-  ;;          ("p" . previous-line)
-  ;;          ("f" . next-completion)
-  ;;          ("b" . previous-completion)
-  ;;          ("M-v" . prot/focus-minibuffer))
-  ;;   :config
-  ;;   (setq completion-cycle-threshold 3)
-  ;;   (setq completion-flex-nospace nil)
-  ;;   (setq completion-pcm-complete-word-inserts-delimiters t)
-  ;;   (setq completion-pcm-word-delimiters "-_./:| ")
-  ;;   ;; NOTE: flex completion is introduced in Emacs 27
-  ;;   (setq completion-show-help nil)
-  ;;   (setq completion-styles '(partial-completion substring initials flex))
-  ;;   (setq completion-category-overrides
-  ;;         '((file (styles initials basic))
-  ;;           (buffer (styles initials basic))
-  ;;           (info-menu (styles basic))))
-  ;;   (setq completions-format 'vertical)   ; *Completions* buffer
-  ;;   (setq enable-recursive-minibuffers t)
-  ;;   (setq read-answer-short t)
-  ;;   (setq read-buffer-completion-ignore-case t)
-  ;;   (setq read-file-name-completion-ignore-case t)
-  ;;   (setq resize-mini-windows t)
-
-  ;;   (file-name-shadow-mode 1)
-  ;;   (minibuffer-depth-indicate-mode 1)
-  ;;   (minibuffer-electric-default-mode 1)
-
-  ;;   (defun prot/focus-minibuffer ()
-  ;;   "Focus the active minibuffer.
-  ;;    Bind this to `completion-list-mode-map' to M-v to easily jump
-  ;;    between the list of candidates present in the \\*Completions\\*
-  ;;    buffer and the minibuffer (because by default M-v switches to the
-  ;;    completions if invoked from inside the minibuffer.
-  ;;   "
-  ;;   (interactive)
-  ;;   (let ((mini (active-minibuffer-window)))
-  ;;     (when mini
-  ;;       (select-window mini))))
-
-  ;;   (defun prot/focus-minibuffer-or-completions ()
-  ;;   "Focus the active minibuffer or the \\*Completions\\*.
-  ;;    If both the minibuffer and the Completions are present, this
-  ;;    command will first move per invocation to the former, then the
-  ;;    latter, and then continue to switch between the two.
-  ;;    The continuous switch is essentially the same as running
-  ;;    `prot/focus-minibuffer' and `switch-to-completions' in
-  ;;    succession.
-  ;;   "
-  ;;   (interactive)
-  ;;   (let* ((mini (active-minibuffer-window))
-  ;;           (completions (get-buffer-window "*Completions*")))
-  ;;       (cond ((and mini
-  ;;                   (not (minibufferp)))
-  ;;              (select-window mini nil))
-  ;;             ((and completions
-  ;;                   (not (eq (selected-window)
-  ;;                            completions)))
-  ;;              (select-window completions nil)))))
-  ;; )
-#+END_SRC
-
-
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package icomplete
-  ;;   :demand
-  ;;   :bind
-  ;;   (:map icomplete-minibuffer-map
-  ;;    ("<left>"  . icomplete-backward-completions)
-  ;;    ("<up>"    . icomplete-backward-completions)
-  ;;    ("<right>" . icomplete-forward-completions)
-  ;;    ("<down>"  . icomplete-forward-completions))
-  ;;   :config
-  ;;   (setq icomplete-delay-completions-threshold 0)
-  ;;   (setq icomplete-max-delay-chars 0)
-  ;;   (setq icomplete-compute-delay 0)
-  ;;   (setq icomplete-show-matches-on-no-input t)
-  ;;   (setq icomplete-hide-common-prefix nil)
-  ;;   (setq icomplete-prospects-height 1)
-  ;;   (setq icomplete-separator " Â· ")
-  ;;   (setq icomplete-with-completion-tables t)
-  ;;   (setq icomplete-in-buffer t)
-  ;;   (icomplete-mode 1)
-  ;;  )
+ :ensure t
+ :config
+ (prescient-persist-mode +1))
 #+END_SRC
 
 *** Ivy
 #+BEGIN_SRC emacs-lisp
-  (use-package ivy
-     :ensure t
-     :diminish (ivy-mode . "")
-     :config (ivy-mode)
-     :bind (("C-x b" . ivy-switch-buffer)
-            ("C-x B" . ivy-switch-buffer-other-window)
-            ("M-H"   . ivy-resume))
-     :custom
-     (ivy-re-builders-alist
-       '((t . ivy--regex-ignore-order))) ;; allow input not in order
-     (ivy-height 10)
-     (ivy-count-format "(%d/%d)")
-     (ivy-display-style 'fancy)
-     (ivy-initial-inputs-alist nil)
-     (ivy-wrap nil)
-     (ivy-use-virtual-buffers nil))
+(use-package ivy
+ :ensure t
+ :diminish (ivy-mode . "")
+ :config (ivy-mode)
+ :bind (("C-x b" . ivy-switch-buffer)
+ ("C-x B" . ivy-switch-buffer-other-window)
+ ("M-H"   . ivy-resume))
+ :custom
+ (ivy-re-builders-alist
+ '((t . ivy--regex-ignore-order))) ;; allow input not in order
+ (ivy-height 10)
+ (ivy-count-format "(%d/%d)")
+ (ivy-display-style 'fancy)
+ (ivy-initial-inputs-alist nil)
+ (ivy-wrap nil)
+ (ivy-use-virtual-buffers nil))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-  (use-package ivy-prescient
-     :ensure t
-     :after ivy
-     :config (ivy-prescient-mode)
-  )
+(use-package ivy-prescient
+ :ensure t
+ :after ivy
+ :config (ivy-prescient-mode))
 #+END_SRC
 
 *** Counsel
 #+BEGIN_SRC emacs-lisp
-  (use-package counsel
-     :ensure t
-     :after ivy
-     :diminish (counsel-mode . "")
-     :bind (("M-x"     . counsel-M-x)
-            ("C-x C-f" . counsel-find-file)
-            ("M-l"     . counsel-imenu)
-            ("C-c h"   . counsel-command-history)
-            ("C-M-s"   . counsel-git-grep))
-  )
+(use-package counsel
+ :ensure t
+ :after ivy
+ :diminish (counsel-mode . "")
+ :bind (("M-x"     . counsel-M-x)
+ ("C-x C-f" . counsel-find-file)
+ ("M-l"     . counsel-imenu)
+ ("C-c h"   . counsel-command-history)
+ ("C-M-s"   . counsel-git-grep)))
 #+END_SRC
 
 ** Search
-*** Isearch
+
 #+BEGIN_SRC emacs-lisp
   (use-package isearch
     :bind
     (("M-s M-o" . multi-occur)
-     ("M-s %" . prot/isearch-query-replace-symbol-at-point)
+     ("M-s %" . my/isearch-query-replace-symbol-at-point)
      :map minibuffer-local-isearch-map
      ("<tab>" . isearch-complete-edit)
      :map isearch-mode-map
      ("<tab>" . isearch-complete)
-     ("C-SPC" . prot/isearch-mark-and-exit))
+     ("C-SPC" . my/isearch-mark-and-exit))
     :config
     (setq search-highlight t)
     (setq search-whitespace-regexp ".*?")
@@ -459,28 +362,19 @@
     (setq isearch-regexp-lax-whitespace nil)
     (setq isearch-lazy-highlight t)
 
-    (defun prot/isearch-mark-and-exit ()
+    (defun my/isearch-mark-and-exit ()
       "Mark the current search string and exit the search."
       (interactive)
       (push-mark isearch-other-end t 'activate)
       (setq deactivate-mark nil)
       (isearch-done))
 
-    (defun prot/isearch-query-replace-symbol-at-point ()
+    (defun my/isearch-query-replace-symbol-at-point ()
       "Run `query-replace-regexp' for the symbol at point."
       (interactive)
       (isearch-forward-symbol-at-point)
       (isearch-query-replace-regexp))
   )
-#+END_SRC
-
-*** Swiper
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package swiper
-  ;;    :ensure t
-  ;;    :after ivy
-  ;;    :bind ("C-s" . swiper)
-  ;; )
 #+END_SRC
 ** Projects Management
 *** Projectile
@@ -495,7 +389,6 @@
 
 *** Speedbar
 
-- speedbar
 #+BEGIN_SRC emacs-lisp
 (use-package speedbar
    :config
@@ -503,7 +396,6 @@
          speedbar-show-unknown-files t))
 #+END_SRC
 
-- sr-speedbar
 #+BEGIN_SRC emacs-lisp
 (use-package sr-speedbar
    :ensure t
@@ -519,6 +411,7 @@
 *** Neotree
 #+BEGIN_SRC emacs-lisp
 (use-package neotree
+  :ensure t
   :commands
   (neotree-toggle my/neotree-project-dir)
   :bind
@@ -555,8 +448,10 @@
 ** Completion
 #+BEGIN_SRC emacs-lisp
 (use-package dabbrev
-  :commands (dabbrev-expand dabbrev-completion)
-  :bind ("<backtab>" . dabbrev-completion)
+  :commands
+  (dabbrev-expand dabbrev-completion)
+  :bind
+  ("<backtab>" . dabbrev-completion)
   :config
   (setq dabbrev-abbrev-char-regexp "\\sw\\|\\s_")
   (setq dabbrev-abbrev-skip-leading-regexp "\\$\\|\\*\\|/\\|=")
@@ -566,15 +461,18 @@
   (setq dabbrev-case-replace nil)
   (setq dabbrev-check-other-buffers t)
   (setq dabbrev-eliminate-newlines nil)
-  (setq dabbrev-upcase-means-case-search t)
-)
+  (setq dabbrev-upcase-means-case-search t))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
 (use-package hippie-exp
   :after dabbrev
-  ;; :hook (prog-mode . (lambda () (local-set-key (kbd "<tab>") 'hippie-expand)))
+;;  :hook
+;;  (prog-mode . (lambda () (local-set-key (kbd "<backtab>") 'hippie-expand)))
+  :bind
+  ("<C-tab>" . hippie-expand)
   :config
+  (setq hippie-expand-verbose nil)
   (setq hippie-expand-try-functions-list
         '(try-expand-dabbrev-visible
           try-expand-dabbrev
@@ -586,11 +484,7 @@
           try-expand-line
           try-complete-file-name-partially
           try-complete-file-name
-          try-expand-all-abbrevs))
-  (setq hippie-expand-verbose nil)
-)
-(add-hook 'prog-mode-hook
-     (lambda () (local-set-key (kbd "<tab>") 'hippie-expand)))
+          try-expand-all-abbrevs)))
 #+END_SRC
 
 ** Expand-Region
@@ -626,17 +520,18 @@
 
 * Shell
 ** shell-mode
+
 #+BEGIN_SRC emacs-lisp
-(use-package shell
-  :init
-  (add-hook 'shell-mode-hook
-    (lambda ()
-      (local-set-key (kbd "C-l") 'comint-clear-buffer))
-      (face-remap-set-base 'comint-highlight-prompt :inherit nil))
-  :config
-  (setq explicit-shell-file-name "C:\\Program Files\\Git\\git-bash.exe")
-  (setq explicit-bash.exe-args '("--login" "-i" "--cd-to-home"))
-)
+  (use-package shell
+    :init
+    (add-hook 'shell-mode-hook
+      (lambda ()
+        (local-set-key (kbd "C-l") 'comint-clear-buffer))
+        (face-remap-set-base 'comint-highlight-prompt :inherit nil))
+    :config
+    ;; (setq explicit-shell-file-name "C:\\Program Files\\Git\\git-bash.exe")
+    ;; (setq explicit-bash.exe-args '("--login" "-i" "--cd-to-home"))
+  )
 #+END_SRC
 
 ** eshell-mode
@@ -661,22 +556,41 @@
 
 ** Tramp
 #+BEGIN_SRC emacs-lisp
-  (use-package tramp
-   :config
-   (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
-   (setq magit-git-executable "git")
-   (setq tramp-default-method "plink")
-   (setq auto-revert-remote-files t)
-   (setq remote-file-name-inhibit-cache nil) ;; cache file-name forever
-   (setq vc-ignore-dir-regexp
-    (format "%s\\|%s"
-        vc-ignore-dir-regexp
-        tramp-file-name-regexp)))
+(use-package tramp
+:config
+(add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+(setq tramp-default-method "plinkx")
+(setq auto-revert-remote-files t)
+(setq remote-file-name-inhibit-cache nil) ;; cache file-name forever
+(setq vc-ignore-dir-regexp
+  (format "%s\\|%s"
+    vc-ignore-dir-regexp
+    tramp-file-name-regexp))
+
+;; Default tramp method is "remote": plinkx on windows, sshx otherwise
+(defconst mf/tramp-default-method
+  (if (equal window-system 'w32)
+    (cdr (assoc "plinkx" tramp-methods))
+    (cdr (assoc "sshx" tramp-methods)))
+"The default method for remote access")
+
+(add-to-list 'tramp-methods
+  (list "remote" mf/tramp-default-method))
+
+;; Remote shell is always bash
+(connection-local-set-profile-variables
+  'remote-bash
+  '((explicit-shell-file-name . "/bin/bash")
+    (explicit-bash-args . ("-i"))))
+
+(connection-local-set-profiles
+  '(:application tramp
+    :protocol "remote")
+    'remote-bash)
+)
 #+END_SRC
 
 To open a (remote) file with =sudo= follow the explanation from [[https://www.emacswiki.org/emacs/TrampMode#toc17][EmacsWiki]]:
-- =sudo= on local host: ~C-x C-f /sudo:: <TAB>~
-- With Ivy, the hydra (M-o) r opens file as root
 - Sudo on /remote/ with any /user/ when ssh/config knows /abbrev/:
   ~C-x C-f /ssh:abbrev|sudo:user@remote:/path/to/file~
 
@@ -698,11 +612,14 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 
 #+BEGIN_SRC emacs-lisp
 (use-package magit
-   :ensure t
-   :bind ("C-x g" . magit-status)
-   :config
-   (setq auto-revert-buffer-list-filter
-         'magit-auto-revert-repository-buffers-p))
+ :ensure t
+ :bind
+ ("C-x g" . magit-status)
+ :config
+ (setq magit-git-executable "git")
+ (setq auto-revert-buffer-list-filter
+       'magit-auto-revert-repository-buffers-p)
+)
 #+END_SRC
 
 * Write
@@ -806,22 +723,6 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 #+END_SRC
 
 ** Latex
-
-- [[https://stackoverflow.com/questions/7587287/how-do-i-bind-latexmk-to-one-key-in-emacs-and-have-it-show-errors-if-there-are-a][Latexmk]]
-#+BEGIN_SRC emacs-lisp
-;;(defun run-latexmk ()
-;;  (interactive)
-;;  (let ((TeX-save-query nil)
-;;        (TeX-process-asynchronous nil)
-;;        (master-file (TeX-master-file)))
-;;    (TeX-save-document "")
-;;    (TeX-run-TeX "run-latexmk" "latexmk" master-file)
-;;    (if (plist-get TeX-error-report-switches (intern master-file))
-;;        (TeX-next-error 1 t)
-;;      (minibuffer-message "done"))))
-#+END_SRC
-
-- Config
 #+BEGIN_SRC emacs-lisp
   (use-package tex
      :defer t
@@ -831,61 +732,69 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
      (setq TeX-auto-save t)
      (setq TeX-parse-self t)
      (setq TeX-source-correlate-start-server t)
-     ;; (setq TeX-view-program-selection '((output-pdf "PDF Tools")))
-     ;; (setq LaTeX-command-style '(("" "%(PDF)%(latex) --synctex=1 %S%(PDFout)")))
+     (setq LaTeX-command-style '(("" "%(PDF)%(latex) -shell-escape -synctex=1 %S%(PDFout)")))
      :hook
      ((LaTeX-mode . TeX-source-correlate-mode)
       (LaTeX-mode . outline-minor-mode)
       (LaTeX-mode . TeX-fold-mode)
-      (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
       (LaTeX-mode . (lambda () (define-key LaTeX-mode-map
-        (kbd "C-x C-s") (lambda () (interactive) (save-buffer) (TeX-fold-buffer))))))
+        (kbd "C-x C-s") (lambda () (interactive) (save-buffer) (TeX-fold-buffer)))))
+      (TeX-after-compilation-finished-functions . TeX-revert-document-buffer))
      :config
-     ;;(add-to-list 'TeX-command-list
-     ;;  '("Latexmk" "(run-latexmk)" TeX-run-function nil t :help "Run Latexmk") t)
-     ;;(add-to-list 'TeX-command-list
-     ;;  '("Make" "make TEXINPUTS=/usr/share/texmf/tex:$TEXINPUTS" TeX-run-compile nil t :help "Run makefile") t)
      (setq outline-promotion-headings
-         '("\\chapter" "\\section" "\\subsection" "\\subsubsection" "\\paragraph" "\\subparagraph"))
-  )
+         '("\\chapter" "\\section" "\\subsection" "\\subsubsection" "\\paragraph" "\\subparagraph")))
 #+END_SRC
 
 ** Bibtex
 [[http://joostkremers.github.io/ebib/][Ebib]] is a BibTeX database manager
 
-- Global keybinding
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-c e") 'ebib)
-(global-set-key (kbd "M-i") 'ebib-insert-citation)
-#+END_SRC
-
-- Config
 #+BEGIN_SRC emacs-lisp
 (use-package ebib
   :ensure t
+  :bind
+  (("C-c e" . 'ebib)
+   ("M-i"   . 'ebib-insert-citation))
   :config
-  (require 'org-ebib)
-;;  (setq ebib-bib-search-dirs '("~/PhD/Biblio/"))
-;;  (setq ebib-preload-bib-files '("~/PhD/Biblio/Library.bib"))
-;;  (setq ebib-notes-use-single-file "~/PhD/Biblio/Library.org")
-;;  (setq ebib-file-associations '(("pdf" . "evince") ("ps" . "gv")))
+  (setq ebib-bib-search-dirs '("~/PhD/Biblio/"))
+  (setq ebib-preload-bib-files '("~/PhD/Biblio/Library.bib"))
+  (setq ebib-notes-use-single-file "~/PhD/Biblio/Library.org")
+  (setq ebib-file-associations '(("pdf" . "C:\\Program Files (x86)\\SumatraPDF\\SumatraPDF.exe")))
   (setq ebib-index-window-size 15)
   (setq ebib-notes-template "** %T\n:PROPERTIES:\n%K\n:DOI: %D\n:FILE: %F\n:END:\n>|<")
   (define-key ebib-multiline-mode-map "\C-c\C-c" 'ebib-cancel-multiline-buffer)
   (remove-hook 'ebib-notes-new-note-hook 'org-narrow-to-subtree)
-  (remove-hook 'ebib-notes-open-note-after-hook 'org-narrow-to-subtree)
-)
+  (remove-hook 'ebib-notes-open-note-after-hook 'org-narrow-to-subtree))
+#+END_SRC
+
+** spell-check
+
+#+BEGIN_SRC emacs-lisp
+(use-package ispell
+  :bind
+  (("C-c w" . 'ispell-word)
+   ("C-c r" . 'ispell-region))
+  :config
+  (setq ispell-program-name "C:\\Program Files\\Hunspell\\bin\\hunspell.exe"))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(use-package flyspell
+  :init
+  (setq flyspell-use-meta-tab nil)
+  (setq flyspell-auto-correct-binding (kbd "C-#"))
+  :hook
+  (LaTeX-mode . turn-on-flyspell))
 #+END_SRC
 
 * Code
 ** VHDL
 #+BEGIN_SRC emacs-lisp
-(defun my-vhdl-mode-hook ()
-   (setq vhdl-standard (quote (08 nil)))
-   (define-key vhdl-mode-map (kbd "<backtab>") 'vhdl-align-region)
-   (define-key vhdl-mode-map " " nil))
-
-(add-hook 'vhdl-mode-hook 'my-vhdl-mode-hook)
+(use-package vhdl-mode
+:bind (:map vhdl-mode-map
+       ("M-i" . vhdl-align-region)
+       ( " "  . nil))
+:config
+(setq vhdl-standard (quote (08 nil))))
 #+END_SRC
 
 ** Verilog
@@ -919,27 +828,29 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 ** TCL
 #+BEGIN_SRC emacs-lisp
 (use-package tcl
-  :mode (("\\.tcl\\'" . tcl-mode)
-         ("\\.sdc\\'" . tcl-mode)
-         ("\\.xdc\\'" . tcl-mode)
-         ("\\.do\\'"  . tcl-mode))
-  :config
-  (setq tcl-application "tclsh")
-  (setq tcl-tab-always-indent nil)
-  :hook (inferior-tcl-mode . (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
-)
+:hook
+(inferior-tcl-mode . (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
+:mode
+(("\\.tcl\\'" . tcl-mode)
+ ("\\.sdc\\'" . tcl-mode)
+ ("\\.xdc\\'" . tcl-mode)
+ ("\\.do\\'"  . tcl-mode))
+:config
+(setq tcl-application "tclsh")
+(setq tcl-tab-always-indent nil))
 #+END_SRC
 
 ** Python
 #+BEGIN_SRC emacs-lisp
 (use-package python
-  :mode ("\\.py\\'" . python-mode)
-  :hook (inferior-python-mode . (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
+  :mode
+  ("\\.py\\'" . python-mode)
+  :hook
+  (inferior-python-mode . (lambda () (local-set-key (kbd "C-l") 'comint-clear-buffer)))
   :config
   (setq python-shell-interpreter "python3")
   (setq indent-tabs-mode nil)
-  (setq python-indent 4)
-)
+  (setq python-indent 4))
 #+END_SRC
 
 ** C
