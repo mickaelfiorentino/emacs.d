@@ -18,8 +18,8 @@
    auto-save-default nil                               ; No auto-save
    mouse-yank-at-point t                               ; Yank at point rather than pointer
    fill-column 100                                     ; Set width for automatic line breaks
-   gc-cons-threshold            50000000               ; Garbage collection size -> 50Mb
-   large-file-warning-threshold 100000000              ; File size limit warning -> 100Mb
+   gc-cons-threshold            50000000               ; Garbage collection size : 50Mb
+   large-file-warning-threshold 100000000              ; File size limit warning : 100Mb
    delete-by-moving-to-trash t                         ; Delete files to trash
    require-final-newline t                             ; May prevent some problems
    display-time-format "%H:%M"                         ; Format the time string
@@ -62,8 +62,8 @@
   (global-set-key (kbd "C-c u")       'upcase-dwim)
   (global-set-key (kbd "C-c l")       'downcase-dwim)
   (global-set-key (kbd "C-c a")       'align-regexp)
-  (global-set-key (kbd "<mouse-5>")   'next-buffer)
-  (global-set-key (kbd "<mouse-4>")   'previous-buffer)
+  ;; (global-set-key (kbd "<mouse-5>")   'next-buffer)
+  ;; (global-set-key (kbd "<mouse-4>")   'previous-buffer)
 #+END_SRC
 
 ** Packages
@@ -114,21 +114,18 @@
 #+END_SRC
 
 ** Desktops
-
-- Desktop+ allows to save/load multiple desktops
 #+BEGIN_SRC emacs-lisp
-(use-package desktop+
-  :ensure t
-  :bind
-  ("C-c d" . desktop+-load)
-  :hook
-  (after-init . (lambda () (desktop+-load "default")))
-  :config
-  (setq desktop-save t)
-  (setq desktop-buffers-not-to-save "^$")
-  (setq desktop-files-not-to-save (not desktop-buffers-not-to-save))
-  (setq desktop+-base-dir (expand-file-name "desktop/" user-emacs-directory))
-)
+  (use-package desktop+
+    :ensure t
+    :bind
+    ("C-c d" . desktop+-load)
+    :hook
+    (after-init . (lambda () (desktop+-load "default")))
+    :config
+    (setq desktop-save t)
+    (setq desktop-buffers-not-to-save "^$")
+    (setq desktop-files-not-to-save (not desktop-buffers-not-to-save))
+    (setq desktop+-base-dir (expand-file-name "desktop/" user-emacs-directory)))
 #+END_SRC
 
 - Save History
@@ -193,105 +190,106 @@
 * Navigation
 ** Windows
 #+BEGIN_SRC emacs-lisp
-(use-package window
-  :bind
-  ("C-c s" . my/toggle-window-split)
-  ("M-0"   . delete-window)
-  ("M-1"   . delete-other-windows)
-  ("M-2"   . split-window-vertically)
-  ("M-3"   . split-window-horizontally)
-  ("M-o"   . other-window)
-  ("M-O"   . other-frame)
-  ("M-k"   . kill-buffer-and-window)
-  :hook
-  ((help-mode . visual-line-mode)
-   (custom-mode . visual-line-mode))
-  :init
-  (setq help-window-select t)           ; Focus new help windows when opened
-  (setq window-combination-resize t)    ; Resize windows proportionally
-  (setq display-buffer-alist
-        '(
-          ("\\*\\(Flycheck\\|Package-Lint\\|Backtrace\\|Warnings\\|Compile-Log\\|Messages\\)\\*"
-           (display-buffer-in-side-window)
-           (window-height . 0.33)
-           (side . bottom)
-           (slot . 1)
-           (window-parameters . ((no-other-window . t))))
-          (".*\\*Completions.*"
-           (display-buffer-in-side-window)
-           (window-height . 0.33)
-           (side . bottom)
-           (slot . 0)
-           (window-parameters . ((no-other-window . t))))
-          (".*\\*Occur.*"
-           (display-buffer-in-side-window)
-           (window-height . 0.33)
-           (side . bottom)
-           (slot . 0)
-           (window-parameters . ((no-other-window . t))))
-          ("\\*e?shell.*"
-           (display-buffer-in-side-window)
-           (window-height . 0.33)
-           (side . bottom)
-           (slot . 1)
-           (inhibit-same-window . nil))
-          ("\\*Python*"
-           (display-buffer-in-side-window)
-           (window-height . 0.33)
-           (side . bottom)
-           (slot . 1)
-           (inhibit-same-window . nil))
-          ;; left side window
-          ("\\*Help.*"
-           (display-buffer-in-side-window)
-           (window-width . 0.33)
-           (side . left)
-           (slot . 0)
-           (window-parameters . ((no-other-window . t))))
-          ;; right side window
-          ("\\*Faces\\*"
-           (display-buffer-in-side-window)
-           (window-width . 0.33)
-           (side . right)
-           (slot . 0)
-           (window-parameters . ((no-other-window . t)
-                                 (mode-line-format . (" "
-                                                      mode-line-buffer-identification)))))
-          ("\\*Custom.*"
-           (display-buffer-in-side-window)
-           (window-width . 0.33)
-           (side . right)
-           (slot . 1))))
-  :config
-  (defun my/toggle-window-split ()
-  "
-  Toggle window view between horizontal and vertical modes
-  Only when the window count is equal to 2
-  "
-    (interactive)
-    (if (= (count-windows) 2)
-      (let* ((this-win-buffer (window-buffer))
-         (next-win-buffer (window-buffer (next-window)))
-         (this-win-edges (window-edges (selected-window)))
-         (next-win-edges (window-edges (next-window)))
-         (this-win-2nd (not (and (<= (car this-win-edges)
-                     (car next-win-edges))
-                     (<= (cadr this-win-edges)
-                     (cadr next-win-edges)))))
-         (splitter
-          (if (= (car this-win-edges)
-             (car (window-edges (next-window))))
-          'split-window-horizontally
-        'split-window-vertically)))
-    (delete-other-windows)
-    (let ((first-win (selected-window)))
-      (funcall splitter)
-      (if this-win-2nd (other-window 1))
-      (set-window-buffer (selected-window) this-win-buffer)
-      (set-window-buffer (next-window) next-win-buffer)
-      (select-window first-win)
-      (if this-win-2nd (other-window 1)))))
-  )
+  (use-package window
+    :bind
+    ("C-c s" . my/toggle-window-split)
+    ("M-0"   . delete-window)
+    ("M-1"   . delete-other-windows)
+    ("M-2"   . split-window-vertically)
+    ("M-3"   . split-window-horizontally)
+    ("M-o"   . other-window)
+    ("M-O"   . other-frame)
+    ("M-k"   . kill-buffer-and-window)
+    :hook
+    ((help-mode . visual-line-mode)
+     (custom-mode . visual-line-mode))
+    :init
+    (setq help-window-select t)           ; Focus new help windows when opened
+    (setq window-combination-resize t)    ; Resize windows proportionally
+    (setq display-buffer-alist
+          '(
+            ("\\*\\(Flycheck\\|Package-Lint\\|Backtrace\\|Warnings\\|Compile-Log\\|Messages\\)\\*"
+             (display-buffer-in-side-window)
+             (window-height . 0.33)
+             (side . bottom)
+             (slot . 1)
+             (window-parameters . ((no-other-window . t))))
+            (".*\\*Completions.*"
+             (display-buffer-in-side-window)
+             (window-height . 0.33)
+             (side . bottom)
+             (slot . 0)
+             (window-parameters . ((no-other-window . t))))
+            (".*\\*Occur.*"
+             (display-buffer-in-side-window)
+             (window-height . 0.33)
+             (side . bottom)
+             (slot . 0)
+             (window-parameters . ((no-other-window . t))))
+            ("\\*e?shell.*"
+             (display-buffer-in-side-window)
+             (window-height . 0.33)
+             (side . bottom)
+             (slot . 1)
+             (inhibit-same-window . nil))
+            ("\\*Python*"
+             (display-buffer-in-side-window)
+             (window-height . 0.33)
+             (side . bottom)
+             (slot . 1)
+             (inhibit-same-window . nil))
+            ;; left side window
+            ("\\*Help.*"
+             (display-buffer-in-side-window)
+             (window-width . 0.33)
+             (side . left)
+             (slot . 0)
+             (window-parameters . ((no-other-window . t))))
+            ;; right side window
+            ("\\*Faces\\*"
+             (display-buffer-in-side-window)
+             (window-width . 0.33)
+             (side . right)
+             (slot . 0)
+             (window-parameters . ((no-other-window . t)
+                                   (mode-line-format . (" "
+                                                        mode-line-buffer-identification)))))
+            ("\\*Custom.*"
+             (display-buffer-in-side-window)
+             (window-width . 0.33)
+             (side . right)
+             (slot . 1))))
+    :config
+    (defun my/toggle-window-split ()
+    "
+    Toggle window view between horizontal and vertical modes
+    Only when the window count is equal to 2
+    ")
+    ;;   (interactive)
+    ;;   (if (= (count-windows) 2)
+    ;;     (let* ((this-win-buffer (window-buffer))
+    ;;        (next-win-buffer (window-buffer (next-window)))
+    ;;        (this-win-edges (window-edges (selected-window)))
+    ;;        (next-win-edges (window-edges (next-window)))
+    ;;        (this-win-2nd (not (and (<= (car this-win-edges)
+    ;;                    (car next-win-edges))
+    ;;                    (<= (cadr this-win-edges)
+    ;;                    (cadr next-win-edges)))))
+    ;;        (splitter
+    ;;         (if (= (car this-win-edges)
+    ;;            (car (window-edges (next-window))))
+    ;;         'split-window-horizontally
+    ;;       'split-window-vertically)))
+    ;;   (delete-other-windows)
+    ;;   (let ((first-win (selected-window)))
+    ;;     (funcall splitter)
+    ;;     (if this-win-2nd (other-window 1))
+    ;;     (set-window-buffer (selected-window) this-win-buffer)
+    ;;     (set-window-buffer (next-window) next-win-buffer)
+    ;;     (select-window first-win)
+    ;;     (if this-win-2nd (other-window 1)))))
+    ;;)
+    ;;)
 )
 #+END_SRC
 ** Minibuffer
@@ -520,18 +518,14 @@
 
 * Shell
 ** shell-mode
-
 #+BEGIN_SRC emacs-lisp
-  (use-package shell
-    :init
-    (add-hook 'shell-mode-hook
-      (lambda ()
-        (local-set-key (kbd "C-l") 'comint-clear-buffer))
-        (face-remap-set-base 'comint-highlight-prompt :inherit nil))
-    :config
-    ;; (setq explicit-shell-file-name "C:\\Program Files\\Git\\git-bash.exe")
-    ;; (setq explicit-bash.exe-args '("--login" "-i" "--cd-to-home"))
-  )
+(use-package shell
+:init
+ (add-hook 'shell-mode-hook
+  (lambda ()
+   (local-set-key (kbd "C-l") 'comint-clear-buffer)
+   (face-remap-set-base 'comint-highlight-prompt :inherit nil)))
+)
 #+END_SRC
 
 ** eshell-mode
@@ -595,8 +589,6 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
   ~C-x C-f /ssh:abbrev|sudo:user@remote:/path/to/file~
 
 ** Dired
-- Map ~<~ to "previous" & ~RET~ to "Enter Directory"
-- Do not open a new buffer each time
 #+BEGIN_SRC emacs-lisp
   (use-package dired
    :config
@@ -749,21 +741,24 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
 [[http://joostkremers.github.io/ebib/][Ebib]] is a BibTeX database manager
 
 #+BEGIN_SRC emacs-lisp
-(use-package ebib
-  :ensure t
-  :bind
-  (("C-c e" . 'ebib)
-   ("M-i"   . 'ebib-insert-citation))
-  :config
-  (setq ebib-bib-search-dirs '("~/PhD/Biblio/"))
-  (setq ebib-preload-bib-files '("~/PhD/Biblio/Library.bib"))
-  (setq ebib-notes-use-single-file "~/PhD/Biblio/Library.org")
-  (setq ebib-file-associations '(("pdf" . "C:\\Program Files (x86)\\SumatraPDF\\SumatraPDF.exe")))
-  (setq ebib-index-window-size 15)
-  (setq ebib-notes-template "** %T\n:PROPERTIES:\n%K\n:DOI: %D\n:FILE: %F\n:END:\n>|<")
-  (define-key ebib-multiline-mode-map "\C-c\C-c" 'ebib-cancel-multiline-buffer)
-  (remove-hook 'ebib-notes-new-note-hook 'org-narrow-to-subtree)
-  (remove-hook 'ebib-notes-open-note-after-hook 'org-narrow-to-subtree))
+  (use-package ebib
+    :ensure t
+    :bind
+    (("C-c e" . 'ebib)
+     ("M-i"   . 'ebib-insert-citation)
+    :map ebib-multiline-mode-map
+     ("C-c C-c" . 'ebib-cancel-multiline-buffer))
+    :config
+    (setq ebib-bib-search-dirs '("~/PhD/Biblio/"))
+    (setq ebib-preload-bib-files '("~/PhD/Biblio/Library.bib"))
+    (setq ebib-notes-use-single-file "~/PhD/Biblio/Library.org")
+    (setq ebib-index-window-size 15)
+    (setq ebib-notes-template "** %T\n:PROPERTIES:\n%K\n:DOI: %D\n:FILE: %F\n:END:\n>|<")
+    (if (equal window-system 'w32)
+      (setq ebib-file-associations '(("pdf" . "C:\\Program Files (x86)\\SumatraPDF\\SumatraPDF.exe")))
+      (setq ebib-file-associations '(("pdf" . "evince"))))
+    (remove-hook 'ebib-notes-new-note-hook 'org-narrow-to-subtree)
+    (remove-hook 'ebib-notes-open-note-after-hook 'org-narrow-to-subtree))
 #+END_SRC
 
 ** spell-check
@@ -774,7 +769,8 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
   (("C-c w" . 'ispell-word)
    ("C-c r" . 'ispell-region))
   :config
-  (setq ispell-program-name "C:\\Program Files\\Hunspell\\bin\\hunspell.exe"))
+  (when (equal window-system 'w32)
+    (setq ispell-program-name "C:\\Program Files\\Hunspell\\bin\\hunspell.exe")))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
