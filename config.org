@@ -308,8 +308,9 @@
  :diminish (ivy-mode . "")
  :config (ivy-mode)
  :bind (("C-x b" . ivy-switch-buffer)
- ("C-x B" . ivy-switch-buffer-other-window)
- ("M-H"   . ivy-resume))
+        ("C-="   . ivy-switch-buffer)
+        ("C-x B" . ivy-switch-buffer-other-window)
+        ("M-H"   . ivy-resume))
  :custom
  (ivy-re-builders-alist
  '((t . ivy--regex-ignore-order))) ;; allow input not in order
