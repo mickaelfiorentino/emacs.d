@@ -173,7 +173,7 @@
 - Global theme
 #+BEGIN_SRC emacs-lisp
 (when (display-graphic-p)
-   (load-theme 'modus-operandi t))
+  (load-theme 'modus-operandi t))
 #+END_SRC
 
 - Smart-mode-line
@@ -446,44 +446,65 @@
 
 ** Completion
 #+BEGIN_SRC emacs-lisp
-(use-package dabbrev
-  :commands
-  (dabbrev-expand dabbrev-completion)
-  :bind
-  ("<backtab>" . dabbrev-completion)
+(use-package auto-complete
+  :bind   ("<C-tab>" . auto-complete)
   :config
-  (setq dabbrev-abbrev-char-regexp "\\sw\\|\\s_")
-  (setq dabbrev-abbrev-skip-leading-regexp "\\$\\|\\*\\|/\\|=")
-  (setq dabbrev-backward-only t)
-  (setq dabbrev-case-distinction nil)
-  (setq dabbrev-case-fold-search t)
-  (setq dabbrev-case-replace nil)
-  (setq dabbrev-check-other-buffers t)
-  (setq dabbrev-eliminate-newlines nil)
-  (setq dabbrev-upcase-means-case-search t))
+  (require 'auto-complete-config)
+  (ac-config-default)
+  (global-auto-complete-mode t)
+  (setq ac-auto-show-menu t)
+  (setq ac-menu-height 20)
+  (setq ac-dwim t)
+  (setq ac-auto-start t)
+  (setq ac-auto-show-menu 0.8)
+  (setq ac-use-comphist t)
+  (setq ac-candidate-limit nil)
+  (setq ac-use-menu-map t)
+  (define-key ac-menu-map (kbd "M-n") 'ac-next)
+  (define-key ac-menu-map (kbd "M-p") 'ac-previous)
+  (define-key ac-completing-map (kbd "M-h") 'ac-quick-help)
+)
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-(use-package hippie-exp
-  :after dabbrev
-;;  :hook
-;;  (prog-mode . (lambda () (local-set-key (kbd "<backtab>") 'hippie-expand)))
-  :bind
-  ("<C-tab>" . hippie-expand)
-  :config
-  (setq hippie-expand-verbose nil)
-  (setq hippie-expand-try-functions-list
-        '(try-expand-dabbrev-visible
-          try-expand-dabbrev
-          try-expand-dabbrev-all-buffers
-          try-expand-dabbrev-from-kill
-          try-expand-list-all-buffers
-          try-expand-list
-          try-expand-line-all-buffers
-          try-expand-line
-          try-complete-file-name-partially
-          try-complete-file-name
-          try-expand-all-abbrevs)))
+  ;; (use-package dabbrev
+  ;;   :commands
+  ;;   (dabbrev-expand dabbrev-completion)
+  ;;   :bind
+  ;;   ("<backtab>" . dabbrev-completion)
+  ;;   :config
+  ;;   (setq dabbrev-abbrev-char-regexp "\\sw\\|\\s_")
+  ;;   (setq dabbrev-abbrev-skip-leading-regexp "\\$\\|\\*\\|/\\|=")
+  ;;   (setq dabbrev-backward-only t)
+  ;;   (setq dabbrev-case-distinction nil)
+  ;;   (setq dabbrev-case-fold-search t)
+  ;;   (setq dabbrev-case-replace nil)
+  ;;   (setq dabbrev-check-other-buffers t)
+  ;;   (setq dabbrev-eliminate-newlines nil)
+  ;;   (setq dabbrev-upcase-means-case-search t))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package hippie-exp
+  ;;   :after dabbrev
+  ;; ;;  :hook
+  ;; ;;  (prog-mode . (lambda () (local-set-key (kbd "<backtab>") 'hippie-expand)))
+  ;;   :bind
+  ;;   ("<C-tab>" . hippie-expand)
+  ;;   :config
+  ;;   (setq hippie-expand-verbose nil)
+  ;;   (setq hippie-expand-try-functions-list
+  ;;         '(try-expand-dabbrev-visible
+  ;;           try-expand-dabbrev
+  ;;           try-expand-dabbrev-all-buffers
+  ;;           try-expand-dabbrev-from-kill
+  ;;           try-expand-list-all-buffers
+  ;;           try-expand-list
+  ;;           try-expand-line-all-buffers
+  ;;           try-expand-line
+  ;;           try-complete-file-name-partially
+  ;;           try-complete-file-name
+  ;;           try-expand-all-abbrevs)))
 #+END_SRC
 
 ** Expand-Region
@@ -506,8 +527,8 @@
    (setq yas-wrap-around-region t)
    (add-to-list #'yas-snippet-dirs "~/.emacs.d/emacs.d/yasnippets")
    :init
-   ;;(yas-reload-all)
-   (yas-global-mode)
+   ;; (yas-global-mode)
+   (add-hook 'prog-mode-hook #'yas-minor-mode)
 )
 #+END_SRC
 
@@ -624,6 +645,7 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
     :bind
     ("C-c n" . my/narrow-or-widen-dwim)
     :config
+    (setq org-src-fontify-natively t)
     (setq org-todo-keywords '((sequence "TODO" "PROCESS" "|" "DONE" )))
     (setq org-startup-folded (quote content))
     (setq org-startup-indented t)
@@ -722,6 +744,7 @@ To open a (remote) file with =sudo= follow the explanation from [[https://www.em
      :ensure auctex
      :mode ("\\.tex\\'" . LaTeX-mode)
      :init
+     (setq yas-minor-mode nil)
      (setq TeX-auto-save t)
      (setq TeX-parse-self t)
      (setq TeX-source-correlate-start-server t)
