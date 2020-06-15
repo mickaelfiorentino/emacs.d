@@ -34,7 +34,7 @@
    x-stretch-cursor t)                                 ; Stretch cursor to the glyph width
   (column-number-mode t)                               ; Column number next to line number
   (global-subword-mode t)                              ; Iterate through CamelCase words
-  (delete-selection-mode t)                            ; Replace region when inserting text
+  (delete-selection-mode nil)                          ; Replace region when inserting text
   (global-auto-revert-mode t)                          ; Automatically revert buffer from file
   (display-time-mode t)                                ; Enable time in the mode-line
   (show-paren-mode t)                                  ; Show matching parenthesis
@@ -452,11 +452,11 @@
   (require 'auto-complete-config)
   (ac-config-default)
   (global-auto-complete-mode t)
+  (setq ac-auto-start nil)
   (setq ac-auto-show-menu t)
+  (setq ac-auto-show-menu 0.8)
   (setq ac-menu-height 20)
   (setq ac-dwim t)
-  (setq ac-auto-start t)
-  (setq ac-auto-show-menu 0.8)
   (setq ac-use-comphist t)
   (setq ac-candidate-limit nil)
   (setq ac-use-menu-map t)
