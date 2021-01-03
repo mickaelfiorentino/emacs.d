@@ -98,11 +98,10 @@
 - Allow access from emacsclient
 #+BEGIN_SRC emacs-lisp
 (use-package server
+  :if window-system
   :config
-
   (unless (server-running-p)
     (server-start))
-
   (when (equal window-system 'w32)
     (setq server-use-tcp t))
 )
@@ -172,125 +171,94 @@
 ** Themes
 - Global theme
 #+BEGIN_SRC emacs-lisp
-(when (display-graphic-p)
-  (load-theme 'modus-operandi t))
+(when (or (display-graphic-p) (>= (tty-display-color-cells) 256))
+  (load-theme 'tsdh-dark t))
 #+END_SRC
 
 - Smart-mode-line
 #+BEGIN_SRC emacs-lisp
-(when (display-graphic-p)
-   (use-package smart-mode-line
-    :ensure t
-    :config
-     (setq sml/no-confirm-load-theme t)
-     (setq sml/theme 'respectful) ;; automatic light my-light dark respectful
-    :hook (after-init . sml/setup)))
+(use-package smart-mode-line
+:if window-system
+:ensure t
+:config
+(setq sml/no-confirm-load-theme t)
+(setq sml/theme 'respectful) ;; automatic light my-light dark respectful
+:hook (after-init . sml/setup))
 #+END_SRC
 
 * Navigation
 ** Windows
 #+BEGIN_SRC emacs-lisp
-  (use-package window
-    :bind
-    ("C-c s" . my/toggle-window-split)
-    ("M-0"   . delete-window)
-    ("M-1"   . delete-other-windows)
-    ("M-2"   . split-window-vertically)
-    ("M-3"   . split-window-horizontally)
-    ("M-o"   . other-window)
-    ("M-O"   . other-frame)
-    ("M-k"   . kill-buffer-and-window)
-    :hook
-    ((help-mode . visual-line-mode)
-     (custom-mode . visual-line-mode))
-    :init
-    (setq help-window-select t)           ; Focus new help windows when opened
-    (setq window-combination-resize t)    ; Resize windows proportionally
-    (setq display-buffer-alist
-          '(
-            ("\\*\\(Flycheck\\|Package-Lint\\|Backtrace\\|Warnings\\|Compile-Log\\|Messages\\)\\*"
-             (display-buffer-in-side-window)
-             (window-height . 0.33)
-             (side . bottom)
-             (slot . 1)
-             (window-parameters . ((no-other-window . t))))
-            (".*\\*Completions.*"
-             (display-buffer-in-side-window)
-             (window-height . 0.33)
-             (side . bottom)
-             (slot . 0)
-             (window-parameters . ((no-other-window . t))))
-            (".*\\*Occur.*"
-             (display-buffer-in-side-window)
-             (window-height . 0.33)
-             (side . bottom)
-             (slot . 0)
-             (window-parameters . ((no-other-window . t))))
-            ("\\*e?shell.*"
-             (display-buffer-in-side-window)
-             (window-height . 0.33)
-             (side . bottom)
-             (slot . 1)
-             (inhibit-same-window . nil))
-            ("\\*Python*"
-             (display-buffer-in-side-window)
-             (window-height . 0.33)
-             (side . bottom)
-             (slot . 1)
-             (inhibit-same-window . nil))
-            ;; left side window
-            ("\\*Help.*"
-             (display-buffer-in-side-window)
-             (window-width . 0.33)
-             (side . left)
-             (slot . 0)
-             (window-parameters . ((no-other-window . t))))
-            ;; right side window
-            ("\\*Faces\\*"
-             (display-buffer-in-side-window)
-             (window-width . 0.33)
-             (side . right)
-             (slot . 0)
-             (window-parameters . ((no-other-window . t)
-                                   (mode-line-format . (" "
-                                                        mode-line-buffer-identification)))))
-            ("\\*Custom.*"
-             (display-buffer-in-side-window)
-             (window-width . 0.33)
-             (side . right)
-             (slot . 1))))
-    :config
-    (defun my/toggle-window-split ()
-    "
-    Toggle window view between horizontal and vertical modes
-    Only when the window count is equal to 2
-    ")
-    ;;   (interactive)
-    ;;   (if (= (count-windows) 2)
-    ;;     (let* ((this-win-buffer (window-buffer))
-    ;;        (next-win-buffer (window-buffer (next-window)))
-    ;;        (this-win-edges (window-edges (selected-window)))
-    ;;        (next-win-edges (window-edges (next-window)))
-    ;;        (this-win-2nd (not (and (<= (car this-win-edges)
-    ;;                    (car next-win-edges))
-    ;;                    (<= (cadr this-win-edges)
-    ;;                    (cadr next-win-edges)))))
-    ;;        (splitter
-    ;;         (if (= (car this-win-edges)
-    ;;            (car (window-edges (next-window))))
-    ;;         'split-window-horizontally
-    ;;       'split-window-vertically)))
-    ;;   (delete-other-windows)
-    ;;   (let ((first-win (selected-window)))
-    ;;     (funcall splitter)
-    ;;     (if this-win-2nd (other-window 1))
-    ;;     (set-window-buffer (selected-window) this-win-buffer)
-    ;;     (set-window-buffer (next-window) next-win-buffer)
-    ;;     (select-window first-win)
-    ;;     (if this-win-2nd (other-window 1)))))
-    ;;)
-    ;;)
-)
+    (use-package window
+      :if window-system
+      :bind
+      ("M-0"   . delete-window)
+      ("M-1"   . delete-other-windows)
+      ("M-2"   . split-window-vertically)
+      ("M-3"   . split-window-horizontally)
+      ("M-o"   . other-window)
+      ("M-O"   . other-frame)
+      ("M-k"   . kill-buffer-and-window)
+      :hook
+      ((help-mode . visual-line-mode)
+       (custom-mode . visual-line-mode))
+      :init
+      (setq help-window-select t)           ; Focus new help windows when opened
+      (setq window-combination-resize t)    ; Resize windows proportionally
+      (setq display-buffer-alist
+            '(
+              ("\\*\\(Flycheck\\|Package-Lint\\|Backtrace\\|Warnings\\|Compile-Log\\|Messages\\)\\*"
+               (display-buffer-in-side-window)
+               (window-height . 0.33)
+               (side . bottom)
+               (slot . 1)
+               (window-parameters . ((no-other-window . t))))
+              (".*\\*Completions.*"
+               (display-buffer-in-side-window)
+               (window-height . 0.33)
+               (side . bottom)
+               (slot . 0)
+               (window-parameters . ((no-other-window . t))))
+              (".*\\*Occur.*"
+               (display-buffer-in-side-window)
+               (window-height . 0.33)
+               (side . bottom)
+               (slot . 0)
+               (window-parameters . ((no-other-window . t))))
+              ("\\*e?shell.*"
+               (display-buffer-in-side-window)
+               (window-height . 0.33)
+               (side . bottom)
+               (slot . 1)
+               (inhibit-same-window . nil))
+              ("\\*Python*"
+               (display-buffer-in-side-window)
+               (window-height . 0.33)
+               (side . bottom)
+               (slot . 1)
+               (inhibit-same-window . nil))
+              ;; left side window
+              ("\\*Help.*"
+               (display-buffer-in-side-window)
+               (window-width . 0.33)
+               (side . left)
+               (slot . 0)
+               (window-parameters . ((no-other-window . t))))
+              ;; right side window
+              ("\\*Faces\\*"
+               (display-buffer-in-side-window)
+               (window-width . 0.33)
+               (side . right)
+               (slot . 0)
+               (window-parameters . ((no-other-window . t)
+                                     (mode-line-format . (" "
+                     mode-line-buffer-identification)))))
+              ("\\*Custom.*"
+               (display-buffer-in-side-window)
+               (window-width . 0.33)
+               (side . right)
+               (slot . 1))))
+  )
 #+END_SRC
 ** Minibuffer
 *** Prescient
@@ -435,13 +403,15 @@
           (message "Could not find git project root."))))
   )
 #+END_SRC
+
 * Edit
 ** Multiple Cursors
 #+BEGIN_SRC emacs-lisp
 (use-package multiple-cursors
   :ensure t
-  :bind (("C->" . mc/mark-next-like-this)
-         ("C-<" . mc/mark-previous-like-this)))
+  :bind (("C-x w" . mc/edit-lines)
+         ("C-M-<down>" . mc/mark-next-like-this)
+         ("C-M-<up>" . mc/mark-previous-like-this)))
 #+END_SRC
 
 ** Completion
