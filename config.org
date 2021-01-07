@@ -45,8 +45,9 @@
   (add-hook 'before-save-hook 'whitespace-cleanup)     ; Delete whitespaces before saving
   (when (display-graphic-p)
    (fringe-mode 0)                                     ; Fringes
-   (tool-bar-mode -1)                                 ; Tool-bar
-   (scroll-bar-mode -1))                              ; Scroll bar
+   (tool-bar-mode -1)                                  ; Tool-bar
+   (menu-bar-mode -1)                                  ; Menu-bar
+   (scroll-bar-mode -1))                               ; Scroll bar
 #+END_SRC
 
 ** Keybindings
@@ -98,7 +99,6 @@
 - Allow access from emacsclient
 #+BEGIN_SRC emacs-lisp
 (use-package server
-  :if window-system
   :config
   (unless (server-running-p)
     (server-start))
@@ -171,8 +171,10 @@
 ** Themes
 - Global theme
 #+BEGIN_SRC emacs-lisp
-(when (or (display-graphic-p) (>= (tty-display-color-cells) 256))
-  (load-theme 'tsdh-dark t))
+  (use-package modus-vivendi-theme
+    :if (or (display-graphic-p) (>= (tty-display-color-cells) 256))
+    :config
+    (load-theme 'modus-vivendi t t))
 #+END_SRC
 
 - Smart-mode-line
