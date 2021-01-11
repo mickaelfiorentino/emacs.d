@@ -43,6 +43,7 @@
   (fset 'yes-or-no-p 'y-or-n-p)                        ; Replace yes/no prompts with y/n
   (add-hook 'text-mode-hook 'turn-on-visual-line-mode) ; Wrap text at end-of-line in text-mode
   (add-hook 'before-save-hook 'whitespace-cleanup)     ; Delete whitespaces before saving
+  (setq auto-window-vscroll nil)                       ; Avoid lag
   (when (display-graphic-p)
    (fringe-mode 0)                                     ; Fringes
    (tool-bar-mode -1)                                 ; Tool-bar
